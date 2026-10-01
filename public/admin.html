@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKG Pro Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: #f8fafc; }
+        .sidebar-btn { padding: 12px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .sidebar-btn:hover { background-color: #1e293b; }
+        .sidebar-btn.active { background-color: #3b82f6; color: white; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Admin Login -->
+    <div id="adminLogin" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900">
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-96 text-center border border-gray-700">
+            <h1 class="text-3xl font-black mb-2 text-white">BKG Admin Pro</h1>
+            <p class="text-gray-400 mb-6">Enter master password to continue</p>
+            <input type="password" id="adminPwd" placeholder="Password" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl mb-4 font-bold text-white focus:border-blue-500 outline-none text-center">
+            <button onclick="loginAdmin()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-500 transition-colors">ACCESS DASHBOARD</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="adminDashboard" class="hidden flex h-screen">
+        
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
+            <div class="p-6 text-center border-b border-gray-800 mb-4">
+                <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">BKG SYSTEM</h2>
+            </div>
+            <div class="flex-1 px-4 overflow-y-auto">
+                <div class="sidebar-btn active" onclick="switchTab('tab-dash', this)"><i class="fa-solid fa-chart-pie w-5"></i> Overview</div>
+                <div class="sidebar-btn" onclick="switchTab('tab-game', this)"><i class="fa-solid fa-gamepad w-5"></i> Game Control</div>
+                <div class="sidebar-btn" onclick="switchTab('tab-users', this)"><i class="fa-solid fa-users w-5"></i> User Manager</div>
+                <div class="sidebar-btn" onclick="switchTab('tab-tx', this)"><i class="fa-solid fa-money-bill-transfer w-5 relative"><span id="txBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span></i> Transactions</div>
+            </div>
+            <div class="p-4 border-t border-gray-800">
+                <button onclick="location.reload()" class="w-full bg-red-500/20 text-red-500 border border-red-500/50 py-3 rounded-lg font-bold hover:bg-red-500 hover:text-white transition-colors">
+                    <i class="fa-solid fa-power-off mr-2"></i> System Exit
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 bg-[#0f172a] overflow-y-auto p-8">
+            
+            <!-- OVERVIEW TAB -->
+            <div id="tab-dash" class="view-section active">
+                <h2 class="text-2xl font-bold mb-6">Global Statistics</h2>
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
+                        <p class="text-gray-400 text-sm font-bold mb-1">Total Users</p>
+                        <h3 class="text-3xl font-black text-white" id="statUsers">0</h3>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
+                        <p class="text-gray-400 text-sm font-bold mb-1">Active Deposits</p>
+                        <h3 class="text-3xl font-black text-green-400" id="statDep">₹0</h3>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
+                        <p class="text-gray-400 text-sm font-bold mb-1">Active Withdrawals</p>
+                        <h3 class="text-3xl font-black text-red-400" id="statWith">₹0</h3>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
+                        <p class="text-gray-400 text-sm font-bold mb-1">Total Profit (Est.)</p>
+                        <h3 class="text-3xl font-black text-blue-400" id="statProfit">₹0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME CONTROL TAB -->
+            <div id="tab-game" class="view-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold flex items-center"><i class="fa-solid fa-tower-broadcast text-red-500 animate-pulse mr-3"></i> Live Game Control Hub</h2>
+                    <div class="flex gap-2 bg-gray-900 p-1 rounded-lg border border-gray-700">
+                        <button onclick="adminSwitchRoom('45s')" id="adminBtn-45s" class="px-4 py-2 rounded-md font-bold text-sm bg-theme-gold text-black">45s</button>
+                        <button onclick="adminSwitchRoom('1m')" id="adminBtn-1m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">1 Min</button>
+                        <button onclick="adminSwitchRoom('3m')" id="adminBtn-3m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">3 Min</button>
+                        <button onclick="adminSwitchRoom('5m')" id="adminBtn-5m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">5 Min</button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Left: Live Monitor -->
+                    <div class="col-span-2 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden flex flex-col h-[750px]">
+                        <div class="p-4 bg-gray-900 border-b border-gray-700 flex justify-between items-center">
+                            <span class="font-bold text-lg" id="adminGameTitle">Win Go : 45s</span>
+                            <span class="font-mono bg-blue-500/20 text-blue-400 px-3 py-1 rounded border border-blue-500/30" id="livePeriod">Period: Loading...</span>
+                            <span class="font-mono text-2xl font-black text-red-500" id="liveTimer">00:00</span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4" id="liveBetsLog">
+                            <div class="text-center text-gray-500 mt-10 text-sm">Waiting for live bets...</div>
+                        </div>
+                        <div class="p-3 bg-gray-900 border-t border-gray-700 flex flex-col gap-2 text-center text-xs">
+                            <!-- COLORS -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="bg-red-500/10 p-2 rounded-lg border border-red-500/30"><div class="text-red-500 font-bold">RED</div><div class="text-lg font-black text-white" id="liveTotalRed">₹0</div></div>
+                                <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/30"><div class="text-purple-500 font-bold">VIOLET</div><div class="text-lg font-black text-white" id="liveTotalViolet">₹0</div></div>
+                                <div class="bg-green-500/10 p-2 rounded-lg border border-green-500/30"><div class="text-green-500 font-bold">GREEN</div><div class="text-lg font-black text-white" id="liveTotalGreen">₹0</div></div>
+                            </div>
+                            <!-- SIZES -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-yellow-500/10 p-2 rounded-lg border border-yellow-500/30"><div class="text-yellow-500 font-bold">BIG</div><div class="text-lg font-black text-white" id="liveTotalBig">₹0</div></div>
+                                <div class="bg-blue-500/10 p-2 rounded-lg border border-blue-500/30"><div class="text-blue-500 font-bold">SMALL</div><div class="text-lg font-black text-white" id="liveTotalSmall">₹0</div></div>
+                            </div>
+                            <!-- NUMBERS -->
+                            <div class="grid grid-cols-5 gap-1">
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">0</div><div class="font-black text-white" id="liveTotalN0">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">1</div><div class="font-black text-white" id="liveTotalN1">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">2</div><div class="font-black text-white" id="liveTotalN2">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">3</div><div class="font-black text-white" id="liveTotalN3">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">4</div><div class="font-black text-white" id="liveTotalN4">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">5</div><div class="font-black text-white" id="liveTotalN5">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">6</div><div class="font-black text-white" id="liveTotalN6">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">7</div><div class="font-black text-white" id="liveTotalN7">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">8</div><div class="font-black text-white" id="liveTotalN8">₹0</div></div>
+                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">9</div><div class="font-black text-white" id="liveTotalN9">₹0</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Manual Override -->
+                    <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg p-6 flex flex-col">
+                        <h3 class="font-black text-xl mb-4 text-white">Manual Outcome Overider</h3>
+                        <p class="text-sm text-gray-400 mb-6">Select a number below to FORCE the outcome for the current period. Once selected, it cannot be changed.</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <button onclick="forceWingo(0)" class="bg-red-500 text-white font-black py-4 rounded-xl shadow border-b-4 border-red-700 active:translate-y-1 active:border-b-0">0 (Red/V)</button>
+                            <button onclick="forceWingo(5)" class="bg-green-500 text-white font-black py-4 rounded-xl shadow border-b-4 border-green-700 active:translate-y-1 active:border-b-0">5 (Green/V)</button>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 gap-2 mb-6">
+                            <button onclick="forceWingo(2)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">2</button>
+                            <button onclick="forceWingo(4)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">4</button>
+                            <button onclick="forceWingo(6)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">6</button>
+                            <button onclick="forceWingo(8)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">8</button>
+                            <button onclick="forceWingo(1)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">1</button>
+                            <button onclick="forceWingo(3)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">3</button>
+                            <button onclick="forceWingo(7)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">7</button>
+                            <button onclick="forceWingo(9)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">9</button>
+                        </div>
+
+                        <div class="mt-auto bg-gray-900 border border-gray-700 p-4 rounded-xl text-center">
+                            <p class="text-xs text-gray-500 mb-1">QUEUED OUTCOME FOR CURRENT PERIOD</p>
+                            <p class="text-4xl font-black text-yellow-400" id="queuedOutcome">NONE</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS TAB -->
+            <div id="tab-users" class="view-section">
+                <h2 class="text-2xl font-bold mb-6">User Manager</h2>
+                <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-900">
+                            <tr>
+                                <th class="p-4 text-gray-400 font-bold text-sm">UID / Mobile</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Balance</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Total Dep / Wd</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Invites / VIP</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TRANSACTIONS TAB -->
+            <div id="tab-tx" class="view-section">
+                <h2 class="text-2xl font-bold mb-6">Pending Transactions</h2>
+                <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-900">
+                            <tr>
+                                <th class="p-4 text-gray-400 font-bold text-sm">User Details</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Date & Time</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Type</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Amount</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm">Payment Details</th>
+                                <th class="p-4 text-gray-400 font-bold text-sm text-center">Approve / Reject</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- USER HISTORY MODAL -->
+    <div id="userHistoryModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex justify-end">
+        <div class="w-full max-w-md bg-gray-900 h-full shadow-2xl flex flex-col border-l border-gray-700 transform transition-transform translate-x-full" id="uhmContent">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-800">
+                <h2 class="text-lg font-black text-white" id="uhmTitle">User History</h2>
+                <button onclick="closeUserHistory()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 flex gap-2">
+                <button onclick="switchUhmTab('bets')" id="uhmBtnBets" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm">Bet History</button>
+                <button onclick="switchUhmTab('txs')" id="uhmBtnTxs" class="flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm">Transactions</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4" id="uhmList">
+                <div class="text-center text-gray-500 mt-10">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentAdminData = null;
+        let lastHistoryData = null;
+        let uhmTab = 'bets';
+
+        // --- NAVIGATION ---
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.sidebar-btn').forEach(e => e.classList.remove('active'));
+            if(el) el.classList.add('active');
+        }
+
+        // --- AUTH ---
+        function loginAdmin() {
+            const pwd = document.getElementById('adminPwd').value;
+            socket.emit('admin_login', pwd);
+        }
+
+        socket.on('admin_auth_success', () => {
+            document.getElementById('adminLogin').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+        });
+        socket.on('toast', (data) => { alert(data.msg); });
+
+        // --- DATA RENDER ---
+        socket.on('admin_data', (data) => {
+            currentAdminData = data;
+            
+            // Dashboard Stats
+            let totalUsers = Object.keys(data.users).length;
+            let activeDep = 0, activeWith = 0;
+            let pendingCount = 0;
+
+            const usersTable = document.getElementById('usersTable');
+            usersTable.innerHTML = '';
+            for (let mobile in data.users) {
+                const u = data.users[mobile];
+                usersTable.innerHTML += `
+                    <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                        <td class="p-4"><div class="font-bold text-white">${mobile}</div><div class="text-xs text-blue-400">UID: ${u.uid}</div></td>
+                        <td class="p-4">
+                            <div class="flex gap-2 items-center">
+                                <span class="font-black text-green-400 w-20">₹${u.balance.toFixed(2)}</span>
+                                <input type="number" id="bal_${mobile}" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 w-20 text-xs text-white">
+                                <button onclick="updateBalance('${mobile}')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow">Set</button>
+                            </div>
+                        </td>
+                        <td class="p-4 text-xs"><div class="text-green-500">+₹${(u.totalDeposit||0)}</div><div class="text-red-500">-₹${(u.totalWithdraw||0)}</div></td>
+                        <td class="p-4 text-xs"><div class="text-purple-400">VIP ${u.vipLevel||0}</div><div class="text-gray-400">Code: ${u.myInviteCode||'-'}</div></td>
+                        <td class="p-4"><button onclick="viewUserHistory('${mobile}')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow"><i class="fa-solid fa-eye mr-2"></i> History</button></td>
+                    </tr>
+                `;
+            }
+
+            const txTable = document.getElementById('txTable');
+            txTable.innerHTML = '';
+            data.transactions.forEach(tx => {
+                if(tx.status === 'PENDING') pendingCount++;
+                if(tx.status === 'APPROVED' && tx.type === 'DEPOSIT') activeDep += tx.amount;
+                if(tx.status === 'APPROVED' && tx.type === 'WITHDRAW') activeWith += tx.amount;
+                
+                if(tx.status === 'PENDING') {
+                    const typeColor = tx.type === 'DEPOSIT' ? 'text-green-400 bg-green-900/30 border-green-500/50' : 'text-red-400 bg-red-900/30 border-red-500/50';
+                    const icon = tx.type === 'DEPOSIT' ? 'fa-wallet' : 'fa-building-columns';
+                    txTable.innerHTML += `
+                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                            <td class="p-4"><div class="font-bold text-white">${tx.mobile}</div><div class="text-xs text-blue-400">UID: ${tx.uid}</div></td>
+                            <td class="p-4 text-xs text-gray-400">${tx.date}</td>
+                            <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-black border ${typeColor}"><i class="fa-solid ${icon} mr-1"></i> ${tx.type}</span></td>
+                            <td class="p-4 font-black text-white">₹${tx.amount.toFixed(2)}</td>
+                            <td class="p-4 text-xs font-mono text-yellow-400 bg-black/20 rounded p-2 border border-gray-800">${tx.type==='DEPOSIT' ? 'UTR: '+tx.utr : tx.bankDetails}</td>
+                            <td class="p-4">
+                                <div class="flex gap-2 justify-center">
+                                    <button onclick="txAction('${tx.id}', 'approve_tx')" class="bg-green-600 hover:bg-green-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center"><i class="fa-solid fa-check"></i></button>
+                                    <button onclick="txAction('${tx.id}', 'reject_tx')" class="bg-red-600 hover:bg-red-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(pendingCount === 0) {
+                txTable.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-gray-500">No pending transactions at the moment.</td></tr>';
+                document.getElementById('txBadge').classList.add('hidden');
+            } else {
+                document.getElementById('txBadge').innerText = pendingCount;
+                document.getElementById('txBadge').classList.remove('hidden');
+            }
+
+            document.getElementById('statUsers').innerText = totalUsers;
+            document.getElementById('statDep').innerText = '₹' + activeDep.toFixed(0);
+            document.getElementById('statWith').innerText = '₹' + activeWith.toFixed(0);
+            document.getElementById('statProfit').innerText = '₹' + (activeDep - activeWith).toFixed(0);
+        });
+
+        // --- GAME CONTROL ---
+        let adminCurrentRoom = '45s';
+        
+        function adminSwitchRoom(room) {
+            adminCurrentRoom = room;
+            document.querySelectorAll('[id^="adminBtn-"]').forEach(btn => {
+                btn.className = "px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white";
+            });
+            document.getElementById('adminBtn-' + room).className = "px-4 py-2 rounded-md font-bold text-sm bg-theme-gold text-black";
+            
+            let titles = {'45s': '45s', '1m': '1 Min', '3m': '3 Min', '5m': '5 Min'};
+            document.getElementById('adminGameTitle').innerText = 'Win Go : ' + titles[room];
+            
+            // clear the dashboard briefly to prevent visual stutter of wrong room
+            document.getElementById('liveBetsLog').innerHTML = '<div class="text-center text-gray-600 mt-10 text-sm">Loading bets...</div>';
+            document.getElementById('livePeriod').innerText = 'Period: Loading...';
+            document.getElementById('liveTimer').innerText = '00:00';
+            ['Red','Green','Violet','Big','Small'].forEach(k => document.getElementById('liveTotal'+k).innerText = '₹0');
+            for(let i=0; i<=9; i++) document.getElementById('liveTotalN'+i).innerText = '₹0';
+        }
+
+        ['45s', '1m', '3m', '5m'].forEach(room => {
+            socket.on('admin_live_bets_' + room, (data) => {
+                if(adminCurrentRoom !== room) return; // Only process active room
+                
+                document.getElementById('livePeriod').innerText = 'Period: ' + data.period;
+                
+                // Handle timer text and reset manual outcome lock visually
+                if(data.time === 0) {
+                    document.getElementById('liveTimer').innerText = 'LOCK';
+                    document.getElementById('queuedOutcome').innerText = 'NONE'; // resets visually when round ends
+                } else {
+                    document.getElementById('liveTimer').innerText = `00:${data.time.toString().padStart(2,'0')}`;
+                }
+
+                let sums = { 'Red': 0, 'Green': 0, 'Violet': 0, 'Big': 0, 'Small': 0 };
+                let numSums = [0,0,0,0,0,0,0,0,0,0];
+                const logContainer = document.getElementById('liveBetsLog');
+                
+                if(data.bets.length === 0) {
+                    logContainer.innerHTML = '<div class="text-center text-gray-600 mt-10 text-sm">No bets placed yet for this period. (Auto-calculating lowest payout outcome)</div>';
+                } else {
+                    logContainer.innerHTML = '';
+                    data.bets.forEach(b => {
+                        // Accumulate totals strictly based on the actual button clicked
+                        if (sums[b.selection] !== undefined) sums[b.selection] += b.amount;
+                        if (b.selection.startsWith('Number ')) {
+                            let n = parseInt(b.selection.replace('Number ', ''));
+                            if (n >= 0 && n <= 9) numSums[n] += b.amount;
+                        }
+
+                        // Render bet log
+                        let colorClass = 'text-gray-300';
+                        if(b.selection === 'Red') colorClass = 'text-red-500';
+                        if(b.selection === 'Green') colorClass = 'text-green-500';
+                        if(b.selection === 'Violet') colorClass = 'text-purple-500';
+                        if(['Big', 'Small'].includes(b.selection)) colorClass = 'text-yellow-500';
+
+                        logContainer.innerHTML += `
+                            <div class="flex justify-between items-center bg-gray-900 border border-gray-800 rounded-lg p-2 mb-2">
+                                <span class="text-sm font-bold text-gray-400"><i class="fa-solid fa-user mr-2 text-gray-600"></i>${b.mobile}</span>
+                                <span class="text-xs font-black px-2 py-1 rounded bg-gray-800 border border-gray-700 ${colorClass}">${b.selection}</span>
+                                <span class="font-black text-white">₹${b.amount}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('liveTotalRed').innerText = '₹' + sums['Red'];
+                document.getElementById('liveTotalGreen').innerText = '₹' + sums['Green'];
+                document.getElementById('liveTotalViolet').innerText = '₹' + sums['Violet'];
+                document.getElementById('liveTotalBig').innerText = '₹' + sums['Big'];
+                document.getElementById('liveTotalSmall').innerText = '₹' + sums['Small'];
+                for(let i=0; i<=9; i++) {
+                    document.getElementById('liveTotalN'+i).innerText = '₹' + numSums[i];
+                }
+            });
+        });
+
+        function forceWingo(num) {
+            socket.emit('admin_action', { action: 'set_wingo_result', room: adminCurrentRoom, num: num });
+            document.getElementById('queuedOutcome').innerText = num;
+        }
+
+        // --- USER HISTORY MODAL ---
+        function viewUserHistory(mobile) {
+            document.getElementById('userHistoryModal').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('uhmContent').classList.remove('translate-x-full'); }, 10);
+            document.getElementById('uhmTitle').innerText = 'History: ' + mobile;
+            document.getElementById('uhmList').innerHTML = '<div class="text-center text-gray-500 mt-10"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>';
+            socket.emit('admin_action', { action: 'get_user_history', mobile: mobile });
+        }
+        function closeUserHistory() {
+            document.getElementById('uhmContent').classList.add('translate-x-full');
+            setTimeout(() => { document.getElementById('userHistoryModal').classList.add('hidden'); }, 300);
+        }
+        
+        socket.on('admin_user_history', (data) => {
+            lastHistoryData = data;
+            renderUhm();
+        });
+
+        function switchUhmTab(tab) {
+            uhmTab = tab;
+            if(tab === 'bets') {
+                document.getElementById('uhmBtnBets').className = 'flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm';
+                document.getElementById('uhmBtnTxs').className = 'flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm';
+            } else {
+                document.getElementById('uhmBtnTxs').className = 'flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm';
+                document.getElementById('uhmBtnBets').className = 'flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm';
+            }
+            renderUhm();
+        }
+
+        function renderUhm() {
+            if(!lastHistoryData) return;
+            const container = document.getElementById('uhmList');
+            container.innerHTML = '';
+            
+            if (uhmTab === 'bets') {
+                if(lastHistoryData.bets.length === 0) return container.innerHTML = '<div class="text-center text-gray-500 mt-10">No bets found.</div>';
+                lastHistoryData.bets.forEach(b => {
+                    const color = b.won > 0 ? 'text-green-500' : 'text-red-500';
+                    const amount = b.won > 0 ? '+₹'+b.won : '-₹'+b.amount;
+                    container.innerHTML += `
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-3 mb-2 flex justify-between items-center">
+                            <div><div class="text-xs text-gray-500">${b.period}</div><div class="font-bold text-sm text-white">${b.selection}</div></div>
+                            <div class="text-right"><div class="font-black ${color}">${amount}</div><div class="text-[10px] text-gray-400">Bet: ₹${b.amount}</div></div>
+                        </div>
+                    `;
+                });
+            } else {
+                if(lastHistoryData.transactions.length === 0) return container.innerHTML = '<div class="text-center text-gray-500 mt-10">No transactions found.</div>';
+                lastHistoryData.transactions.forEach(t => {
+                    const color = t.status === 'APPROVED' ? 'text-green-500' : (t.status === 'REJECTED' ? 'text-red-500' : 'text-yellow-500');
+                    const sign = t.type === 'DEPOSIT' ? '+' : '-';
+                    container.innerHTML += `
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-3 mb-2 flex justify-between items-center">
+                            <div><div class="font-bold text-sm text-white">${t.type}</div><div class="text-[10px] text-gray-400">${t.date}</div></div>
+                            <div class="text-right"><div class="font-black text-white">${sign}₹${t.amount}</div><div class="text-[10px] font-black ${color}">${t.status}</div></div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // --- ACTIONS ---
+        function updateBalance(mobile) {
+            const newBal = document.getElementById('bal_' + mobile).value;
+            socket.emit('admin_action', { action: 'update_balance', mobile, newBalance: newBal });
+        }
+        function txAction(txId, action) {
+            socket.emit('admin_action', { action, txId });
+        }
+
+        // --- ALERTS ---
+        socket.on('admin_alert', (data) => {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `fixed top-6 right-6 text-white px-6 py-4 rounded-xl shadow-2xl font-bold z-50 animate-bounce flex items-center gap-3 ${data.type === 'deposit' ? 'bg-green-600 border border-green-500' : 'bg-red-600 border border-red-500'}`;
+            alertDiv.innerHTML = `<i class="fa-solid fa-bell text-2xl"></i> <div>${data.msg}</div>`;
+            document.body.appendChild(alertDiv);
+            
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(data.type === 'deposit' ? 880 : 440, ctx.currentTime);
+            osc.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+
+            setTimeout(() => { alertDiv.remove(); }, 5000);
+        });
+    </script>
+</body>
+</html>
