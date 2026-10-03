@@ -255,6 +255,16 @@ io.on('connection', (socket) => {
     });
 
     // Auth
+        socket.on('reset_password', (data) => {
+        if(db.users[data.mobile]) {
+            db.users[data.mobile].password = data.newPass;
+            saveDB();
+            socket.emit('reset_success');
+        } else {
+            socket.emit('reset_error', 'Mobile number not found');
+        }
+    });
+
     socket.on('login', ({ mobile, password }) => {
         if (db.users[mobile] && db.users[mobile].password === password) {
             socket.mobile = mobile;
@@ -286,7 +296,7 @@ io.on('connection', (socket) => {
             }
 
             const newUid = Math.floor(100000 + Math.random() * 900000).toString();
-            const myCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const myCode = Math.floor(1000000000 + Math.random() * 9000000000).toString();
             
             db.users[mobile] = { 
                 password, 
@@ -478,3 +488,4 @@ const PORT = 8081;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Strict Tiranga Engine running on port ${PORT}`);
 });
+

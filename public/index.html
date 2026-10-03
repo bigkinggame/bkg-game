@@ -84,12 +84,18 @@
                     <input type="tel" id="loginMobile" placeholder="Phone number" class="w-full bg-transparent py-3 pl-20 pr-4 focus:outline-none font-bold text-white text-lg tracking-widest" maxlength="10">
                 </div>
                 
-                <div class="mb-8 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
+                                <div class="mb-5 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
                     <i class="fa-solid fa-lock absolute left-2 top-3 text-theme-gold text-xl"></i>
                     <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-transparent py-3 pl-10 pr-10 focus:outline-none font-bold text-white text-lg">
                 </div>
+                <div class="flex justify-between items-center mb-6">
+                    <label class="text-gray-400 text-sm flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="w-4 h-4 rounded accent-theme-gold border-0" checked> Remember password
+                    </label>
+                    <span onclick="openForgotPassword()" class="text-theme-gold text-sm font-bold cursor-pointer hover:underline">Forgot password?</span>
+                </div>
                 
-                <button onclick="handleLogin()" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Log in</button>
+                <button onclick="showCaptcha('login')" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Log in</button>
             </div>
 
             <div class="w-full px-6 mt-8 z-10 relative hidden" id="registerForm">
@@ -104,15 +110,20 @@
                 
                 <div class="mb-5 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
                     <i class="fa-solid fa-lock absolute left-2 top-3 text-theme-gold text-xl"></i>
-                    <input type="password" id="regPassword" placeholder="Set password (min 6 chars)" class="w-full bg-transparent py-3 pl-10 pr-10 focus:outline-none font-bold text-white text-lg">
+                    <input type="password" id="regPassword" placeholder="Set password" class="w-full bg-transparent py-3 pl-10 pr-10 focus:outline-none font-bold text-white text-lg">
+                </div>
+
+                <div class="mb-5 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
+                    <i class="fa-solid fa-lock absolute left-2 top-3 text-theme-gold text-xl"></i>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password" class="w-full bg-transparent py-3 pl-10 pr-10 focus:outline-none font-bold text-white text-lg">
                 </div>
 
                 <div class="mb-8 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
                     <i class="fa-solid fa-user-group absolute left-2 top-3 text-theme-gold text-xl"></i>
-                    <input type="text" id="regInvite" placeholder="Invite code (Optional)" class="w-full bg-transparent py-3 pl-10 focus:outline-none font-bold text-white text-lg uppercase" maxlength="6">
+                    <input type="text" id="regInvite" placeholder="Invite code (Required)" class="w-full bg-transparent py-3 pl-10 focus:outline-none font-bold text-white text-lg uppercase tracking-widest" maxlength="10">
                 </div>
                 
-                <button onclick="handleRegister()" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Register</button>
+                <button onclick="showCaptcha('register')" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Register</button>
             </div>
         </div>
 
@@ -354,7 +365,7 @@
                     </div>
                 </div>
 
-                <button onclick="location.reload()" class="w-full bg-transparent border-2 border-[#555] text-gray-400 font-bold py-4 rounded-xl shadow-sm mb-6 hover:border-theme-gold hover:text-theme-gold active:scale-95 transition-all text-lg">Log out</button>
+                <button onclick="logoutUser()" class="w-full bg-transparent border-2 border-[#555] text-gray-400 font-bold py-4 rounded-xl shadow-sm mb-6 hover:border-theme-gold hover:text-theme-gold active:scale-95 transition-all text-lg">Log out</button>
             </div>
         </div>
 
@@ -530,7 +541,7 @@
         </nav>
 
         <!-- WINGO BET MODAL -->
-        <div id="betModal" class="fixed inset-0 bg-black/80 z-[100] flex justify-center items-end pb-0 hidden transition-opacity">
+        <div id="betModal" class="fixed inset-0 bg-black/80 z-[10001] flex justify-center items-end pb-0 hidden transition-opacity">
             <div class="bg-[#1c1c1c] w-full max-w-[414px] rounded-t-[30px] overflow-hidden transform transition-transform translate-y-full shadow-[0_-5px_30px_rgba(0,0,0,0.8)] border-t border-[#333]" id="betModalContent">
                 <div class="p-4 text-center text-white font-black text-xl relative shadow-md" id="modalHeader">
                     Join Green
@@ -780,6 +791,214 @@
             }
         });
 
+                // --- NEW FEATURES LOGIC ---
+                let pendingAuthAction = '';
+        
+        let savedMobile = localStorage.getItem('bkg_mobile');
+        let savedPassword = localStorage.getItem('bkg_password');
+        let tempMobile = '';
+        let tempPassword = '';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (savedMobile && savedPassword) {
+                // Auto login on page load
+                socket.emit('login', { mobile: savedMobile, password: savedPassword });
+            }
+        });
+
+        function logoutUser() {
+            localStorage.removeItem('bkg_mobile');
+            localStorage.removeItem('bkg_password');
+            location.reload();
+        }
+        
+        // Auto-fill Invite Code
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            const inviteInput = document.getElementById('regInvite');
+            if(inviteInput) {
+                if(refCode && refCode.length === 10) {
+                    inviteInput.value = refCode;
+                    inviteInput.readOnly = true; // Lock it if it came from a link
+                } else {
+                    inviteInput.value = '1000000000'; // Default Admin Master Code
+                }
+            }
+        });
+
+        // Forgot Password Modal
+        function openForgotPassword() {
+            document.getElementById('forgotPasswordModal').classList.remove('hidden');
+            document.getElementById('forgotPasswordModal').classList.add('flex');
+        }
+        function closeForgotPassword() {
+            document.getElementById('forgotPasswordModal').classList.add('hidden');
+            document.getElementById('forgotPasswordModal').classList.remove('flex');
+        }
+
+        // Mock OTP System
+        let generatedOtp = '';
+        function sendOtp() {
+            const mobile = document.getElementById('forgotMobile').value;
+            if(mobile.length !== 10) return showToast('Enter a valid 10-digit mobile number');
+            
+            const btn = document.getElementById('otpBtn');
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+                // FOR TESTING: We show it in an alert. In production, this goes via SMS API.
+                alert('[TESTING MODE]\\nYour OTP is: ' + generatedOtp + '\\n(In real app, this goes to SMS)');
+                showToast('OTP sent successfully!');
+                
+                let countdown = 60;
+                const timer = setInterval(() => {
+                    btn.innerText = countdown + 's';
+                    countdown--;
+                    if(countdown < 0) {
+                        clearInterval(timer);
+                        btn.innerText = 'Send OTP';
+                        btn.disabled = false;
+                        generatedOtp = '';
+                    }
+                }, 1000);
+            }, 1000);
+        }
+
+        function handleResetPassword() {
+            const mobile = document.getElementById('forgotMobile').value;
+            const otp = document.getElementById('forgotOtp').value;
+            const newPass = document.getElementById('forgotNewPassword').value;
+
+            if(mobile.length !== 10) return showToast('Invalid mobile');
+            if(otp !== generatedOtp || !otp) return showToast('Invalid or expired OTP');
+            if(newPass.length < 6) return showToast('Password must be at least 6 characters');
+
+            socket.emit('reset_password', { mobile, newPass });
+        }
+
+        socket.on('reset_success', () => {
+            showToast('Password reset successful! Please login.');
+            closeForgotPassword();
+            switchAuthTab('login');
+        });
+        socket.on('reset_error', (msg) => showToast(msg));
+
+                // Slider Captcha Logic
+        let slider = null, fill = null, sliderText = null;
+        function initSlider() {
+            slider = document.getElementById('captchaSlider');
+            fill = document.getElementById('sliderFill');
+            sliderText = document.getElementById('sliderText');
+            if(slider) {
+                slider.addEventListener('mousedown', handleDragStart);
+                slider.addEventListener('touchstart', handleDragStart, {passive: true});
+                document.addEventListener('mousemove', handleDragMove);
+                document.addEventListener('touchmove', handleDragMove, {passive: false});
+                document.addEventListener('mouseup', handleDragEnd);
+                document.addEventListener('touchend', handleDragEnd);
+            }
+        }
+        let isDragging = false;
+        let startX = 0;
+        let maxDrag = 0;
+
+        function showCaptcha(action) {
+            // Pre-validation before showing captcha
+            if(action === 'login') {
+                if(!document.getElementById('loginMobile').value || !document.getElementById('loginPassword').value) {
+                    return showToast('Please fill all fields');
+                }
+            } else if(action === 'register') {
+                const pass = document.getElementById('regPassword').value;
+                const conf = document.getElementById('regConfirmPassword').value;
+                const inv = document.getElementById('regInvite').value;
+                if(!document.getElementById('regMobile').value || !pass) return showToast('Please fill all fields');
+                if(pass !== conf) return showToast('Passwords do not match!');
+                if(inv.length !== 10) return showToast('Invalid 10-digit Invite Code');
+            }
+
+            if(!slider) initSlider();
+            pendingAuthAction = action;
+            document.getElementById('captchaModal').classList.remove('hidden');
+            document.getElementById('captchaModal').classList.add('flex');
+            resetCaptcha();
+            
+            // Calculate max drag dynamically
+            const container = slider.parentElement;
+            maxDrag = container.offsetWidth - slider.offsetWidth - 8; // 8px padding
+        }
+
+        function closeCaptcha() {
+            document.getElementById('captchaModal').classList.add('hidden');
+            document.getElementById('captchaModal').classList.remove('flex');
+        }
+
+        function resetCaptcha() {
+            if(!slider) return;
+            slider.style.transform = 'translateX(0px)';
+            slider.innerHTML = '<i class="fa-solid fa-angles-right text-black text-xl pointer-events-none"></i>';
+            slider.classList.remove('bg-green-500');
+            slider.classList.add('bg-theme-gold');
+            fill.style.width = '0px';
+            fill.classList.remove('bg-green-500/30');
+            fill.classList.add('bg-theme-gold/30');
+            sliderText.innerText = 'Slide to complete';
+            sliderText.classList.remove('text-green-500');
+        }
+
+        function handleDragStart(e) {
+            isDragging = true;
+            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging) return;
+            const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            let diff = currentX - startX;
+            
+            if (diff < 0) diff = 0;
+            if (diff > maxDrag) diff = maxDrag;
+            
+            slider.style.transform = 'translateX(0px)';
+            fill.style.width = (diff + 24) + 'px'; // 24 is half slider width
+
+            if (diff >= maxDrag && maxDrag > 0) {
+                isDragging = false;
+                captchaSuccess();
+            }
+        }
+
+        function handleDragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                resetCaptcha(); // snap back if not completed
+            }
+        }
+
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('touchmove', handleDragMove, {passive: false});
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+
+        function captchaSuccess() {
+            slider.innerHTML = '<i class="fa-solid fa-check text-white text-xl pointer-events-none"></i>';
+            slider.classList.remove('bg-theme-gold');
+            slider.classList.add('bg-green-500');
+            fill.classList.remove('bg-theme-gold/30');
+            fill.classList.add('bg-green-500/30');
+            sliderText.innerText = 'Verified!';
+            sliderText.classList.add('text-green-500');
+            
+            setTimeout(() => {
+                closeCaptcha();
+                if(pendingAuthAction === 'login') handleLogin();
+                else if(pendingAuthAction === 'register') handleRegister();
+            }, 500);
+        }
+
         // --- AUTHENTICATION ---
         function switchAuthTab(tab) {
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
@@ -794,12 +1013,12 @@
                 password: document.getElementById('loginPassword').value 
             }); 
         }
-        function handleRegister() { 
-            socket.emit('register', { 
-                mobile: document.getElementById('regMobile').value, 
-                password: document.getElementById('regPassword').value,
-                inviteCode: document.getElementById('regInvite').value 
-            }); 
+                function handleRegister() {
+            const mobile = document.getElementById('regMobile').value;
+            const password = document.getElementById('regPassword').value;
+            const invite = document.getElementById('regInvite').value;
+            if(!mobile || !password) return showToast('Please fill all fields');
+            socket.emit('register', { mobile, password, invite });
         }
 
         socket.on('auth_success', (userData) => {
@@ -1262,5 +1481,64 @@
         }
 
     </script>
+    <!-- Captcha Modal -->
+    <div id="captchaModal" class="fixed inset-0 bg-black/80 z-[10001] hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#1c1c1c] rounded-2xl w-full max-w-sm overflow-hidden border border-[#333] shadow-2xl">
+            <div class="p-4 border-b border-[#333] flex justify-between items-center bg-[#242424]">
+                <span class="text-white font-bold tracking-wide"><i class="fa-solid fa-shield-halved text-theme-gold mr-2"></i> Security Verification</span>
+                <i class="fa-solid fa-xmark text-gray-400 text-xl cursor-pointer hover:text-white" onclick="closeCaptcha()"></i>
+            </div>
+            <div class="p-6 flex flex-col items-center bg-[#1a1a1a]">
+                <p class="text-gray-400 text-sm mb-6 font-bold">Drag the slider to unlock</p>
+                <div class="w-full h-14 bg-[#2a2a2a] rounded-full relative shadow-inner flex items-center border border-[#444] overflow-hidden">
+                    <div class="absolute left-0 h-full bg-theme-gold/30 rounded-l-full transition-none" id="sliderFill" style="width: 0px;"></div>
+                    <div id="captchaSlider" class="absolute left-1 w-12 h-12 bg-theme-gold rounded-full shadow-[0_0_15px_rgba(212,175,55,0.5)] flex items-center justify-center cursor-grab active:cursor-grabbing z-10 transition-none" style="touch-action: none; transform: translateX(0px);">
+                        <i class="fa-solid fa-angles-right text-black text-xl pointer-events-none"></i>
+                    </div>
+                    <span class="w-full text-center text-gray-400 text-sm font-bold pointer-events-none z-0" id="sliderText">Slide to complete</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-[#121212] z-[10000] hidden flex-col justify-start p-4 pt-8">
+        <div class="flex items-center mb-10" onclick="closeForgotPassword()">
+            <i class="fa-solid fa-chevron-left text-white text-2xl mr-4 cursor-pointer"></i>
+            <h2 class="text-2xl font-black text-white tracking-widest">RESET PASSWORD</h2>
+        </div>
+        
+        <p class="text-gray-400 text-sm font-bold mb-8">Enter your registered mobile number</p>
+
+        <div class="mb-5 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
+            <i class="fa-solid fa-mobile-screen-button absolute left-2 top-3 text-theme-gold text-xl"></i>
+            <span class="absolute left-10 top-3 text-white font-bold">+91</span>
+            <input type="tel" id="forgotMobile" placeholder="Phone number" class="w-full bg-transparent py-3 pl-20 pr-4 focus:outline-none font-bold text-white text-lg tracking-widest" maxlength="10">
+        </div>
+
+        <div class="flex gap-2 mb-5">
+            <div class="relative flex-1 border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
+                <i class="fa-solid fa-shield-halved absolute left-2 top-3 text-theme-gold text-xl"></i>
+                <input type="text" id="forgotOtp" placeholder="OTP" class="w-full bg-transparent py-3 pl-10 focus:outline-none font-bold text-white text-lg tracking-widest" maxlength="4">
+            </div>
+            <button onclick="sendOtp()" id="otpBtn" class="bg-[#333] text-theme-gold font-bold px-6 rounded shadow-md active:scale-95 border border-[#444]">Send OTP</button>
+        </div>
+        
+        <div class="mb-10 relative border-b-2 border-[#333] focus-within:border-theme-gold transition-colors">
+            <i class="fa-solid fa-lock absolute left-2 top-3 text-theme-gold text-xl"></i>
+            <input type="password" id="forgotNewPassword" placeholder="New Password" class="w-full bg-transparent py-3 pl-10 focus:outline-none font-bold text-white text-lg">
+        </div>
+        
+        <button onclick="handleResetPassword()" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Reset Password</button>
+    </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
