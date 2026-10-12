@@ -80,10 +80,10 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold flex items-center"><i class="fa-solid fa-tower-broadcast text-red-500 animate-pulse mr-3"></i> Live Game Control Hub</h2>
                     <div class="flex gap-2 bg-gray-900 p-1 rounded-lg border border-gray-700">
-                        <button onclick="adminSwitchRoom('45s')" id="adminBtn-45s" class="px-4 py-2 rounded-md font-bold text-sm bg-theme-gold text-black">45s</button>
+                        <button onclick="adminSwitchRoom('30s')" id="adminBtn-30s" class="px-4 py-2 rounded-md font-bold text-sm bg-blue-600 text-white">30s</button>
                         <button onclick="adminSwitchRoom('1m')" id="adminBtn-1m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">1 Min</button>
-                        <button onclick="adminSwitchRoom('3m')" id="adminBtn-3m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">3 Min</button>
-                        <button onclick="adminSwitchRoom('5m')" id="adminBtn-5m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">5 Min</button>
+
+
                     </div>
                 </div>
                 
@@ -91,7 +91,7 @@
                     <!-- Left: Live Monitor -->
                     <div class="col-span-2 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden flex flex-col h-[750px]">
                         <div class="p-4 bg-gray-900 border-b border-gray-700 flex justify-between items-center">
-                            <span class="font-bold text-lg" id="adminGameTitle">Win Go : 45s</span>
+                            <span class="font-bold text-lg" id="adminGameTitle">Win Go : 30s</span>
                             <span class="font-mono bg-blue-500/20 text-blue-400 px-3 py-1 rounded border border-blue-500/30" id="livePeriod">Period: Loading...</span>
                             <span class="font-mono text-2xl font-black text-red-500" id="liveTimer">00:00</span>
                         </div>
@@ -313,7 +313,7 @@
         });
 
         // --- GAME CONTROL ---
-        let adminCurrentRoom = '45s';
+        let adminCurrentRoom = '30s';
         
         function adminSwitchRoom(room) {
             adminCurrentRoom = room;
@@ -322,7 +322,7 @@
             });
             document.getElementById('adminBtn-' + room).className = "px-4 py-2 rounded-md font-bold text-sm bg-theme-gold text-black";
             
-            let titles = {'45s': '45s', '1m': '1 Min', '3m': '3 Min', '5m': '5 Min'};
+            let titles = {'30s': '30s', '1m': '1 Min'};
             document.getElementById('adminGameTitle').innerText = 'Win Go : ' + titles[room];
             
             // clear the dashboard briefly to prevent visual stutter of wrong room
@@ -333,7 +333,7 @@
             for(let i=0; i<=9; i++) document.getElementById('liveTotalN'+i).innerText = '₹0';
         }
 
-        ['45s', '1m', '3m', '5m'].forEach(room => {
+        ['30s', '1m'].forEach(room => {
             socket.on('admin_live_bets_' + room, (data) => {
                 if(adminCurrentRoom !== room) return; // Only process active room
                 

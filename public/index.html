@@ -36,6 +36,22 @@
         .num-btn:active { transform: scale(0.9); }
         .bg-gv { background: linear-gradient(135deg, #18b660 50%, #eb43dd 50%); }
         .bg-rv { background: linear-gradient(135deg, #fb4e4e 50%, #eb43dd 50%); }
+        .wingo-ball { width: 54px; height: 54px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 -4px 6px rgba(0,0,0,0.4), inset 0 3px 6px rgba(255,255,255,0.45); margin: 0 auto; }
+        .wingo-ball:active { transform: scale(0.9); }
+        .wingo-ball.ball-highlight { transform: scale(1.14); box-shadow: 0 0 18px #D4AF37, 0 5px 10px rgba(0,0,0,0.6); }
+        .wingo-ball::before { content: ''; position: absolute; inset: 3px; border-radius: 50%; border: 2.5px dashed rgba(255,255,255,0.75); pointer-events: none; }
+        .wingo-ball-inner { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffffff, #f1f5f9 70%, #cbd5e1); display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 900; box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), 0 2px 4px rgba(0,0,0,0.35); z-index: 2; }
+        .ball-green { background: radial-gradient(circle at 30% 25%, #34d399, #18b660 60%, #0d7a3e); }
+        .ball-green .wingo-ball-inner, .ball-green .mini-ball-inner { color: #18b660; }
+        .ball-red { background: radial-gradient(circle at 30% 25%, #ff7b7b, #fb4e4e 60%, #b91c1c); }
+        .ball-red .wingo-ball-inner, .ball-red .mini-ball-inner { color: #fb4e4e; }
+        .ball-rv { background: linear-gradient(135deg, #fb4e4e 50%, #a855f7 50%); }
+        .ball-rv .wingo-ball-inner span, .ball-rv .mini-ball-inner span { background: linear-gradient(180deg, #fb4e4e 50%, #a855f7 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .ball-gv { background: linear-gradient(135deg, #18b660 50%, #a855f7 50%); }
+        .ball-gv .wingo-ball-inner span, .ball-gv .mini-ball-inner span { background: linear-gradient(180deg, #18b660 50%, #a855f7 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mini-ball { width: 26px; height: 26px; border-radius: 50%; position: relative; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.4); }
+        .mini-ball::before { content: ''; position: absolute; inset: 1.5px; border-radius: 50%; border: 1.5px dashed rgba(255,255,255,0.75); pointer-events: none; }
+        .mini-ball-inner { width: 16px; height: 16px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; line-height: 1; z-index: 2; }
         
         /* Modals & Toasts */
         #toastContainer { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
@@ -181,7 +197,7 @@
                     <button class="z-10 bg-theme-gold px-4 py-1.5 rounded-full font-black shadow-md text-sm active:scale-95">GO</button>
                 </div>
 
-                <div class="bg-[#1c1c1c] rounded-xl shadow-md border border-[#333] p-3 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-[#1c1c1c] rounded-xl shadow-md border border-[#333] p-3 flex justify-between items-center cursor-pointer relative overflow-hidden" onclick="handleGameClick('k3')">
                     <div class="flex items-center gap-4 z-10">
                         <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-[#444] to-[#111] border border-[#333] flex items-center justify-center text-theme-gold shadow-sm font-black text-xl">K3</div>
                         <div>
@@ -371,124 +387,201 @@
 
         <!-- ================= WIN GO GAME PAGE ================= -->
         <div id="view-wingo" class="view-section">
-            <div class="bg-[#1c1c1c] p-3 flex justify-between items-center sticky top-0 z-40 shadow-md border-b border-[#333]">
+            <!-- Header -->
+            <div class="bg-[#1c1c1c] px-4 py-3 flex justify-between items-center sticky top-0 z-40 shadow-md border-b border-[#333]">
                 <i class="fa-solid fa-angle-left text-xl cursor-pointer text-gray-300 hover:text-theme-gold" onclick="switchView('home')"></i>
-                <h1 class="text-lg font-black text-theme-gold tracking-widest">WIN GO</h1>
-                <i class="fa-solid fa-headset text-gray-400 text-xl cursor-pointer hover:text-theme-gold"></i>
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown text-theme-gold text-lg"></i>
+                    <h1 class="text-xl font-black text-theme-gold italic tracking-wider">BIG KING</h1>
+                </div>
+                <div class="flex items-center gap-3.5">
+                    <i class="fa-solid fa-headset text-theme-gold text-lg cursor-pointer hover:opacity-80" onclick="alert('Customer Service Live Chat coming soon!')"></i>
+                    <i id="wingoSoundIcon" class="fa-solid fa-volume-high text-theme-gold text-lg cursor-pointer hover:opacity-80" onclick="toggleWingoSound()"></i>
+                </div>
             </div>
 
-            <!-- Wallet Card -->
-            <div class="px-4 py-3 bg-[#121212]">
-                <div class="bg-theme-gold p-4 rounded-2xl text-black shadow-md relative overflow-hidden border-b-4 border-[#8A6A27]">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-black opacity-10 rounded-full"></div>
-                    <p class="text-sm font-bold opacity-80 mb-1 text-[#333]">Available balance</p>
-                    <h2 class="text-3xl font-black user-balance-display">₹0.00</h2>
-                    <div class="flex gap-3 mt-4">
-                        <button onclick="openDepositModal()" class="flex-1 bg-black text-theme-gold py-2 rounded-full font-black text-sm shadow">Deposit</button>
-                        <button onclick="openWithdrawModal()" class="flex-1 border-2 border-black text-black py-2 rounded-full font-black text-sm">Withdraw</button>
+            <div class="px-3.5 pt-3">
+                <!-- Wallet Balance Card (Tiranga Layout in BKG Black & Gold Theme) -->
+                <div class="bg-gradient-to-b from-[#252525] to-[#181818] p-4 rounded-2xl text-center shadow-lg relative overflow-hidden border border-[#D4AF37]/40 mb-3">
+                    <div class="flex items-center justify-center gap-2">
+                        <h2 class="text-2xl font-black text-white user-balance-display tracking-wide">₹0.00</h2>
+                        <i class="fa-solid fa-arrows-rotate text-gray-400 hover:text-theme-gold cursor-pointer text-sm transition-transform" onclick="this.classList.add('fa-spin'); setTimeout(()=>this.classList.remove('fa-spin'), 600);"></i>
+                    </div>
+                    <div class="flex items-center justify-center gap-1.5 text-xs font-bold text-gray-300 mt-1 mb-4">
+                        <i class="fa-solid fa-wallet text-theme-gold"></i>
+                        <span>Wallet balance</span>
+                    </div>
+                    <div class="flex gap-4 px-2">
+                        <button onclick="openWithdrawModal()" class="flex-1 bg-[#fb4e4e] hover:bg-red-500 text-white py-2 rounded-full font-black text-sm shadow-md active:scale-95 transition-transform">Withdraw</button>
+                        <button onclick="openDepositModal()" class="flex-1 bg-[#18b660] hover:bg-green-500 text-white py-2 rounded-full font-black text-sm shadow-md active:scale-95 transition-transform">Deposit</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="px-4">
-                <!-- Game Tabs -->
-                <div class="bg-[#1c1c1c] rounded-t-xl shadow-sm flex p-1 border-b border-[#333]" id="gameTabsContainer">
-                    <button onclick="switchGameRoom('45s', this)" class="game-tab-btn flex-1 py-3 text-gray-500 font-bold text-xs flex flex-col items-center hover:text-theme-gold transition-colors">
-                        <i class="fa-regular fa-clock text-xl mb-1"></i>Win Go 45s
+                <!-- Marquee Notice Bar -->
+                <div class="bg-[#1c1c1c] rounded-full px-3 py-1.5 flex items-center shadow-sm border border-[#333] mb-3">
+                    <i class="fa-solid fa-volume-high text-theme-gold text-xs mr-2"></i>
+                    <marquee class="text-[11px] font-bold text-gray-300 flex-1">Welcome to BIG KING GAME! Greetings, Gamers and Enthusiasts! Play Win Go and win huge rewards daily.</marquee>
+                    <button class="bg-theme-gold text-black text-[10px] font-black px-3 py-1 rounded-full ml-2 flex items-center gap-1 shadow"><i class="fa-solid fa-fire text-[9px]"></i> Detail</button>
+                </div>
+
+                <!-- Game Tabs (ONLY 2 Timers: 30sec and 1Min) -->
+                <div class="bg-[#1c1c1c] rounded-2xl shadow-md flex p-1.5 gap-2 border border-[#333] mb-3" id="gameTabsContainer">
+                    <button onclick="switchGameRoom('30s', this)" class="game-tab-btn flex-1 py-2.5 bg-theme-gold text-black rounded-xl font-black text-xs flex flex-col items-center shadow-md active-tab transition-all">
+                        <div class="w-8 h-8 rounded-full bg-black/15 flex items-center justify-center mb-1">
+                            <i class="fa-regular fa-clock text-lg"></i>
+                        </div>
+                        <span>WinGo 30sec</span>
                     </button>
-                    <button onclick="switchGameRoom('1m', this)" class="game-tab-btn flex-1 py-3 bg-theme-gold text-black rounded-lg font-black text-xs flex flex-col items-center shadow-md active-tab transition-colors">
-                        <i class="fa-regular fa-clock text-xl mb-1"></i>Win Go 1Min
-                    </button>
-                    <button onclick="switchGameRoom('3m', this)" class="game-tab-btn flex-1 py-3 text-gray-500 font-bold text-xs flex flex-col items-center hover:text-theme-gold transition-colors">
-                        <i class="fa-regular fa-clock text-xl mb-1"></i>Win Go 3Min
-                    </button>
-                    <button onclick="switchGameRoom('5m', this)" class="game-tab-btn flex-1 py-3 text-gray-500 font-bold text-xs flex flex-col items-center hover:text-theme-gold transition-colors">
-                        <i class="fa-regular fa-clock text-xl mb-1"></i>Win Go 5Min
+                    <button onclick="switchGameRoom('1m', this)" class="game-tab-btn flex-1 py-2.5 text-gray-400 rounded-xl font-bold text-xs flex flex-col items-center hover:text-theme-gold transition-all">
+                        <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center mb-1">
+                            <i class="fa-regular fa-clock text-lg"></i>
+                        </div>
+                        <span>WinGo 1Min</span>
                     </button>
                 </div>
 
-                <!-- Game Board -->
-                <div class="bg-[#1c1c1c] rounded-b-xl shadow-md p-4 mb-4 border border-[#333] border-t-0">
-                    <div class="flex justify-between items-center mb-5">
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold border-l-4 border-theme-gold pl-2 mb-1">Period</p>
-                            <p class="text-lg font-black text-white font-mono drop-shadow-md" id="periodDisplay">Loading...</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-gray-400 font-bold mb-1">Time remaining</p>
-                            <div class="flex gap-1 mt-1 font-mono" id="timerBox">
-                                <span class="time-box">0</span><span class="time-box">0</span><span class="text-theme-gold font-black text-xl">:</span>
-                                <span class="time-box" id="sec1">-</span><span class="time-box" id="sec2">-</span>
+                <!-- Ticket-Style Period & Timer Box -->
+                <div class="bg-gradient-to-r from-[#262013] via-[#1d1a14] to-[#262013] rounded-2xl p-3.5 mb-3 border border-[#D4AF37]/50 relative overflow-hidden shadow-lg">
+                    <!-- Ticket Cutout Notches & Dashed Center Line -->
+                    <div class="absolute left-1/2 -top-2.5 -translate-x-1/2 w-5 h-5 rounded-full bg-[#121212] border-b border-[#D4AF37]/50 z-10"></div>
+                    <div class="absolute left-1/2 -bottom-2.5 -translate-x-1/2 w-5 h-5 rounded-full bg-[#121212] border-t border-[#D4AF37]/50 z-10"></div>
+                    <div class="absolute left-1/2 top-2.5 bottom-2.5 border-l-2 border-dashed border-[#D4AF37]/35"></div>
+
+                    <div class="grid grid-cols-2 gap-3 items-center">
+                        <!-- Left Side: How to play + Room Name + Last 5 Balls -->
+                        <div class="pr-2">
+                            <button onclick="alert('How to Play Win Go:\n1. Select Green, Violet, Red, Big/Small, or a Number (0-9).\n2. Choose your contract amount and multiplier.\n3. Wait for the countdown to finish to see the winning result!')" class="border border-theme-gold text-theme-gold hover:bg-theme-gold hover:text-black transition-colors rounded-full px-3 py-0.5 text-[11px] font-bold inline-flex items-center gap-1.5 mb-1.5">
+                                <i class="fa-solid fa-book-open text-[10px]"></i> How to play
+                            </button>
+                            <p class="text-xs text-gray-300 font-bold mb-2" id="wingoModeLabel">WinGo 30sec</p>
+                            <div class="flex items-center gap-1" id="lastFiveBalls">
+                                <!-- Populated dynamically with last 5 3D mini balls -->
                             </div>
                         </div>
+
+                        <!-- Right Side: Time Remaining + Digital Timer + Period ID -->
+                        <div class="pl-2 text-right">
+                            <p class="text-[11px] text-theme-gold font-extrabold mb-1.5">Time remaining</p>
+                            <div class="flex gap-1 justify-end items-center font-mono mb-2" id="timerBox">
+                                <span class="time-box">0</span><span class="time-box">0</span><span class="text-theme-gold font-black text-lg px-0.5">:</span>
+                                <span class="time-box" id="sec1">-</span><span class="time-box" id="sec2">-</span>
+                            </div>
+                            <p class="text-xs font-black text-white font-mono tracking-wider" id="periodDisplay">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Betting Board -->
+                <div class="bg-[#1c1c1c] rounded-2xl shadow-lg p-3.5 mb-4 border border-[#333] relative overflow-hidden">
+                    <!-- 5-Second Lock Overlay (Two Giant Cards like Image 1) -->
+                    <div id="gridDisabler" class="absolute inset-0 bg-black/75 z-30 hidden flex items-center justify-center gap-5 rounded-2xl backdrop-blur-[2px]">
+                        <div class="w-28 h-36 rounded-2xl bg-[#262013] border-2 border-[#D4AF37]/60 shadow-[0_0_25px_rgba(0,0,0,0.9)] flex items-center justify-center text-[90px] font-black text-theme-gold leading-none select-none" id="lockDigit1">0</div>
+                        <div class="w-28 h-36 rounded-2xl bg-[#262013] border-2 border-[#D4AF37]/60 shadow-[0_0_25px_rgba(0,0,0,0.9)] flex items-center justify-center text-[90px] font-black text-theme-gold leading-none select-none" id="lockDigit2">5</div>
+                        <span id="lockCountdown" class="hidden">05</span>
                     </div>
 
                     <!-- Color Betting (DON'T CHANGE BG COLORS) -->
-                    <div class="flex justify-between gap-3 mb-4">
-                        <button onclick="openBetModal('Green')" class="flex-1 bg-game-green py-3 rounded-t-xl rounded-bl-xl font-black shadow-md active:scale-95 text-sm">Green</button>
-                        <button onclick="openBetModal('Violet')" class="flex-1 bg-game-violet py-3 rounded-xl font-black shadow-md active:scale-95 text-sm">Violet</button>
-                        <button onclick="openBetModal('Red')" class="flex-1 bg-game-red py-3 rounded-t-xl rounded-br-xl font-black shadow-md active:scale-95 text-sm">Red</button>
+                    <div class="flex justify-between gap-3 mb-3.5">
+                        <button onclick="openBetModal('Green')" class="flex-1 bg-game-green py-2.5 rounded-tr-2xl rounded-bl-2xl font-black shadow-md active:scale-95 text-sm">Green</button>
+                        <button onclick="openBetModal('Violet')" class="flex-1 bg-game-violet py-2.5 rounded-lg font-black shadow-md active:scale-95 text-sm">Violet</button>
+                        <button onclick="openBetModal('Red')" class="flex-1 bg-game-red py-2.5 rounded-tl-2xl rounded-br-2xl font-black shadow-md active:scale-95 text-sm">Red</button>
                     </div>
 
-                    <!-- Number Betting -->
-                    <div class="bg-[#121212] rounded-xl p-4 border border-[#333] relative mb-4">
-                        <div id="gridDisabler" class="absolute inset-0 bg-black/80 z-20 hidden flex items-center justify-center rounded-xl backdrop-blur-sm">
-                            <div class="text-7xl font-black text-white drop-shadow-[0_0_20px_rgba(255,0,0,0.8)]" id="lockCountdown">05</div>
-                        </div>
-                        <div class="grid grid-cols-5 gap-y-4 gap-x-2">
-                            <button onclick="openBetModal('Number 0')" class="num-btn bg-rv border-2 border-[#121212]">0</button>
-                            <button onclick="openBetModal('Number 1')" class="num-btn bg-game-green border-2 border-[#121212]">1</button>
-                            <button onclick="openBetModal('Number 2')" class="num-btn bg-game-red border-2 border-[#121212]">2</button>
-                            <button onclick="openBetModal('Number 3')" class="num-btn bg-game-green border-2 border-[#121212]">3</button>
-                            <button onclick="openBetModal('Number 4')" class="num-btn bg-game-red border-2 border-[#121212]">4</button>
-                            <button onclick="openBetModal('Number 5')" class="num-btn bg-gv border-2 border-[#121212]">5</button>
-                            <button onclick="openBetModal('Number 6')" class="num-btn bg-game-red border-2 border-[#121212]">6</button>
-                            <button onclick="openBetModal('Number 7')" class="num-btn bg-game-green border-2 border-[#121212]">7</button>
-                            <button onclick="openBetModal('Number 8')" class="num-btn bg-game-red border-2 border-[#121212]">8</button>
-                            <button onclick="openBetModal('Number 9')" class="num-btn bg-game-green border-2 border-[#121212]">9</button>
+                    <!-- 3D Lottery Number Balls (0 - 9) -->
+                    <div class="bg-[#121212] rounded-xl p-3.5 border border-[#2a2a2a] relative mb-3.5">
+                        <div class="grid grid-cols-5 gap-y-3.5 gap-x-2">
+                            <div onclick="openBetModal('Number 0')" id="ballBtn0" class="wingo-ball ball-rv"><div class="wingo-ball-inner"><span>0</span></div></div>
+                            <div onclick="openBetModal('Number 1')" id="ballBtn1" class="wingo-ball ball-green"><div class="wingo-ball-inner"><span>1</span></div></div>
+                            <div onclick="openBetModal('Number 2')" id="ballBtn2" class="wingo-ball ball-red"><div class="wingo-ball-inner"><span>2</span></div></div>
+                            <div onclick="openBetModal('Number 3')" id="ballBtn3" class="wingo-ball ball-green"><div class="wingo-ball-inner"><span>3</span></div></div>
+                            <div onclick="openBetModal('Number 4')" id="ballBtn4" class="wingo-ball ball-red"><div class="wingo-ball-inner"><span>4</span></div></div>
+                            <div onclick="openBetModal('Number 5')" id="ballBtn5" class="wingo-ball ball-gv"><div class="wingo-ball-inner"><span>5</span></div></div>
+                            <div onclick="openBetModal('Number 6')" id="ballBtn6" class="wingo-ball ball-red"><div class="wingo-ball-inner"><span>6</span></div></div>
+                            <div onclick="openBetModal('Number 7')" id="ballBtn7" class="wingo-ball ball-green"><div class="wingo-ball-inner"><span>7</span></div></div>
+                            <div onclick="openBetModal('Number 8')" id="ballBtn8" class="wingo-ball ball-red"><div class="wingo-ball-inner"><span>8</span></div></div>
+                            <div onclick="openBetModal('Number 9')" id="ballBtn9" class="wingo-ball ball-green"><div class="wingo-ball-inner"><span>9</span></div></div>
                         </div>
                     </div>
 
-                    <!-- Size Betting -->
-                    <div class="flex justify-between gap-3">
-                        <button onclick="openBetModal('Big')" class="flex-1 bg-game-yellow py-3 rounded-full font-black shadow-md active:scale-95 text-lg">Big</button>
-                        <button onclick="openBetModal('Small')" class="flex-1 bg-game-blue py-3 rounded-full font-black shadow-md active:scale-95 text-lg">Small</button>
+                    <!-- Random + Multipliers Row on Board -->
+                    <div class="flex items-center justify-between gap-1 mb-3.5">
+                        <button onclick="pickRandomNumber()" class="border border-[#fb4e4e] text-[#fb4e4e] hover:bg-[#fb4e4e]/10 px-2.5 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all">Random</button>
+                        <button onclick="selectBoardMultiplier(1, this)" class="board-mult-btn bg-[#18b660] text-white px-2.5 py-1.5 rounded-lg text-xs font-black transition-all">X1</button>
+                        <button onclick="selectBoardMultiplier(5, this)" class="board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all">X5</button>
+                        <button onclick="selectBoardMultiplier(10, this)" class="board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2 py-1.5 rounded-lg text-xs font-bold transition-all">X10</button>
+                        <button onclick="selectBoardMultiplier(20, this)" class="board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2 py-1.5 rounded-lg text-xs font-bold transition-all">X20</button>
+                        <button onclick="selectBoardMultiplier(50, this)" class="board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2 py-1.5 rounded-lg text-xs font-bold transition-all">X50</button>
+                        <button onclick="selectBoardMultiplier(100, this)" class="board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2 py-1.5 rounded-lg text-xs font-bold transition-all">X100</button>
+                    </div>
+
+                    <!-- Connected Big / Small Split Pill Bar -->
+                    <div class="flex rounded-full overflow-hidden shadow-md">
+                        <button onclick="openBetModal('Big')" class="flex-1 bg-game-yellow py-2.5 font-black text-base text-white active:opacity-90 transition-opacity">Big</button>
+                        <button onclick="openBetModal('Small')" class="flex-1 bg-game-blue py-2.5 font-black text-base text-white active:opacity-90 transition-opacity">Small</button>
                     </div>
                 </div>
 
-                <!-- History Table -->
-                <div class="bg-[#1c1c1c] rounded-xl shadow-md overflow-hidden mb-6 border border-[#333]" id="historySection">
-                    <div class="flex border-b border-[#333] bg-[#242424]">
-                        <button onclick="switchHistoryTab('record', this)" class="hist-tab-btn flex-1 py-3 text-theme-gold font-black border-b-2 border-theme-gold transition-colors">Game Record</button>
-                        <button onclick="switchHistoryTab('chart', this)" class="hist-tab-btn flex-1 py-3 text-gray-500 font-bold border-b-2 border-transparent hover:text-theme-gold transition-colors">Chart</button>
-                        <button onclick="switchHistoryTab('myrecord', this)" class="hist-tab-btn flex-1 py-3 text-gray-500 font-bold border-b-2 border-transparent hover:text-theme-gold transition-colors">My Record</button>
-                    </div>
-                    
+                <!-- 3 Pill History Tabs -->
+                <div class="flex gap-2.5 mb-3">
+                    <button onclick="switchHistoryTab('record', this)" class="hist-tab-btn flex-1 py-2.5 rounded-xl bg-theme-gold text-black font-black text-xs shadow-md transition-all">Game history</button>
+                    <button onclick="switchHistoryTab('chart', this)" class="hist-tab-btn flex-1 py-2.5 rounded-xl bg-[#1c1c1c] text-gray-400 font-bold text-xs border border-[#333] hover:text-theme-gold transition-all">Chart</button>
+                    <button onclick="switchHistoryTab('myrecord', this)" class="hist-tab-btn flex-1 py-2.5 rounded-xl bg-[#1c1c1c] text-gray-400 font-bold text-xs border border-[#333] hover:text-theme-gold transition-all">My history</button>
+                </div>
+
+                <!-- History Content Box -->
+                <div class="mb-6" id="historySection">
                     <!-- Game Record -->
                     <div id="tab-hist-record" class="hist-content-pane">
-                        <div class="w-full text-xs font-bold text-gray-500 history-row bg-[#1c1c1c]">
-                            <div>Period</div>
-                            <div>Number</div>
-                            <div>Size</div>
-                            <div>Color</div>
+                        <div class="bg-[#1c1c1c] rounded-xl shadow-md overflow-hidden border border-[#333]">
+                            <div class="w-full text-xs font-bold text-theme-gold history-row bg-[#242424] border-b border-[#333]">
+                                <div>Period</div>
+                                <div>Number</div>
+                                <div>Big Small</div>
+                                <div>Color</div>
+                            </div>
+                            <div id="historyTable" class="text-sm font-bold text-gray-200 bg-[#1c1c1c]">
+                                <!-- Populated by Backend -->
+                            </div>
                         </div>
-                        <div id="historyTable" class="text-sm font-bold text-gray-300 bg-[#1c1c1c]">
-                            <!-- Populated by Backend -->
+                        <!-- Pagination Bar for Game History -->
+                        <div class="bg-[#1c1c1c] mt-3 p-3.5 rounded-xl border border-[#333] flex items-center justify-center gap-6 shadow-md">
+                            <button id="histPrevBtn" onclick="changeHistoryPage(-1)" class="w-9 h-9 rounded-lg bg-[#2a2a2a] text-gray-400 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+                            <span id="histPageText" class="text-xs font-bold text-gray-300 font-mono">1/10</span>
+                            <button id="histNextBtn" onclick="changeHistoryPage(1)" class="w-9 h-9 rounded-lg bg-theme-gold text-black flex items-center justify-center active:scale-95 transition-all shadow"><i class="fa-solid fa-chevron-right text-sm"></i></button>
                         </div>
                     </div>
                     
-                    <!-- Chart -->
-                    <div id="tab-hist-chart" class="hist-content-pane hidden p-4 overflow-x-auto">
-                        <div class="text-center text-gray-400 text-xs mb-4">Trend Chart showing recent results</div>
-                        <div id="chartContainer" class="flex flex-col gap-2 min-w-max">
-                            <!-- Populated dynamically -->
+                    <!-- Chart (Authentic Tiranga Trend Chart) -->
+                    <div id="tab-hist-chart" class="hist-content-pane hidden">
+                        <div class="bg-[#1c1c1c] rounded-xl shadow-md overflow-hidden border border-[#333]">
+                            <!-- Header -->
+                            <div class="w-full text-xs font-bold text-theme-gold bg-[#242424] border-b border-[#333] py-3 grid grid-cols-12 text-center">
+                                <div class="col-span-5">Period</div>
+                                <div class="col-span-7">Number</div>
+                            </div>
+                            <!-- Statistic (last 100 Periods) -->
+                            <div class="p-3 border-b border-[#333] bg-[#181818]" id="chartStatsBox">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <!-- Trend Matrix Rows + SVG Connecting Line -->
+                            <div id="chartContainer" class="relative bg-[#1c1c1c]">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <!-- Pagination Bar for Chart -->
+                        <div class="bg-[#1c1c1c] mt-3 p-3.5 rounded-xl border border-[#333] flex items-center justify-center gap-6 shadow-md">
+                            <button id="chartPrevBtn" onclick="changeChartPage(-1)" class="w-9 h-9 rounded-lg bg-[#2a2a2a] text-gray-400 flex items-center justify-center active:scale-95 transition-all"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+                            <span id="chartPageText" class="text-xs font-bold text-gray-300 font-mono">1/10</span>
+                            <button id="chartNextBtn" onclick="changeChartPage(1)" class="w-9 h-9 rounded-lg bg-theme-gold text-black flex items-center justify-center active:scale-95 transition-all shadow"><i class="fa-solid fa-chevron-right text-sm"></i></button>
                         </div>
                     </div>
                     
                     <!-- My Record -->
                     <div id="tab-hist-myrecord" class="hist-content-pane hidden">
-                        <div id="myRecordTable" class="text-sm font-bold text-gray-300 bg-[#1c1c1c]">
-                            <div class="p-8 text-center text-gray-500">Loading your bets...</div>
+                        <div class="bg-[#1c1c1c] rounded-xl shadow-md overflow-hidden border border-[#333]">
+                            <div id="myRecordTable" class="text-sm font-bold text-gray-300 bg-[#1c1c1c]">
+                                <div class="p-8 text-center text-gray-500">Loading your bets...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -710,20 +803,36 @@
         const socket = io();
         
         // --- NAVIGATION ---
-        let currentRoom = '1m';
+        let currentRoom = '30s';
+        let histPage = 1;
+        let chartPage = 1;
+        const ITEMS_PER_PAGE = 10;
+
         function switchGameRoom(room, btnEl) {
             currentRoom = room;
+            histPage = 1;
+            chartPage = 1;
             socket.emit('join_game', room);
-            // clear history table pending load
             document.getElementById('historyTable').innerHTML = '<div class="p-4 text-center text-gray-500">Loading...</div>';
+            const modeLabel = document.getElementById('wingoModeLabel');
+            if (modeLabel) modeLabel.innerText = room === '30s' ? 'WinGo 30sec' : 'WinGo 1Min';
             
-            // update classes
             document.querySelectorAll('.game-tab-btn').forEach(btn => {
-                btn.classList.remove('bg-theme-gold', 'text-black', 'shadow-md', 'active-tab');
-                btn.classList.add('text-gray-500');
+                btn.classList.remove('bg-theme-gold', 'text-black', 'shadow-md', 'active-tab', 'font-black');
+                btn.classList.add('text-gray-400', 'font-bold');
+                const iconBox = btn.querySelector('div');
+                if (iconBox) {
+                    iconBox.classList.remove('bg-black/15');
+                    iconBox.classList.add('bg-[#2a2a2a]');
+                }
             });
-            btnEl.classList.remove('text-gray-500');
-            btnEl.classList.add('bg-theme-gold', 'text-black', 'shadow-md', 'active-tab');
+            btnEl.classList.remove('text-gray-400', 'font-bold');
+            btnEl.classList.add('bg-theme-gold', 'text-black', 'shadow-md', 'active-tab', 'font-black');
+            const activeIconBox = btnEl.querySelector('div');
+            if (activeIconBox) {
+                activeIconBox.classList.remove('bg-[#2a2a2a]');
+                activeIconBox.classList.add('bg-black/15');
+            }
         }
 
         let currentHistTab = 'record';
@@ -733,18 +842,59 @@
             document.getElementById('tab-hist-' + tab).classList.remove('hidden');
 
             document.querySelectorAll('.hist-tab-btn').forEach(btn => {
-                btn.classList.remove('text-theme-gold', 'border-theme-gold');
-                btn.classList.add('text-gray-500', 'border-transparent');
+                btn.classList.remove('bg-theme-gold', 'text-black', 'font-black', 'shadow-md');
+                btn.classList.add('bg-[#1c1c1c]', 'text-gray-400', 'font-bold', 'border', 'border-[#333]');
             });
-            btnEl.classList.remove('text-gray-500', 'border-transparent');
-            btnEl.classList.add('text-theme-gold', 'border-theme-gold');
+            btnEl.classList.remove('bg-[#1c1c1c]', 'text-gray-400', 'font-bold', 'border', 'border-[#333]');
+            btnEl.classList.add('bg-theme-gold', 'text-black', 'font-black', 'shadow-md');
             
-            if (tab === 'myrecord') {
-                socket.emit('get_profile_data'); // This will trigger profile_data which can render 'myrecord'
+            if (tab === 'chart') {
+                requestAnimationFrame(() => renderChart());
+            } else if (tab === 'myrecord') {
+                socket.emit('get_profile_data');
             }
         }
 
+        let userTotalDeposit = 0;
+
+        function openDepositRequiredModal() {
+            const modal = document.getElementById('depositRequiredModal');
+            const card = document.getElementById('depositRequiredCard');
+            if (!modal || !card) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDepositRequiredModal() {
+            const modal = document.getElementById('depositRequiredModal');
+            const card = document.getElementById('depositRequiredCard');
+            if (!modal || !card) return;
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 250);
+        }
+
+        function handleGameClick(gameId) {
+            if (userTotalDeposit <= 0) {
+                openDepositRequiredModal();
+                return;
+            }
+            if (gameId === 'wingo') switchView('wingo');
+            else showToast('Coming soon!', 'success');
+        }
+
         function switchView(viewId, btnEl, push = true) {
+            if (viewId === 'wingo' && userTotalDeposit <= 0) {
+                openDepositRequiredModal();
+                return;
+            }
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             
             let targetView = document.getElementById('view-' + viewId);
@@ -783,6 +933,7 @@
             if(!document.getElementById('depositModal').classList.contains('hidden')) closeDepositModal();
             if(!document.getElementById('withdrawModal').classList.contains('hidden')) closeWithdrawModal();
             if(!document.getElementById('historyModal').classList.contains('hidden')) closeHistoryModal();
+            if(!document.getElementById('depositRequiredModal').classList.contains('hidden')) closeDepositRequiredModal();
 
             if (e.state && e.state.viewId) {
                 switchView(e.state.viewId, null, false);
@@ -962,7 +1113,7 @@
             if (diff < 0) diff = 0;
             if (diff > maxDrag) diff = maxDrag;
             
-            slider.style.transform = 'translateX(0px)';
+            slider.style.transform = `translateX(${diff}px)`;
             fill.style.width = (diff + 24) + 'px'; // 24 is half slider width
 
             if (diff >= maxDrag && maxDrag > 0) {
@@ -1008,6 +1159,8 @@
         }
 
         function handleLogin() { 
+            tempMobile = document.getElementById('loginMobile').value;
+            tempPassword = document.getElementById('loginPassword').value;
             socket.emit('login', { 
                 mobile: document.getElementById('loginMobile').value, 
                 password: document.getElementById('loginPassword').value 
@@ -1018,6 +1171,8 @@
             const password = document.getElementById('regPassword').value;
             const invite = document.getElementById('regInvite').value;
             if(!mobile || !password) return showToast('Please fill all fields');
+            tempMobile = mobile;
+            tempPassword = password;
             socket.emit('register', { mobile, password, invite });
         }
 
@@ -1027,6 +1182,11 @@
             document.querySelectorAll('.display-uid').forEach(el => el.innerText = 'UID: ' + userData.uid);
             document.querySelectorAll('.user-balance-display').forEach(el => el.innerText = `₹${userData.balance.toFixed(2)}`);
             document.getElementById('vipBadge').innerText = 'VIP ' + (userData.vipLevel || 0);
+            userTotalDeposit = userData.totalDeposit || 0;
+            if (tempMobile && tempPassword) {
+                localStorage.setItem('bkg_mobile', tempMobile);
+                localStorage.setItem('bkg_password', tempPassword);
+            }
         });
 
         socket.on('vip_update', (level) => {
@@ -1047,9 +1207,75 @@
         socket.on('toast', (data) => { showToast(data.msg, data.type); });
 
         // --- WIN GO BETTING LOGIC ---
-        let winGoSel = ''; let baseAmt = 10; let qty = 1;
+        let winGoSel = ''; let baseAmt = 10; let qty = 1; let boardMultiplier = 1;
+        let wingoSoundMuted = false;
+
+        function toggleWingoSound() {
+            wingoSoundMuted = !wingoSoundMuted;
+            const icon = document.getElementById('wingoSoundIcon');
+            if (icon) {
+                icon.className = wingoSoundMuted
+                    ? 'fa-solid fa-volume-xmark text-gray-500 text-lg cursor-pointer hover:opacity-80'
+                    : 'fa-solid fa-volume-high text-theme-gold text-lg cursor-pointer hover:opacity-80';
+            }
+        }
+
+        function selectBoardMultiplier(m, btn) {
+            boardMultiplier = m;
+            qty = m;
+            document.querySelectorAll('.board-mult-btn').forEach(b => {
+                b.className = 'board-mult-btn bg-[#242424] text-gray-300 border border-[#333] px-2 py-1.5 rounded-lg text-xs font-bold transition-all';
+            });
+            btn.className = 'board-mult-btn bg-[#18b660] text-white px-2.5 py-1.5 rounded-lg text-xs font-black shadow transition-all';
+        }
+
+        let randomAnimating = false;
+        function pickRandomNumber() {
+            if (userTotalDeposit <= 0) {
+                openDepositRequiredModal();
+                return;
+            }
+            if (randomAnimating) return;
+            randomAnimating = true;
+            let steps = 0;
+            const maxSteps = 8;
+            let lastIdx = -1;
+            const iv = setInterval(() => {
+                if (lastIdx >= 0) {
+                    const prev = document.getElementById('ballBtn' + lastIdx);
+                    if (prev) prev.classList.remove('ball-highlight');
+                }
+                const r = Math.floor(Math.random() * 10);
+                lastIdx = r;
+                const cur = document.getElementById('ballBtn' + r);
+                if (cur) cur.classList.add('ball-highlight');
+                steps++;
+                if (steps >= maxSteps) {
+                    clearInterval(iv);
+                    setTimeout(() => {
+                        if (cur) cur.classList.remove('ball-highlight');
+                        randomAnimating = false;
+                        openBetModal('Number ' + r);
+                    }, 180);
+                }
+            }, 70);
+        }
+
+        socket.on('deposit_status_update', (totalDep) => {
+            userTotalDeposit = totalDep || 0;
+        });
+
+        socket.on('require_deposit', () => {
+            closeBetModal();
+            openDepositRequiredModal();
+        });
+
         function openBetModal(selection) {
-            winGoSel = selection; baseAmt = 10; qty = 1; 
+            if (userTotalDeposit <= 0) {
+                openDepositRequiredModal();
+                return;
+            }
+            winGoSel = selection; baseAmt = 10; qty = boardMultiplier || 1; 
             updateBetUI();
             
             document.querySelectorAll('.bet-amt-btn').forEach(btn => {
@@ -1112,20 +1338,25 @@
             let secStr = data.time < 10 ? "0" + data.time : data.time.toString();
             document.getElementById('sec1').innerText = secStr.charAt(0); document.getElementById('sec2').innerText = secStr.charAt(1);
             
+            const d1 = document.getElementById('lockDigit1');
+            const d2 = document.getElementById('lockDigit2');
             if(data.time <= 5 && data.time > 0) { 
                 document.getElementById('timerBox').classList.add('timer-drawing'); 
                 document.getElementById('gridDisabler').classList.remove('hidden');
+                closeBetModal();
                 
-                let lockCt = document.getElementById('lockCountdown');
-                lockCt.innerText = '0' + data.time;
-                lockCt.classList.remove('animate-ping');
-                void lockCt.offsetWidth; // trigger reflow
-                lockCt.classList.add('animate-ping');
+                if (d1) d1.innerText = '0';
+                if (d2) d2.innerText = data.time.toString();
                 
-                try { audioTick.play(); } catch(e){} 
+                if (!wingoSoundMuted) {
+                    try { audioTick.play(); } catch(e){}
+                }
             } 
             else if (data.time === 0) {
-                document.getElementById('lockCountdown').innerText = '00';
+                document.getElementById('timerBox').classList.add('timer-drawing');
+                document.getElementById('gridDisabler').classList.remove('hidden');
+                if (d1) d1.innerText = '0';
+                if (d2) d2.innerText = '0';
             }
             else { 
                 document.getElementById('timerBox').classList.remove('timer-drawing'); 
@@ -1134,63 +1365,224 @@
         });
 
         let currentHistory = [];
-        
-        function renderChart() {
-            const chartCont = document.getElementById('chartContainer');
-            if(!chartCont) return;
-            chartCont.innerHTML = '';
-            
-            // Reverse history to show chronological order for chart
-            let chrono = [...currentHistory].reverse();
-            
-            let gridHTML = '<div class="flex gap-2 p-2 items-end justify-start">';
-            chrono.forEach(item => {
-                const bgClasses = item.result.num === 0 || item.result.num === 5 ? 'bg-rv' : (item.result.num % 2 === 0 ? 'bg-game-red' : 'bg-game-green');
-                gridHTML += `
-                    <div class="flex flex-col items-center gap-1">
-                        <div class="text-[10px] text-gray-500 font-mono">${item.period.slice(-3)}</div>
-                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${bgClasses}">${item.result.num}</div>
-                    </div>
-                `;
+
+        function renderLastFiveBalls() {
+            const box = document.getElementById('lastFiveBalls');
+            if (!box) return;
+            box.innerHTML = '';
+            const lastFive = currentHistory.slice(0, 5);
+            lastFive.forEach(item => {
+                const n = item.result.num;
+                let ballClass = 'ball-green';
+                if (n === 0) ballClass = 'ball-rv';
+                else if (n === 5) ballClass = 'ball-gv';
+                else if (n % 2 === 0) ballClass = 'ball-red';
+                box.innerHTML += `<div class="mini-ball ${ballClass}"><div class="mini-ball-inner"><span>${n}</span></div></div>`;
             });
-            gridHTML += '</div>';
-            chartCont.innerHTML = gridHTML;
         }
+
+        function updatePaginationButtons(prevBtnId, nextBtnId, pageTextId, currentPage, totalPages) {
+            const prevBtn = document.getElementById(prevBtnId);
+            const nextBtn = document.getElementById(nextBtnId);
+            const pageText = document.getElementById(pageTextId);
+            if (pageText) pageText.innerText = `${currentPage}/${totalPages}`;
+            if (prevBtn) {
+                if (currentPage <= 1) {
+                    prevBtn.className = 'w-9 h-9 rounded-lg bg-[#2a2a2a] text-gray-500 flex items-center justify-center transition-colors cursor-not-allowed';
+                } else {
+                    prevBtn.className = 'w-9 h-9 rounded-lg bg-theme-gold text-black flex items-center justify-center transition-colors shadow-md active:scale-95';
+                }
+            }
+            if (nextBtn) {
+                if (currentPage >= totalPages) {
+                    nextBtn.className = 'w-9 h-9 rounded-lg bg-[#2a2a2a] text-gray-500 flex items-center justify-center transition-colors cursor-not-allowed';
+                } else {
+                    nextBtn.className = 'w-9 h-9 rounded-lg bg-theme-gold text-black flex items-center justify-center transition-colors shadow-md active:scale-95';
+                }
+            }
+        }
+
+        function renderHistoryTable(highlightFirst = false) {
+            const historyTable = document.getElementById('historyTable');
+            if (!historyTable) return;
+            const totalPages = Math.max(1, Math.ceil(currentHistory.length / ITEMS_PER_PAGE));
+            if (histPage > totalPages) histPage = totalPages;
+            const start = (histPage - 1) * ITEMS_PER_PAGE;
+            const pageItems = currentHistory.slice(start, start + ITEMS_PER_PAGE);
+
+            historyTable.innerHTML = '';
+            pageItems.forEach((item, idx) => {
+                const rowHighlight = (highlightFirst && histPage === 1 && idx === 0) ? 'bg-theme-gold/15' : '';
+                historyTable.innerHTML += `
+                <div class="history-row ${rowHighlight} transition-colors duration-700">
+                    <div class="font-mono text-[12px] text-gray-200 tracking-tight text-left pl-2">${item.period}</div>
+                    <div class="text-[22px] leading-none font-black ${item.result.colorClasses}">${item.result.num}</div>
+                    <div class="text-xs font-semibold text-white">${item.result.size}</div>
+                    <div class="flex justify-center items-center">${item.result.html}</div>
+                </div>`;
+            });
+            updatePaginationButtons('histPrevBtn', 'histNextBtn', 'histPageText', histPage, totalPages);
+        }
+
+        function changeHistoryPage(delta) {
+            const totalPages = Math.max(1, Math.ceil(currentHistory.length / ITEMS_PER_PAGE));
+            const next = histPage + delta;
+            if (next < 1 || next > totalPages) return;
+            histPage = next;
+            renderHistoryTable(false);
+        }
+
+        function drawChartLines() {
+            const chartCont = document.getElementById('chartContainer');
+            const svg = document.getElementById('chartSvgOverlay');
+            if (!chartCont || !svg) return;
+            const balls = chartCont.querySelectorAll('.chart-active-ball');
+            if (balls.length < 2) {
+                svg.innerHTML = '';
+                return;
+            }
+            const contRect = chartCont.getBoundingClientRect();
+            if (contRect.width === 0) return;
+
+            let linesHtml = '';
+            for (let i = 0; i < balls.length - 1; i++) {
+                const r1 = balls[i].getBoundingClientRect();
+                const r2 = balls[i + 1].getBoundingClientRect();
+                const x1 = (r1.left - contRect.left + r1.width / 2).toFixed(1);
+                const y1 = (r1.top - contRect.top + r1.height / 2).toFixed(1);
+                const x2 = (r2.left - contRect.left + r2.width / 2).toFixed(1);
+                const y2 = (r2.top - contRect.top + r2.height / 2).toFixed(1);
+                linesHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fb4e4e" stroke-width="1.5" />`;
+            }
+            svg.innerHTML = linesHtml;
+        }
+
+        function renderChart() {
+            const statsBox = document.getElementById('chartStatsBox');
+            const chartCont = document.getElementById('chartContainer');
+            if (!chartCont) return;
+
+            const last100 = currentHistory.slice(0, 100);
+            const totalLen = last100.length || 1;
+            const missingArr = [];
+            const avgMissingArr = [];
+            const freqArr = [];
+            const maxConsecArr = [];
+
+            for (let d = 0; d <= 9; d++) {
+                let firstIdx = last100.findIndex(item => item.result.num === d);
+                missingArr.push(firstIdx === -1 ? last100.length : firstIdx);
+
+                let freq = 0;
+                let curStreak = 0;
+                let maxStreak = 0;
+                last100.forEach(item => {
+                    if (item.result.num === d) {
+                        freq++;
+                        curStreak++;
+                        if (curStreak > maxStreak) maxStreak = curStreak;
+                    } else {
+                        curStreak = 0;
+                    }
+                });
+                freqArr.push(freq);
+                maxConsecArr.push(maxStreak);
+                avgMissingArr.push(freq > 0 ? Math.round((totalLen - freq) / (freq + 1)) : totalLen);
+            }
+
+            if (statsBox) {
+                const winNumsHtml = [0,1,2,3,4,5,6,7,8,9].map(d =>
+                    `<div class="w-[18px] h-[18px] rounded-full border border-[#fb4e4e] text-[#fb4e4e] flex items-center justify-center text-[10px] font-bold">${d}</div>`
+                ).join('');
+                const makeStatRow = (label, arr) => `
+                    <div class="flex items-center justify-between py-1">
+                        <span class="text-[11px] text-gray-300 font-medium">${label}</span>
+                        <div class="flex items-center gap-[5px] pr-5">
+                            ${arr.map(v => `<div class="w-[18px] text-center text-[11px] text-gray-400 font-mono">${v}</div>`).join('')}
+                        </div>
+                    </div>`;
+
+                statsBox.innerHTML = `
+                    <div class="text-xs font-bold text-white mb-2">Statistic (last 100 Periods)</div>
+                    <div class="flex items-center justify-between py-1">
+                        <span class="text-[11px] text-gray-300 font-medium">Winning Numbers</span>
+                        <div class="flex items-center gap-[5px] pr-5">${winNumsHtml}</div>
+                    </div>
+                    ${makeStatRow('Missing', missingArr)}
+                    ${makeStatRow('Avg missing', avgMissingArr)}
+                    ${makeStatRow('Frequency', freqArr)}
+                    ${makeStatRow('Max consecutive', maxConsecArr)}
+                `;
+            }
+
+            const totalPages = Math.max(1, Math.ceil(currentHistory.length / ITEMS_PER_PAGE));
+            if (chartPage > totalPages) chartPage = totalPages;
+            const start = (chartPage - 1) * ITEMS_PER_PAGE;
+            const pageItems = currentHistory.slice(start, start + ITEMS_PER_PAGE);
+
+            let rowsHtml = `<svg id="chartSvgOverlay" class="absolute inset-0 w-full h-full pointer-events-none z-10"></svg>`;
+            pageItems.forEach(item => {
+                const winNum = item.result.num;
+                let ballsHtml = '';
+                for (let d = 0; d <= 9; d++) {
+                    if (d === winNum) {
+                        let activeStyle = '';
+                        let activeBg = '';
+                        if (d === 0) activeStyle = 'background: linear-gradient(135deg, #fb4e4e 50%, #9b4dff 50%);';
+                        else if (d === 5) activeStyle = 'background: linear-gradient(135deg, #18b660 50%, #9b4dff 50%);';
+                        else if (d % 2 === 0) activeBg = 'bg-[#fb4e4e]';
+                        else activeBg = 'bg-[#18b660]';
+
+                        ballsHtml += `<div class="chart-active-ball w-[17px] h-[17px] rounded-full ${activeBg} text-white flex items-center justify-center text-[10px] font-bold relative z-20 shadow-sm" style="${activeStyle}">${d}</div>`;
+                    } else {
+                        ballsHtml += `<div class="w-[17px] h-[17px] rounded-full border border-[#3a3a3a] text-gray-500 flex items-center justify-center text-[10px] relative z-20">${d}</div>`;
+                    }
+                }
+                const isBig = item.result.size === 'Big';
+                const bsBadge = isBig
+                    ? `<div class="w-[17px] h-[17px] rounded-full bg-[#feaa57] text-white flex items-center justify-center text-[10px] font-bold ml-1 relative z-20">B</div>`
+                    : `<div class="w-[17px] h-[17px] rounded-full bg-[#6ea8f4] text-white flex items-center justify-center text-[10px] font-bold ml-1 relative z-20">S</div>`;
+
+                rowsHtml += `
+                    <div class="flex items-center justify-between px-3 py-3 border-b border-[#262626] relative">
+                        <div class="font-mono text-[11px] text-gray-200 tracking-tight">${item.period}</div>
+                        <div class="flex items-center gap-[4px]">
+                            ${ballsHtml}
+                            ${bsBadge}
+                        </div>
+                    </div>`;
+            });
+
+            chartCont.innerHTML = rowsHtml;
+            updatePaginationButtons('chartPrevBtn', 'chartNextBtn', 'chartPageText', chartPage, totalPages);
+            requestAnimationFrame(drawChartLines);
+        }
+
+        function changeChartPage(delta) {
+            const totalPages = Math.max(1, Math.ceil(currentHistory.length / ITEMS_PER_PAGE));
+            const next = chartPage + delta;
+            if (next < 1 || next > totalPages) return;
+            chartPage = next;
+            renderChart();
+        }
+
+        window.addEventListener('resize', () => {
+            if (currentHistTab === 'chart') requestAnimationFrame(drawChartLines);
+        });
 
         socket.on('history', (history) => {
             currentHistory = history;
-            const historyTable = document.getElementById('historyTable');
-            historyTable.innerHTML = '';
-            history.forEach(item => {
-                let sizeClass = item.result.size === 'Big' ? 'text-yellow-500' : 'text-blue-500';
-                historyTable.innerHTML += `
-                <div class="history-row">
-                    <div class="font-mono text-xs text-gray-500">${item.period}</div>
-                    <div class="text-xl font-black ${item.result.colorClasses}">${item.result.num}</div>
-                    <div class="text-sm font-bold ${sizeClass}">${item.result.size}</div>
-                    <div class="flex justify-center">${item.result.html}</div>
-                </div>`;
-            });
+            renderLastFiveBalls();
+            renderHistoryTable(false);
             renderChart();
         });
 
         socket.on('new_result', (item) => {
             currentHistory.unshift(item);
-            if(currentHistory.length > 20) currentHistory.pop();
+            if(currentHistory.length > 100) currentHistory.pop();
             
-            const historyTable = document.getElementById('historyTable');
-            const tr = document.createElement('div');
-            tr.className = "history-row bg-theme-gold/20 transition-colors duration-1000";
-            let sizeClass = item.result.size === 'Big' ? 'text-yellow-500' : 'text-blue-500';
-            tr.innerHTML = `
-                <div class="font-mono text-xs text-gray-500">${item.period}</div>
-                <div class="text-xl font-black ${item.result.colorClasses}">${item.result.num}</div>
-                <div class="text-sm font-bold ${sizeClass}">${item.result.size}</div>
-                <div class="flex justify-center">${item.result.html}</div>
-            `;
-            historyTable.prepend(tr);
-            setTimeout(() => tr.classList.remove('bg-theme-gold/20'), 1500);
-            
+            renderLastFiveBalls();
+            renderHistoryTable(true);
             renderChart();
         });
         // --- DEPOSIT & WITHDRAW ---
@@ -1480,7 +1872,289 @@
             closeLanguageSheet();
         }
 
+        // --- WINGO WIN / LOSS RESULT POPUP MODAL ---
+        let wingoAutoClose = true;
+        let wingoAutoCloseTimer = null;
+        let lastWingoIsWin = true;
+
+        function updateWingoAutoCloseUI() {
+            const circle = document.getElementById('wingoAutoCloseCircle');
+            const label = document.getElementById('wingoAutoCloseLabel');
+            if (!circle || !label) return;
+            if (lastWingoIsWin) {
+                label.className = 'text-xs font-medium text-white/95';
+                circle.className = wingoAutoClose
+                    ? 'w-[18px] h-[18px] rounded-full border border-white bg-white/25 flex items-center justify-center text-white text-[10px]'
+                    : 'w-[18px] h-[18px] rounded-full border border-white/75 flex items-center justify-center text-transparent text-[10px]';
+            } else {
+                label.className = 'text-xs font-medium text-[#475569]';
+                circle.className = wingoAutoClose
+                    ? 'w-[18px] h-[18px] rounded-full border border-[#64748b] bg-[#64748b] flex items-center justify-center text-white text-[10px]'
+                    : 'w-[18px] h-[18px] rounded-full border border-[#64748b] flex items-center justify-center text-transparent text-[10px]';
+            }
+        }
+
+        function toggleWingoAutoClose() {
+            wingoAutoClose = !wingoAutoClose;
+            updateWingoAutoCloseUI();
+            if (wingoAutoCloseTimer) {
+                clearTimeout(wingoAutoCloseTimer);
+                wingoAutoCloseTimer = null;
+            }
+            if (wingoAutoClose) {
+                wingoAutoCloseTimer = setTimeout(() => closeWingoResultModal(), 3000);
+            }
+        }
+
+        function closeWingoResultModal() {
+            if (wingoAutoCloseTimer) {
+                clearTimeout(wingoAutoCloseTimer);
+                wingoAutoCloseTimer = null;
+            }
+            const modal = document.getElementById('wingoResultModal');
+            const wrap = document.getElementById('wingoResultWrap');
+            if (!modal || !wrap) return;
+            wrap.classList.remove('scale-100', 'opacity-100');
+            wrap.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 220);
+        }
+
+        function showWingoResultModal(data) {
+            const modal = document.getElementById('wingoResultModal');
+            const wrap = document.getElementById('wingoResultWrap');
+            const card = document.getElementById('wingoResultCard');
+            const headerSvg = document.getElementById('wingoResHeaderSvg');
+            const titleEl = document.getElementById('wingoResTitle');
+            const lotLabel = document.getElementById('wingoResLotteryLabel');
+            const colorBadge = document.getElementById('wingoResColorBadge');
+            const numBadge = document.getElementById('wingoResNumBadge');
+            const sizeBadge = document.getElementById('wingoResSizeBadge');
+            const slotEl = document.getElementById('wingoResSlot');
+            const ticketEl = document.getElementById('wingoResTicket');
+            const ticketContent = document.getElementById('wingoResTicketContent');
+
+            if (!modal || !card) return;
+            const isWin = !!data.won;
+            lastWingoIsWin = isWin;
+
+            // Header Winged Rocket & Ribbon SVG (Gold/Orange for Win, White/Silver-Slate for Lose)
+            if (isWin) {
+                headerSvg.innerHTML = `
+                <svg viewBox="0 0 280 120" class="w-full h-full drop-shadow-[0_6px_12px_rgba(0,0,0,0.3)]">
+                    <defs>
+                        <linearGradient id="winRibBack" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#e07428"/><stop offset="100%" stop-color="#b54b0c"/>
+                        </linearGradient>
+                        <linearGradient id="winRibFront" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#ffc875"/><stop offset="50%" stop-color="#f59038"/><stop offset="100%" stop-color="#d96716"/>
+                        </linearGradient>
+                        <linearGradient id="winWing" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#ffe5cc"/><stop offset="100%" stop-color="#f7b481"/>
+                        </linearGradient>
+                        <linearGradient id="winCoinOuter" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#fff0d4"/><stop offset="50%" stop-color="#fbbd61"/><stop offset="100%" stop-color="#e38222"/>
+                        </linearGradient>
+                        <linearGradient id="winCoinInner" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#ffd042"/><stop offset="100%" stop-color="#f58d14"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Left & Right Ribbon Tails -->
+                    <path d="M12,78 L52,65 L58,98 L24,104 L30,88 Z" fill="url(#winRibBack)"/>
+                    <path d="M268,78 L228,65 L222,98 L256,104 L250,88 Z" fill="url(#winRibBack)"/>
+                    <!-- Main Ribbon -->
+                    <path d="M36,54 C70,40 210,40 244,54 L232,88 C198,74 82,74 48,88 Z" fill="url(#winRibFront)"/>
+                    <!-- Left Wing -->
+                    <path d="M102,56 C78,46 66,30 62,15 C74,20 88,26 98,35 C82,25 75,14 74,4 C86,10 98,20 107,33 C96,21 92,12 93,4 C103,12 111,24 115,38 Z" fill="url(#winWing)"/>
+                    <path d="M98,66 C76,64 62,56 55,44 C68,46 80,50 92,55 Z" fill="url(#winWing)"/>
+                    <!-- Right Wing -->
+                    <path d="M178,56 C202,46 214,30 218,15 C206,20 192,26 182,35 C198,25 205,14 206,4 C194,10 182,20 173,33 C184,21 188,12 187,4 C177,12 169,24 165,38 Z" fill="url(#winWing)"/>
+                    <path d="M182,66 C204,64 218,56 225,44 C212,46 200,50 188,55 Z" fill="url(#winWing)"/>
+                    <!-- Center Medal Outer & Inner Rings -->
+                    <circle cx="140" cy="54" r="42" fill="url(#winCoinOuter)" stroke="#fff6e5" stroke-width="1.5"/>
+                    <circle cx="140" cy="54" r="33" fill="url(#winCoinInner)" stroke="#ffe5a3" stroke-width="1.5"/>
+                    <!-- Rocket with Lightning Icon -->
+                    <path d="M140,26 C148,34 151,46 150,57 L156,64 L149,66 L146,61 L134,61 L131,66 L124,64 L130,57 C129,46 132,34 140,26 Z" fill="#fff8eb"/>
+                    <polygon points="141,38 135,47 140,47 138,55 145,45 140,45" fill="#f59316"/>
+                    <path d="M140,63 C143,67 143,72 140,76 C137,72 137,67 140,63 Z" fill="#fff0c2"/>
+                </svg>`;
+                card.style.background = 'linear-gradient(180deg, #f68d5c 0%, #f45c46 52%, #ef463b 100%)';
+                card.className = 'w-[295px] rounded-[24px] pt-14 pb-5 px-5 relative shadow-[0_18px_45px_rgba(240,70,60,0.45)] border border-white/25';
+                titleEl.innerText = 'Congratulations';
+                titleEl.className = 'text-[23px] font-extrabold text-white text-center tracking-wide mb-3.5 drop-shadow-sm';
+                lotLabel.className = 'text-[11px] font-semibold text-white/95 mr-1';
+                slotEl.className = 'h-3.5 w-full rounded-full bg-[#8f261b] shadow-inner';
+                ticketEl.style.background = 'linear-gradient(180deg, #f3cfc9 0%, #ffffff 22%, #ffffff 100%)';
+            } else {
+                headerSvg.innerHTML = `
+                <svg viewBox="0 0 280 120" class="w-full h-full drop-shadow-[0_6px_12px_rgba(0,0,0,0.25)]">
+                    <defs>
+                        <linearGradient id="loseRibBack" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#64748b"/>
+                        </linearGradient>
+                        <linearGradient id="loseRibFront" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f8fafc"/><stop offset="50%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#94a3b8"/>
+                        </linearGradient>
+                        <linearGradient id="loseWing" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#ffffff"/><stop offset="65%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#cbd5e1"/>
+                        </linearGradient>
+                        <linearGradient id="loseCoinOuter" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#dbe4f0"/><stop offset="100%" stop-color="#94a3b8"/>
+                        </linearGradient>
+                        <linearGradient id="loseCoinInner" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#7c8ea6"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Left & Right Ribbon Tails -->
+                    <path d="M12,78 L52,65 L58,98 L24,104 L30,88 Z" fill="url(#loseRibBack)"/>
+                    <path d="M268,78 L228,65 L222,98 L256,104 L250,88 Z" fill="url(#loseRibBack)"/>
+                    <!-- Main Ribbon -->
+                    <path d="M36,54 C70,40 210,40 244,54 L232,88 C198,74 82,74 48,88 Z" fill="url(#loseRibFront)"/>
+                    <!-- Left Wing -->
+                    <path d="M102,56 C78,46 66,30 62,15 C74,20 88,26 98,35 C82,25 75,14 74,4 C86,10 98,20 107,33 C96,21 92,12 93,4 C103,12 111,24 115,38 Z" fill="url(#loseWing)"/>
+                    <path d="M98,66 C76,64 62,56 55,44 C68,46 80,50 92,55 Z" fill="url(#loseWing)"/>
+                    <!-- Right Wing -->
+                    <path d="M178,56 C202,46 214,30 218,15 C206,20 192,26 182,35 C198,25 205,14 206,4 C194,10 182,20 173,33 C184,21 188,12 187,4 C177,12 169,24 165,38 Z" fill="url(#loseWing)"/>
+                    <path d="M182,66 C204,64 218,56 225,44 C212,46 200,50 188,55 Z" fill="url(#loseWing)"/>
+                    <!-- Center Medal Outer & Inner Rings -->
+                    <circle cx="140" cy="54" r="42" fill="url(#loseCoinOuter)" stroke="#ffffff" stroke-width="1.5"/>
+                    <circle cx="140" cy="54" r="33" fill="url(#loseCoinInner)" stroke="#e2e8f0" stroke-width="1.5"/>
+                    <!-- Rocket with Lightning Icon -->
+                    <path d="M140,26 C148,34 151,46 150,57 L156,64 L149,66 L146,61 L134,61 L131,66 L124,64 L130,57 C129,46 132,34 140,26 Z" fill="#ffffff"/>
+                    <polygon points="141,38 135,47 140,47 138,55 145,45 140,45" fill="#7c8ea6"/>
+                    <path d="M140,63 C143,67 143,72 140,76 C137,72 137,67 140,63 Z" fill="#f1f5f9"/>
+                </svg>`;
+                card.style.background = 'linear-gradient(180deg, #ffffff 0%, #eff4f9 52%, #dce5f0 100%)';
+                card.className = 'w-[295px] rounded-[24px] pt-14 pb-5 px-5 relative shadow-[0_18px_45px_rgba(0,0,0,0.5)] border border-white';
+                titleEl.innerText = 'Sorry';
+                titleEl.className = 'text-[23px] font-extrabold text-[#475569] text-center tracking-wide mb-3.5';
+                lotLabel.className = 'text-[11px] font-semibold text-[#475569] mr-1';
+                slotEl.className = 'h-3.5 w-full rounded-full bg-[#94a3b8] shadow-inner';
+                ticketEl.style.background = 'linear-gradient(180deg, #cbd5e1 0%, #ffffff 22%, #ffffff 100%)';
+            }
+
+            // Result badges (Red / Green / Violet-split)
+            const rNum = data.result ? data.result.num : 0;
+            const rSize = data.result ? data.result.size : 'Small';
+            let rColorText = data.result ? data.result.colorName : 'Red';
+            if (rColorText === 'Red/Violet') rColorText = 'Red Violet';
+            if (rColorText === 'Green/Violet') rColorText = 'Green Violet';
+
+            let badgeBgStyle = '';
+            let badgeBgClass = 'bg-[#c8372d]';
+            if (!isWin) {
+                badgeBgClass = 'bg-[#687c97]';
+            } else {
+                if (rNum === 0) {
+                    badgeBgClass = '';
+                    badgeBgStyle = 'background: linear-gradient(135deg, #c8372d 50%, #8b3dff 50%);';
+                } else if (rNum === 5) {
+                    badgeBgClass = '';
+                    badgeBgStyle = 'background: linear-gradient(135deg, #18b660 50%, #8b3dff 50%);';
+                } else if (rNum % 2 === 0) {
+                    badgeBgClass = 'bg-[#c8372d]';
+                } else {
+                    badgeBgClass = 'bg-[#18b660]';
+                }
+            }
+
+            colorBadge.className = `px-2.5 py-0.5 rounded text-[11px] font-bold text-white border border-white/35 ${badgeBgClass}`;
+            colorBadge.style = badgeBgStyle;
+            colorBadge.innerText = rColorText;
+
+            numBadge.className = `w-[22px] h-[22px] rounded-full flex items-center justify-center text-[11px] font-bold text-white border border-white/35 ${badgeBgClass}`;
+            numBadge.style = badgeBgStyle;
+            numBadge.innerText = rNum;
+
+            sizeBadge.className = `px-2.5 py-0.5 rounded text-[11px] font-bold text-white border border-white/35 ${badgeBgClass}`;
+            sizeBadge.style = badgeBgStyle;
+            sizeBadge.innerText = rSize;
+
+            // Ticket Content
+            const periodLabel = `Period:${data.roomLabel || 'Win 1 minute'} ${data.period || ''}`;
+            if (isWin) {
+                const formattedBonus = Number(data.amount || 0).toLocaleString('en-IN', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                ticketContent.innerHTML = `
+                    <div class="text-xs font-extrabold text-[#e05246] mb-0.5">Bonus</div>
+                    <div class="text-[24px] leading-tight font-black text-[#e13b32] mb-2">₹${formattedBonus}</div>
+                    <div class="text-[10px] font-medium text-gray-400 tracking-tight">${periodLabel}</div>
+                `;
+            } else {
+                ticketContent.innerHTML = `
+                    <div class="text-[26px] leading-tight font-black text-[#5a6e85] my-2">Lose</div>
+                    <div class="text-[10px] font-medium text-gray-400 tracking-tight">${periodLabel}</div>
+                `;
+            }
+
+            updateWingoAutoCloseUI();
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            requestAnimationFrame(() => {
+                wrap.classList.remove('scale-90', 'opacity-0');
+                wrap.classList.add('scale-100', 'opacity-100');
+            });
+
+            if (wingoAutoCloseTimer) clearTimeout(wingoAutoCloseTimer);
+            if (wingoAutoClose) {
+                wingoAutoCloseTimer = setTimeout(() => closeWingoResultModal(), 3000);
+            }
+        }
+
+        socket.on('wingo_bet_result', (data) => {
+            showWingoResultModal(data);
+            if (currentHistTab === 'myrecord') {
+                socket.emit('get_profile_data');
+            }
+        });
+
     </script>
+    <!-- WinGo Win / Loss Result Modal -->
+    <div id="wingoResultModal" class="fixed inset-0 bg-black/75 z-[10005] hidden flex-col items-center justify-center p-4 backdrop-blur-[2px]" onclick="if(event.target === this) closeWingoResultModal()">
+        <div id="wingoResultWrap" class="flex flex-col items-center transform transition-all duration-200 scale-90 opacity-0 mt-8">
+            <div id="wingoResultCard" class="w-[295px] rounded-[24px] pt-14 pb-5 px-5 relative shadow-2xl">
+                <!-- Protruding Top Winged Rocket & Ribbon Emblem -->
+                <div id="wingoResHeaderSvg" class="absolute -top-14 left-1/2 -translate-x-1/2 w-[275px] h-[115px] pointer-events-none z-20"></div>
+
+                <!-- Title (Congratulations / Sorry) -->
+                <h3 id="wingoResTitle" class="text-[23px] font-extrabold text-white text-center tracking-wide mb-3.5">Congratulations</h3>
+
+                <!-- Lottery Results Row -->
+                <div class="flex items-center justify-center gap-1.5 mb-5">
+                    <span id="wingoResLotteryLabel" class="text-[11px] font-semibold text-white/95 mr-1">Lottery results</span>
+                    <span id="wingoResColorBadge" class="px-2.5 py-0.5 rounded text-[11px] font-bold text-white bg-[#c8372d] border border-white/35">Red</span>
+                    <span id="wingoResNumBadge" class="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[11px] font-bold text-white bg-[#c8372d] border border-white/35">8</span>
+                    <span id="wingoResSizeBadge" class="px-2.5 py-0.5 rounded text-[11px] font-bold text-white bg-[#c8372d] border border-white/35">Big</span>
+                </div>
+
+                <!-- Ticket Dispenser Slot & Flared White Receipt -->
+                <div class="relative px-1">
+                    <div id="wingoResSlot" class="h-3.5 w-full rounded-full bg-[#8f261b] shadow-inner"></div>
+                    <div id="wingoResTicket" class="mx-2 -mt-2 rounded-b-xl shadow-[0_10px_20px_rgba(0,0,0,0.22)] pt-3.5 pb-3 px-3 text-center relative z-10" style="background: linear-gradient(180deg, #f3cfc9 0%, #ffffff 22%, #ffffff 100%);">
+                        <div id="wingoResTicketContent"></div>
+                    </div>
+                </div>
+
+                <!-- 3 Seconds Auto Close -->
+                <div class="flex items-center gap-2 mt-5 px-2 cursor-pointer select-none" onclick="toggleWingoAutoClose()">
+                    <div id="wingoAutoCloseCircle" class="w-[18px] h-[18px] rounded-full border border-white bg-white/25 flex items-center justify-center text-white text-[10px]">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span id="wingoAutoCloseLabel" class="text-xs font-medium text-white/95">3 seconds auto close</span>
+                </div>
+            </div>
+
+            <!-- Bottom (X) Close Button -->
+            <button onclick="closeWingoResultModal()" class="mt-5 w-8 h-8 rounded-full border-2 border-white/85 text-white flex items-center justify-center hover:bg-white/10 active:scale-90 transition-transform">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+    </div>
     <!-- Captcha Modal -->
     <div id="captchaModal" class="fixed inset-0 bg-black/80 z-[10001] hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-[#1c1c1c] rounded-2xl w-full max-w-sm overflow-hidden border border-[#333] shadow-2xl">
@@ -1530,6 +2204,73 @@
         </div>
         
         <button onclick="handleResetPassword()" class="w-full bg-theme-gold text-black py-4 rounded-full font-black shadow-[0_4px_15px_rgba(212,175,55,0.2)] active:scale-95 transition-transform mb-6 text-lg">Reset Password</button>
+    </div>
+    <!-- Deposit Required Popup Modal -->
+    <div id="depositRequiredModal" class="fixed inset-0 bg-black/85 z-[10002] hidden items-center justify-center p-5 backdrop-blur-md" onclick="if(event.target === this) closeDepositRequiredModal()">
+        <div id="depositRequiredCard" class="bg-gradient-to-b from-[#242424] via-[#1a1a1a] to-[#121212] w-full max-w-[350px] rounded-3xl border border-[#D4AF37]/60 shadow-[0_15px_50px_rgba(212,175,55,0.28)] overflow-hidden relative text-center transform transition-all duration-250 scale-90 opacity-0">
+            <!-- Top Gold Accent Bar -->
+            <div class="h-1.5 w-full bg-theme-gold"></div>
+            
+            <!-- Close Button -->
+            <button onclick="closeDepositRequiredModal()" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-[#2a2a2a] border border-[#444] text-gray-400 hover:text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="p-6 pt-7">
+                <!-- Luxury Gold Lock / Crown Emblem -->
+                <div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-theme-gold opacity-20 animate-ping"></div>
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#AA771C] p-[2px] shadow-[0_0_25px_rgba(212,175,55,0.4)]">
+                        <div class="w-full h-full rounded-full bg-[#161616] flex items-center justify-center relative">
+                            <i class="fa-solid fa-crown text-3xl text-theme-gold"></i>
+                            <div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-theme-gold text-black flex items-center justify-center shadow-md border-2 border-[#161616]">
+                                <i class="fa-solid fa-lock text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badge -->
+                <div class="inline-block bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-theme-gold text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full mb-3">
+                    Account Activation Required
+                </div>
+
+                <!-- Title -->
+                <h3 class="text-2xl font-black text-white tracking-wide mb-2">Deposit Required to Play</h3>
+
+                <!-- Description -->
+                <p class="text-gray-300 text-xs font-medium leading-relaxed mb-5 px-1">
+                    Welcome to <span class="text-theme-gold font-bold">BIG KING GAME</span>! Your <span class="text-white font-bold">₹48.00 Sign-Up Bonus</span> has been credited, but remains locked. Please complete your first deposit to enter games and unlock your bonus balance.
+                </p>
+
+                <!-- Info Highlights -->
+                <div class="bg-[#121212] border border-[#333] rounded-2xl p-3.5 mb-6 text-left space-y-2.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-400 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-gift text-theme-gold"></i> Sign-Up Bonus
+                        </span>
+                        <span class="font-black text-theme-gold bg-[#D4AF37]/10 px-2.5 py-0.5 rounded-full border border-[#D4AF37]/30">₹48.00 Locked</span>
+                    </div>
+                    <div class="border-t border-[#262626]"></div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-400 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-green-400"></i> Game & Bonus Access
+                        </span>
+                        <span class="font-bold text-green-400">Unlocks on 1st Deposit</span>
+                    </div>
+                </div>
+
+                <!-- Primary Action Button -->
+                <button onclick="closeDepositRequiredModal(); openDepositModal();" class="w-full bg-theme-gold text-black py-3.5 rounded-full font-black text-base shadow-[0_5px_20px_rgba(212,175,55,0.35)] active:scale-95 transition-transform flex items-center justify-center gap-2 mb-2.5">
+                    <i class="fa-solid fa-wallet"></i> Deposit Now
+                </button>
+
+                <!-- Secondary Action Button -->
+                <button onclick="closeDepositRequiredModal()" class="w-full bg-transparent hover:bg-[#222] text-gray-400 font-bold py-2.5 rounded-full text-xs transition-colors">
+                    Maybe Later
+                </button>
+            </div>
+        </div>
     </div>
 </body>
 </html>

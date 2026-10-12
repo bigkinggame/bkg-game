@@ -89,10 +89,8 @@ function getVipLevel(amt) {
 let dateStrGlobal = new Date().toISOString().replace(/-/g, '').slice(0,8);
 
 const GAMES = {
-    '45s': { name: '45s', length: 45, timeLeft: 45, periodCounter: 1, currentPeriod: dateStrGlobal + '0001', history: [], activeBets: [], nextWingoNum: null },
-    '1m':  { name: '1Min', length: 60, timeLeft: 60, periodCounter: 1, currentPeriod: dateStrGlobal + '0001', history: [], activeBets: [], nextWingoNum: null },
-    '3m':  { name: '3Min', length: 180, timeLeft: 180, periodCounter: 1, currentPeriod: dateStrGlobal + '0001', history: [], activeBets: [], nextWingoNum: null },
-    '5m':  { name: '5Min', length: 300, timeLeft: 300, periodCounter: 1, currentPeriod: dateStrGlobal + '0001', history: [], activeBets: [], nextWingoNum: null }
+    '30s': { name: '30s', prefix: '10005', length: 30, timeLeft: 30, periodCounter: 1101, currentPeriod: dateStrGlobal + '100051101', history: [], activeBets: [], nextWingoNum: null },
+    '1m':  { name: '1Min', prefix: '10001', length: 60, timeLeft: 60, periodCounter: 1101, currentPeriod: dateStrGlobal + '100011101', history: [], activeBets: [], nextWingoNum: null }
 };
 
 function generateResult(forcedNum, activeBets) {
@@ -136,11 +134,11 @@ function generateResult(forcedNum, activeBets) {
     let html = '';
     size = finalNum >= 5 ? 'Big' : 'Small';
     if(finalNum === 0) {
-        colorClasses = "text-[#fb4e4e]"; colorName = "Red/Violet";
-        html = '<div class="w-3 h-3 rounded-full bg-[#fb4e4e]"></div><div class="w-3 h-3 rounded-full bg-[#eb43dd] -ml-1"></div>';
+        colorClasses = "bg-gradient-to-b from-[#fb4e4e] from-50% to-[#eb43dd] to-50% bg-clip-text text-transparent"; colorName = "Red/Violet";
+        html = '<div class="w-3 h-3 rounded-full bg-[#fb4e4e]"></div><div class="w-3 h-3 rounded-full bg-[#eb43dd] ml-1.5"></div>';
     } else if (finalNum === 5) {
-        colorClasses = "text-[#18b660]"; colorName = "Green/Violet";
-        html = '<div class="w-3 h-3 rounded-full bg-[#18b660]"></div><div class="w-3 h-3 rounded-full bg-[#eb43dd] -ml-1"></div>';
+        colorClasses = "bg-gradient-to-b from-[#18b660] from-50% to-[#eb43dd] to-50% bg-clip-text text-transparent"; colorName = "Green/Violet";
+        html = '<div class="w-3 h-3 rounded-full bg-[#18b660]"></div><div class="w-3 h-3 rounded-full bg-[#eb43dd] ml-1.5"></div>';
     } else if (finalNum % 2 === 0) {
         colorClasses = "text-[#fb4e4e]"; colorName = "Red";
         html = '<div class="w-3 h-3 rounded-full bg-[#fb4e4e] mx-auto"></div>';
@@ -150,6 +148,15 @@ function generateResult(forcedNum, activeBets) {
     }
     return { num: finalNum, colorClasses, html, colorName, size };
 }
+
+// Seed initial 100 history records for each room so UI, Chart statistics & last 5 balls are populated immediately
+Object.keys(GAMES).forEach(r => {
+    const g = GAMES[r];
+    for (let i = 1001; i <= 1100; i++) {
+        const p = dateStrGlobal + g.prefix + i.toString().padStart(4, '0');
+        g.history.unshift({ period: p, result: generateResult(null, []) });
+    }
+});
 
 setInterval(() => {
     Object.keys(GAMES).forEach(room => {
@@ -167,8 +174,8 @@ setInterval(() => {
             game.nextWingoNum = null;
             const newRecord = { period: game.currentPeriod, result };
             
-            let usersToUpdate = new Set();
             let userWinnings = {};
+            let userSockets = {};
 
             game.activeBets.forEach(bet => {
                 if (bet.period === game.currentPeriod) {
@@ -181,42 +188,45 @@ setInterval(() => {
                     else if (bet.selection === 'Big' && result.size === 'Big') { wonAmt = betAmt * 2; } 
                     else if (bet.selection === 'Small' && result.size === 'Small') { wonAmt = betAmt * 2; }
 
-                    if (wonAmt > 0) {
-                        if (!userWinnings[bet.mobile]) userWinnings[bet.mobile] = 0;
-                        userWinnings[bet.mobile] += wonAmt;
-                        usersToUpdate.add(bet.mobile);
-                    }
-                }
-            });
+                    if (userWinnings[bet.mobile] === undefined) userWinnings[bet.mobile] = 0;
+                    userWinnings[bet.mobile] += wonAmt;
+                    userSockets[bet.mobile] = bet.socketId;
 
-            game.activeBets.forEach(bet => {
-                if (bet.period === game.currentPeriod) {
-                    const won = userWinnings[bet.mobile] || 0;
-                    
                     if (!db.users[bet.mobile].betHistory) db.users[bet.mobile].betHistory = [];
                     db.users[bet.mobile].betHistory.unshift({
                         room: room,
                         period: game.currentPeriod,
                         selection: bet.selection,
                         amount: bet.amount,
-                        won: won,
+                        won: wonAmt,
                         date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
                     });
 
-                    if (won > 0) {
-                        db.users[bet.mobile].balance += won;
-                        usersToUpdate.add(bet.mobile);
+                    if (wonAmt > 0) {
+                        db.users[bet.mobile].balance += wonAmt;
                     }
+                }
+            });
 
-                    const socket = io.sockets.sockets.get(bet.socketId);
-                    if (socket) {
-                        if (won > 0) {
-                            socket.emit('balance_update', db.users[bet.mobile].balance);
-                            socket.emit('toast', { type: 'success', msg: `Win Go ${game.name}: You won ₹${won.toFixed(2)}` });
-                        } else {
-                            socket.emit('toast', { type: 'error', msg: `Win Go ${game.name}: You didn't win this round.` });
-                        }
+            Object.keys(userWinnings).forEach(mobile => {
+                const totalWon = userWinnings[mobile];
+                const socket = io.sockets.sockets.get(userSockets[mobile]);
+                if (socket) {
+                    if (totalWon > 0) {
+                        socket.emit('balance_update', db.users[mobile].balance);
                     }
+                    socket.emit('wingo_bet_result', {
+                        won: totalWon > 0,
+                        amount: totalWon,
+                        room: room,
+                        roomLabel: room === '30s' ? 'Win 30 second' : 'Win 1 minute',
+                        period: game.currentPeriod,
+                        result: {
+                            num: result.num,
+                            size: result.size,
+                            colorName: result.colorName
+                        }
+                    });
                 }
             });
 
@@ -224,13 +234,13 @@ setInterval(() => {
             game.activeBets = [];
 
             game.history.unshift(newRecord);
-            if(game.history.length > 20) game.history.pop();
+            if(game.history.length > 100) game.history.pop();
             io.to('wingo_' + room).emit('new_result', newRecord);
             
             game.timeLeft = game.length;
             game.periodCounter++;
             let pStr = game.periodCounter.toString().padStart(4, '0');
-            game.currentPeriod = dateStrGlobal + pStr;
+            game.currentPeriod = dateStrGlobal + game.prefix + pStr;
             io.to('wingo_' + room).emit('timer', { time: game.timeLeft, period: game.currentPeriod });
         }
     });
@@ -242,13 +252,13 @@ setInterval(() => {
 io.on('connection', (socket) => {
     
     // Default room join
-    socket.join('wingo_1m');
-    socket.emit('timer', { time: Math.max(0, GAMES['1m'].timeLeft), period: GAMES['1m'].currentPeriod });
-    socket.emit('history', GAMES['1m'].history);
+    socket.join('wingo_30s');
+    socket.emit('timer', { time: Math.max(0, GAMES['30s'].timeLeft), period: GAMES['30s'].currentPeriod });
+    socket.emit('history', GAMES['30s'].history);
 
     socket.on('join_game', (room) => {
         if(!GAMES[room]) return;
-        ['45s', '1m', '3m', '5m'].forEach(r => socket.leave('wingo_' + r));
+        ['30s', '1m'].forEach(r => socket.leave('wingo_' + r));
         socket.join('wingo_' + room);
         socket.emit('timer', { time: Math.max(0, GAMES[room].timeLeft), period: GAMES[room].currentPeriod });
         socket.emit('history', GAMES[room].history);
@@ -273,7 +283,8 @@ io.on('connection', (socket) => {
                 balance: db.users[mobile].balance, 
                 uid: db.users[mobile].uid,
                 myInviteCode: db.users[mobile].myInviteCode,
-                vipLevel: getVipLevel(db.users[mobile].totalBetAmount)
+                vipLevel: getVipLevel(db.users[mobile].totalBetAmount),
+                totalDeposit: db.users[mobile].totalDeposit || 0
             });
         } else {
             socket.emit('toast', { type: 'error', msg: 'Invalid mobile number or password' });
@@ -300,17 +311,18 @@ io.on('connection', (socket) => {
             
             db.users[mobile] = { 
                 password, 
-                balance: 100.00, 
+                balance: 48.00, 
                 uid: newUid,
                 myInviteCode: myCode,
                 upline: uplineMobile,
-                totalBetAmount: 0
+                totalBetAmount: 0,
+                totalDeposit: 0
             }; 
             saveDB();
             
             socket.mobile = mobile;
-            socket.emit('auth_success', { mobile, balance: 100.00, uid: newUid, myInviteCode: myCode, vipLevel: 0 });
-            socket.emit('toast', { type: 'success', msg: 'Registered Successfully! ₹100 Bonus added.' });
+            socket.emit('auth_success', { mobile, balance: 48.00, uid: newUid, myInviteCode: myCode, vipLevel: 0, totalDeposit: 0 });
+            socket.emit('toast', { type: 'success', msg: 'Registered Successfully! ₹48 Bonus added.' });
         }
     });
 
@@ -318,6 +330,9 @@ io.on('connection', (socket) => {
     socket.on('place_bet', (betData) => {
         if (!socket.mobile) return socket.emit('toast', { type: 'error', msg: 'Please login first!' });
         const user = db.users[socket.mobile];
+        if ((user.totalDeposit || 0) <= 0) {
+            return socket.emit('require_deposit');
+        }
         const room = betData.room || '1m';
         const game = GAMES[room];
 
@@ -453,6 +468,13 @@ io.on('connection', (socket) => {
                 if (tx.type === 'DEPOSIT') { 
                     db.users[tx.mobile].balance += tx.amount; 
                     db.users[tx.mobile].totalDeposit = (db.users[tx.mobile].totalDeposit || 0) + tx.amount;
+                    io.sockets.sockets.forEach(s => {
+                        if (s.mobile === tx.mobile) {
+                            s.emit('balance_update', db.users[tx.mobile].balance);
+                            s.emit('deposit_status_update', db.users[tx.mobile].totalDeposit);
+                            s.emit('toast', { type: 'success', msg: `Deposit of ₹${tx.amount} Approved! Games Unlocked.` });
+                        }
+                    });
                 } else if (tx.type === 'WITHDRAW') {
                     db.users[tx.mobile].totalWithdraw = (db.users[tx.mobile].totalWithdraw || 0) + tx.amount;
                 }
