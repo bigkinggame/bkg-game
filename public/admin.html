@@ -3,487 +3,1201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BKG Pro Admin Panel</title>
+    <title>BKG Admin Pro — Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: #f8fafc; }
-        .sidebar-btn { padding: 12px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .sidebar-btn:hover { background-color: #1e293b; }
-        .sidebar-btn.active { background-color: #3b82f6; color: white; }
-        .view-section { display: none; }
-        .view-section.active { display: block; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #060a12; color: #e2e8f0; }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        /* Sidebar */
+        .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 16px; border-radius:10px; cursor:pointer; transition:all .2s; font-weight:700; font-size:13px; margin-bottom:4px; color:#94a3b8; }
+        .sidebar-item:hover { background:#1e293b; color:#e2e8f0; }
+        .sidebar-item.active { background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; box-shadow:0 4px 15px rgba(37,99,235,.3); }
+        .sidebar-item .icon { width:18px; text-align:center; flex-shrink:0; }
+
+        /* Views */
+        .view-section { display:none; }
+        .view-section.active { display:block; animation:fadeIn .2s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Cards */
+        .stat-card { background:linear-gradient(135deg,#0f172a,#1e293b); border:1px solid #1e293b; border-radius:16px; padding:20px 24px; }
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table th { background:#0f172a; padding:12px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#64748b; text-align:left; border-bottom:1px solid #1e293b; }
+        .data-table td { padding:12px 16px; border-bottom:1px solid #0f172a; font-size:13px; vertical-align:middle; }
+        .data-table tr:hover td { background:#0f172a; }
+
+        /* Badges */
+        .badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+        .badge-green { background:#052e16; color:#4ade80; border:1px solid #166534; }
+        .badge-red { background:#2d0a0a; color:#f87171; border:1px solid #7f1d1d; }
+        .badge-yellow { background:#1c1700; color:#fbbf24; border:1px solid #78350f; }
+        .badge-blue { background:#0c1a3d; color:#60a5fa; border:1px solid #1e3a8a; }
+
+        /* Buttons */
+        .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; }
+        .btn-primary { background:#2563eb; color:#fff; }
+        .btn-primary:hover { background:#1d4ed8; }
+        .btn-success { background:#15803d; color:#fff; }
+        .btn-success:hover { background:#166534; }
+        .btn-danger { background:#b91c1c; color:#fff; }
+        .btn-danger:hover { background:#991b1b; }
+        .btn-warning { background:#d97706; color:#fff; }
+        .btn-warning:hover { background:#b45309; }
+        .btn-ghost { background:#1e293b; color:#94a3b8; border:1px solid #334155; }
+        .btn-ghost:hover { background:#334155; color:#e2e8f0; }
+
+        /* Input */
+        .inp { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:8px 12px; color:#e2e8f0; font-size:13px; width:100%; outline:none; }
+        .inp:focus { border-color:#2563eb; }
+
+        /* Notification banner */
+        #notifBanner { position:fixed; top:0; left:0; right:0; z-index:9999; display:none; }
+        .notif-item { display:flex; align-items:center; gap:10px; padding:10px 20px; font-size:13px; font-weight:700; }
+        .notif-dep { background:linear-gradient(135deg,#052e16,#14532d); border-bottom:2px solid #16a34a; }
+        .notif-wd { background:linear-gradient(135deg,#2d0a0a,#7f1d1d); border-bottom:2px solid #dc2626; }
+
+        /* Game control buttons */
+        .num-btn { border:2px solid transparent; border-radius:12px; padding:14px 8px; font-weight:900; font-size:15px; cursor:pointer; transition:all .15s; text-align:center; }
+        .num-btn-red { background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; border-color:#b91c1c; }
+        .num-btn-green { background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; border-color:#166534; }
+        .num-btn-violet { background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; border-color:#5b21b6; }
+        .num-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.4); }
+        .num-btn:active { transform:translateY(0); }
+
+        /* Crash buttons */
+        .crash-btn { padding:12px; border-radius:12px; font-weight:900; font-size:13px; cursor:pointer; text-align:center; transition:all .15s; }
+        .crash-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.4); }
+        .crash-btn:active { transform:translateY(0); }
+
+        /* Login page */
+        .login-bg { background:radial-gradient(circle at 30% 30%, #0d1b4b, #060a12 60%), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+
+        /* Search box */
+        .search-box { background:#0f172a; border:1px solid #334155; border-radius:10px; padding:9px 14px; color:#e2e8f0; font-size:13px; outline:none; }
+        .search-box:focus { border-color:#2563eb; }
+
+        /* Modal */
+        .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:500; display:none; align-items:center; justify-content:center; }
+        .modal-bg.open { display:flex; }
+        .modal-box { background:#0f172a; border:1px solid #1e293b; border-radius:20px; width:100%; max-width:520px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 25px 60px rgba(0,0,0,.8); }
+
+        /* Glow pulse */
+        .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.6); animation:livePulse 1.5s infinite; }
+        @keyframes livePulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 70%{box-shadow:0 0 0 8px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+
+        /* Scrollable panels */
+        .scrollable { overflow-y:auto; }
+
+        /* Tab buttons inside panels */
+        .tab-btn { padding:7px 18px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all .2s; }
+        .tab-btn.active { background:#2563eb; color:#fff; }
+        .tab-btn:not(.active) { color:#64748b; }
+        .tab-btn:not(.active):hover { color:#e2e8f0; }
     </style>
 </head>
 <body class="overflow-hidden">
 
-    <!-- Admin Login -->
-    <div id="adminLogin" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900">
-        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-96 text-center border border-gray-700">
-            <h1 class="text-3xl font-black mb-2 text-white">BKG Admin Pro</h1>
-            <p class="text-gray-400 mb-6">Enter master password to continue</p>
-            <input type="password" id="adminPwd" placeholder="Password" class="w-full bg-gray-900 border border-gray-700 p-4 rounded-xl mb-4 font-bold text-white focus:border-blue-500 outline-none text-center">
-            <button onclick="loginAdmin()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-500 transition-colors">ACCESS DASHBOARD</button>
+<!-- ==================== NOTIFICATION BANNER ==================== -->
+<div id="notifBanner"></div>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="adminLogin" class="fixed inset-0 z-50 flex items-center justify-center login-bg">
+    <div class="w-full max-w-sm">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4" style="background:linear-gradient(135deg,#1e40af,#2563eb);box-shadow:0 0 40px rgba(37,99,235,.4)">
+                <i class="fa-solid fa-chess-king text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-wide">BKG <span class="text-blue-400">ADMIN</span></h1>
+            <p class="text-slate-400 text-sm mt-1">Secure Control Center</p>
+        </div>
+        <div class="bg-[#0f172a] rounded-2xl border border-[#1e293b] p-8 shadow-2xl">
+            <div class="mb-5">
+                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Master Password</label>
+                <div class="relative">
+                    <input type="password" id="adminPwd" placeholder="Enter password..." onkeydown="if(event.key==='Enter') loginAdmin()"
+                        class="w-full bg-[#060a12] border border-[#334155] rounded-xl py-3.5 px-4 pr-12 text-white font-bold outline-none focus:border-blue-500 transition-colors">
+                    <button onclick="togglePwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <button onclick="loginAdmin()" class="w-full py-3.5 rounded-xl font-black text-white text-sm tracking-wide transition-all active:scale-95"
+                style="background:linear-gradient(135deg,#1d4ed8,#2563eb);box-shadow:0 4px 20px rgba(37,99,235,.4)">
+                <i class="fa-solid fa-unlock-keyhole mr-2"></i> UNLOCK DASHBOARD
+            </button>
+            <div id="loginError" class="mt-4 text-center text-red-400 text-sm font-bold hidden"></div>
+        </div>
+        <p class="text-center text-slate-600 text-xs mt-4">BIG KING GAME — Admin v2.0</p>
+    </div>
+</div>
+
+<!-- ==================== MAIN DASHBOARD ==================== -->
+<div id="adminDashboard" class="hidden h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <div class="w-[220px] flex-shrink-0 flex flex-col h-full border-r border-[#1e293b]" style="background:#080d18">
+        <!-- Brand -->
+        <div class="px-5 py-5 border-b border-[#1e293b]">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#1e40af,#2563eb)">
+                    <i class="fa-solid fa-chess-king text-white text-sm"></i>
+                </div>
+                <div>
+                    <div class="font-black text-white text-sm">BKG ADMIN</div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="live-dot"></div>
+                        <span class="text-[10px] text-green-400 font-bold">LIVE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nav Items -->
+        <nav class="flex-1 px-3 py-4 overflow-y-auto">
+            <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest px-3 mb-2">Main</div>
+            <div class="sidebar-item active" onclick="switchTab('tab-dash', this)">
+                <span class="icon"><i class="fa-solid fa-gauge-high"></i></span> Overview
+            </div>
+            <div class="sidebar-item" onclick="switchTab('tab-tx', this)">
+                <span class="icon"><i class="fa-solid fa-money-bill-transfer"></i></span>
+                Transactions
+                <span id="txBadge" class="hidden ml-auto bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">0</span>
+            </div>
+            <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest px-3 mt-4 mb-2">Management</div>
+            <div class="sidebar-item" onclick="switchTab('tab-users', this)">
+                <span class="icon"><i class="fa-solid fa-users"></i></span> User Manager
+            </div>
+            <div class="text-[10px] font-black text-slate-600 uppercase tracking-widest px-3 mt-4 mb-2">Game Control</div>
+            <div class="sidebar-item" onclick="switchTab('tab-wingo', this)">
+                <span class="icon"><i class="fa-solid fa-circle-dot text-green-400"></i></span> WinGo Control
+            </div>
+            <div class="sidebar-item" onclick="switchTab('tab-aviator', this)">
+                <span class="icon"><i class="fa-solid fa-plane text-red-400"></i></span> Aviator Control
+            </div>
+        </nav>
+
+        <!-- Bottom -->
+        <div class="px-3 py-4 border-t border-[#1e293b]">
+            <button onclick="location.reload()" class="sidebar-item w-full text-red-400 hover:bg-red-500/10 mb-0">
+                <span class="icon"><i class="fa-solid fa-power-off"></i></span> Logout
+            </button>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="adminDashboard" class="hidden flex h-screen">
-        
-        <!-- Sidebar -->
-        <div class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
-            <div class="p-6 text-center border-b border-gray-800 mb-4">
-                <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">BKG SYSTEM</h2>
-            </div>
-            <div class="flex-1 px-4 overflow-y-auto">
-                <div class="sidebar-btn active" onclick="switchTab('tab-dash', this)"><i class="fa-solid fa-chart-pie w-5"></i> Overview</div>
-                <div class="sidebar-btn" onclick="switchTab('tab-game', this)"><i class="fa-solid fa-gamepad w-5"></i> Game Control</div>
-                <div class="sidebar-btn" onclick="switchTab('tab-users', this)"><i class="fa-solid fa-users w-5"></i> User Manager</div>
-                <div class="sidebar-btn" onclick="switchTab('tab-tx', this)"><i class="fa-solid fa-money-bill-transfer w-5 relative"><span id="txBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span></i> Transactions</div>
-            </div>
-            <div class="p-4 border-t border-gray-800">
-                <button onclick="location.reload()" class="w-full bg-red-500/20 text-red-500 border border-red-500/50 py-3 rounded-lg font-bold hover:bg-red-500 hover:text-white transition-colors">
-                    <i class="fa-solid fa-power-off mr-2"></i> System Exit
-                </button>
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- TOP BAR -->
+        <div class="h-14 flex items-center justify-between px-6 border-b border-[#1e293b] flex-shrink-0" style="background:#080d18">
+            <div id="topBarTitle" class="font-black text-white text-sm tracking-wide">Dashboard Overview</div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-[#0f172a] border border-[#1e293b] rounded-full px-4 py-1.5">
+                    <i class="fa-solid fa-users text-blue-400 text-xs"></i>
+                    <span class="text-xs font-bold text-slate-300">Users: <span id="topBarUsers" class="text-white font-black">0</span></span>
+                </div>
+                <div class="flex items-center gap-2 bg-[#0f172a] border border-[#1e293b] rounded-full px-4 py-1.5">
+                    <i class="fa-solid fa-arrow-down text-green-400 text-xs"></i>
+                    <span class="text-xs font-bold text-green-400">₹<span id="topBarDep">0</span></span>
+                    <span class="text-slate-600">|</span>
+                    <i class="fa-solid fa-arrow-up text-red-400 text-xs"></i>
+                    <span class="text-xs font-bold text-red-400">₹<span id="topBarWd">0</span></span>
+                </div>
+                <div class="text-xs text-slate-500 font-mono" id="topBarTime"></div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="flex-1 bg-[#0f172a] overflow-y-auto p-8">
-            
-            <!-- OVERVIEW TAB -->
+        <!-- SCROLLABLE CONTENT -->
+        <div class="flex-1 overflow-y-auto p-6">
+
+            <!-- ========== OVERVIEW TAB ========== -->
             <div id="tab-dash" class="view-section active">
-                <h2 class="text-2xl font-bold mb-6">Global Statistics</h2>
-                <div class="grid grid-cols-4 gap-6 mb-8">
-                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
-                        <p class="text-gray-400 text-sm font-bold mb-1">Total Users</p>
-                        <h3 class="text-3xl font-black text-white" id="statUsers">0</h3>
+                <h2 class="text-xl font-black text-white mb-6">📊 Dashboard Overview</h2>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Users</span>
+                            <div class="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                <i class="fa-solid fa-users text-blue-400 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-white" id="statUsers">0</div>
+                        <div class="text-xs text-slate-500 mt-1">Registered accounts</div>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
-                        <p class="text-gray-400 text-sm font-bold mb-1">Active Deposits</p>
-                        <h3 class="text-3xl font-black text-green-400" id="statDep">₹0</h3>
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Deposits</span>
+                            <div class="w-9 h-9 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                <i class="fa-solid fa-wallet text-green-400 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-green-400" id="statDep">₹0</div>
+                        <div class="text-xs text-slate-500 mt-1">Approved deposits</div>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
-                        <p class="text-gray-400 text-sm font-bold mb-1">Active Withdrawals</p>
-                        <h3 class="text-3xl font-black text-red-400" id="statWith">₹0</h3>
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Withdrawals</span>
+                            <div class="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
+                                <i class="fa-solid fa-building-columns text-red-400 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-red-400" id="statWith">₹0</div>
+                        <div class="text-xs text-slate-500 mt-1">Approved withdrawals</div>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-lg">
-                        <p class="text-gray-400 text-sm font-bold mb-1">Total Profit (Est.)</p>
-                        <h3 class="text-3xl font-black text-blue-400" id="statProfit">₹0</h3>
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Net Profit</span>
+                            <div class="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                                <i class="fa-solid fa-chart-line text-yellow-400 text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-black text-yellow-400" id="statProfit">₹0</div>
+                        <div class="text-xs text-slate-500 mt-1">Deposits minus Withdrawals</div>
+                    </div>
+                </div>
+
+                <!-- Pending Transactions Quick View -->
+                <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-[#1e293b] flex items-center justify-between">
+                        <div class="font-black text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clock text-yellow-400"></i> Pending Requests
+                            <span id="pendingCountBadge" class="hidden bg-yellow-500 text-black text-xs font-black px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <button onclick="switchTab('tab-tx', document.querySelector('.sidebar-item:nth-child(2)'))" class="btn btn-ghost text-xs">View All →</button>
+                    </div>
+                    <div id="quickPendingTable" class="max-h-64 overflow-y-auto">
+                        <div class="p-8 text-center text-slate-600 text-sm">No pending transactions</div>
                     </div>
                 </div>
             </div>
 
-            <!-- GAME CONTROL TAB -->
-            <div id="tab-game" class="view-section">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold flex items-center"><i class="fa-solid fa-tower-broadcast text-red-500 animate-pulse mr-3"></i> Live Game Control Hub</h2>
-                    <div class="flex gap-2 bg-gray-900 p-1 rounded-lg border border-gray-700">
-                        <button onclick="adminSwitchRoom('30s')" id="adminBtn-30s" class="px-4 py-2 rounded-md font-bold text-sm bg-blue-600 text-white">30s</button>
-                        <button onclick="adminSwitchRoom('1m')" id="adminBtn-1m" class="px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white">1 Min</button>
-
-
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-6">
-                    <!-- Left: Live Monitor -->
-                    <div class="col-span-2 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden flex flex-col h-[750px]">
-                        <div class="p-4 bg-gray-900 border-b border-gray-700 flex justify-between items-center">
-                            <span class="font-bold text-lg" id="adminGameTitle">Win Go : 30s</span>
-                            <span class="font-mono bg-blue-500/20 text-blue-400 px-3 py-1 rounded border border-blue-500/30" id="livePeriod">Period: Loading...</span>
-                            <span class="font-mono text-2xl font-black text-red-500" id="liveTimer">00:00</span>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-4" id="liveBetsLog">
-                            <div class="text-center text-gray-500 mt-10 text-sm">Waiting for live bets...</div>
-                        </div>
-                        <div class="p-3 bg-gray-900 border-t border-gray-700 flex flex-col gap-2 text-center text-xs">
-                            <!-- COLORS -->
-                            <div class="grid grid-cols-3 gap-2">
-                                <div class="bg-red-500/10 p-2 rounded-lg border border-red-500/30"><div class="text-red-500 font-bold">RED</div><div class="text-lg font-black text-white" id="liveTotalRed">₹0</div></div>
-                                <div class="bg-purple-500/10 p-2 rounded-lg border border-purple-500/30"><div class="text-purple-500 font-bold">VIOLET</div><div class="text-lg font-black text-white" id="liveTotalViolet">₹0</div></div>
-                                <div class="bg-green-500/10 p-2 rounded-lg border border-green-500/30"><div class="text-green-500 font-bold">GREEN</div><div class="text-lg font-black text-white" id="liveTotalGreen">₹0</div></div>
-                            </div>
-                            <!-- SIZES -->
-                            <div class="grid grid-cols-2 gap-2">
-                                <div class="bg-yellow-500/10 p-2 rounded-lg border border-yellow-500/30"><div class="text-yellow-500 font-bold">BIG</div><div class="text-lg font-black text-white" id="liveTotalBig">₹0</div></div>
-                                <div class="bg-blue-500/10 p-2 rounded-lg border border-blue-500/30"><div class="text-blue-500 font-bold">SMALL</div><div class="text-lg font-black text-white" id="liveTotalSmall">₹0</div></div>
-                            </div>
-                            <!-- NUMBERS -->
-                            <div class="grid grid-cols-5 gap-1">
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">0</div><div class="font-black text-white" id="liveTotalN0">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">1</div><div class="font-black text-white" id="liveTotalN1">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">2</div><div class="font-black text-white" id="liveTotalN2">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">3</div><div class="font-black text-white" id="liveTotalN3">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">4</div><div class="font-black text-white" id="liveTotalN4">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">5</div><div class="font-black text-white" id="liveTotalN5">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">6</div><div class="font-black text-white" id="liveTotalN6">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">7</div><div class="font-black text-white" id="liveTotalN7">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">8</div><div class="font-black text-white" id="liveTotalN8">₹0</div></div>
-                                <div class="bg-gray-800 p-1 rounded border border-gray-700"><div class="text-gray-400 font-bold">9</div><div class="font-black text-white" id="liveTotalN9">₹0</div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Manual Override -->
-                    <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg p-6 flex flex-col">
-                        <h3 class="font-black text-xl mb-4 text-white">Manual Outcome Overider</h3>
-                        <p class="text-sm text-gray-400 mb-6">Select a number below to FORCE the outcome for the current period. Once selected, it cannot be changed.</p>
-                        
-                        <div class="grid grid-cols-2 gap-3 mb-6">
-                            <button onclick="forceWingo(0)" class="bg-red-500 text-white font-black py-4 rounded-xl shadow border-b-4 border-red-700 active:translate-y-1 active:border-b-0">0 (Red/V)</button>
-                            <button onclick="forceWingo(5)" class="bg-green-500 text-white font-black py-4 rounded-xl shadow border-b-4 border-green-700 active:translate-y-1 active:border-b-0">5 (Green/V)</button>
-                        </div>
-                        
-                        <div class="grid grid-cols-4 gap-2 mb-6">
-                            <button onclick="forceWingo(2)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">2</button>
-                            <button onclick="forceWingo(4)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">4</button>
-                            <button onclick="forceWingo(6)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">6</button>
-                            <button onclick="forceWingo(8)" class="bg-red-500 text-white font-bold py-3 rounded-lg border-b-4 border-red-700 active:translate-y-1">8</button>
-                            <button onclick="forceWingo(1)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">1</button>
-                            <button onclick="forceWingo(3)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">3</button>
-                            <button onclick="forceWingo(7)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">7</button>
-                            <button onclick="forceWingo(9)" class="bg-green-500 text-white font-bold py-3 rounded-lg border-b-4 border-green-700 active:translate-y-1">9</button>
-                        </div>
-
-                        <div class="mt-auto bg-gray-900 border border-gray-700 p-4 rounded-xl text-center">
-                            <p class="text-xs text-gray-500 mb-1">QUEUED OUTCOME FOR CURRENT PERIOD</p>
-                            <p class="text-4xl font-black text-yellow-400" id="queuedOutcome">NONE</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- USERS TAB -->
-            <div id="tab-users" class="view-section">
-                <h2 class="text-2xl font-bold mb-6">User Manager</h2>
-                <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-900">
-                            <tr>
-                                <th class="p-4 text-gray-400 font-bold text-sm">UID / Mobile</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Balance</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Total Dep / Wd</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Invites / VIP</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTable"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TRANSACTIONS TAB -->
+            <!-- ========== TRANSACTIONS TAB ========== -->
             <div id="tab-tx" class="view-section">
-                <h2 class="text-2xl font-bold mb-6">Pending Transactions</h2>
-                <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-lg overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-900">
-                            <tr>
-                                <th class="p-4 text-gray-400 font-bold text-sm">User Details</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Date & Time</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Type</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Amount</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm">Payment Details</th>
-                                <th class="p-4 text-gray-400 font-bold text-sm text-center">Approve / Reject</th>
-                            </tr>
-                        </thead>
-                        <tbody id="txTable"></tbody>
-                    </table>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-black text-white">💳 Transactions</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-1 bg-[#0f172a] border border-[#1e293b] rounded-xl p-1">
+                            <button onclick="filterTx('PENDING')" id="txFilter-PENDING" class="tab-btn active">Pending</button>
+                            <button onclick="filterTx('ALL')" id="txFilter-ALL" class="tab-btn">All</button>
+                            <button onclick="filterTx('APPROVED')" id="txFilter-APPROVED" class="tab-btn">Approved</button>
+                            <button onclick="filterTx('REJECTED')" id="txFilter-REJECTED" class="tab-btn">Rejected</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User (Mobile / UID)</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Payment Info</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txTable">
+                                <tr><td colspan="7" class="text-center text-slate-600 py-12">Loading transactions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-        </div>
-    </div>
-
-    <!-- USER HISTORY MODAL -->
-    <div id="userHistoryModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex justify-end">
-        <div class="w-full max-w-md bg-gray-900 h-full shadow-2xl flex flex-col border-l border-gray-700 transform transition-transform translate-x-full" id="uhmContent">
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-800">
-                <h2 class="text-lg font-black text-white" id="uhmTitle">User History</h2>
-                <button onclick="closeUserHistory()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- ========== USER MANAGER TAB ========== -->
+            <div id="tab-users" class="view-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-black text-white">👥 User Manager</h2>
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="userSearch" placeholder="🔍 Search mobile, UID..." oninput="filterUsers()" class="search-box w-64">
+                        <button onclick="createNewUser()" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> New User
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table" id="usersDataTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Mobile Number</th>
+                                    <th>User ID (UID)</th>
+                                    <th>Password</th>
+                                    <th>Balance</th>
+                                    <th>Deposit / Withdraw</th>
+                                    <th>VIP / Invite</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr><td colspan="9" class="text-center text-slate-600 py-12">Loading users...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="p-4 flex gap-2">
-                <button onclick="switchUhmTab('bets')" id="uhmBtnBets" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm">Bet History</button>
-                <button onclick="switchUhmTab('txs')" id="uhmBtnTxs" class="flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm">Transactions</button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-4" id="uhmList">
-                <div class="text-center text-gray-500 mt-10">Loading...</div>
-            </div>
-        </div>
-    </div>
 
-    <script>
-        const socket = io();
-        let currentAdminData = null;
-        let lastHistoryData = null;
-        let uhmTab = 'bets';
+            <!-- ========== WINGO CONTROL TAB ========== -->
+            <div id="tab-wingo" class="view-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-black text-white flex items-center gap-3">
+                        <div class="live-dot"></div>
+                        WinGo Live Control
+                    </h2>
+                    <div class="flex items-center gap-2 bg-[#0f172a] border border-[#1e293b] rounded-xl p-1">
+                        <button onclick="adminSwitchRoom('30s')" id="adminBtn-30s" class="tab-btn active px-5">30 Sec</button>
+                        <button onclick="adminSwitchRoom('1m')" id="adminBtn-1m" class="tab-btn px-5">1 Min</button>
+                    </div>
+                </div>
 
-        // --- NAVIGATION ---
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.sidebar-btn').forEach(e => e.classList.remove('active'));
-            if(el) el.classList.add('active');
-        }
-
-        // --- AUTH ---
-        function loginAdmin() {
-            const pwd = document.getElementById('adminPwd').value;
-            socket.emit('admin_login', pwd);
-        }
-
-        socket.on('admin_auth_success', () => {
-            document.getElementById('adminLogin').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-        });
-        socket.on('toast', (data) => { alert(data.msg); });
-
-        // --- DATA RENDER ---
-        socket.on('admin_data', (data) => {
-            currentAdminData = data;
-            
-            // Dashboard Stats
-            let totalUsers = Object.keys(data.users).length;
-            let activeDep = 0, activeWith = 0;
-            let pendingCount = 0;
-
-            const usersTable = document.getElementById('usersTable');
-            usersTable.innerHTML = '';
-            for (let mobile in data.users) {
-                const u = data.users[mobile];
-                usersTable.innerHTML += `
-                    <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-                        <td class="p-4"><div class="font-bold text-white">${mobile}</div><div class="text-xs text-blue-400">UID: ${u.uid}</div></td>
-                        <td class="p-4">
-                            <div class="flex gap-2 items-center">
-                                <span class="font-black text-green-400 w-20">₹${u.balance.toFixed(2)}</span>
-                                <input type="number" id="bal_${mobile}" class="bg-gray-900 border border-gray-700 rounded px-2 py-1 w-20 text-xs text-white">
-                                <button onclick="updateBalance('${mobile}')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow">Set</button>
+                <div class="grid grid-cols-3 gap-5">
+                    <!-- Live Bet Monitor -->
+                    <div class="col-span-2 bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden flex flex-col" style="height:680px">
+                        <div class="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between bg-[#080d18]">
+                            <div class="font-black text-white text-sm" id="adminGameTitle">WinGo : 30 Sec</div>
+                            <div class="flex items-center gap-3">
+                                <span class="badge badge-blue" id="livePeriod">Period: —</span>
+                                <span class="text-2xl font-black text-red-400 font-mono" id="liveTimer">00</span>
                             </div>
-                        </td>
-                        <td class="p-4 text-xs"><div class="text-green-500">+₹${(u.totalDeposit||0)}</div><div class="text-red-500">-₹${(u.totalWithdraw||0)}</div></td>
-                        <td class="p-4 text-xs"><div class="text-purple-400">VIP ${u.vipLevel||0}</div><div class="text-gray-400">Code: ${u.myInviteCode||'-'}</div></td>
-                        <td class="p-4"><button onclick="viewUserHistory('${mobile}')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow"><i class="fa-solid fa-eye mr-2"></i> History</button></td>
-                    </tr>
-                `;
-            }
-
-            const txTable = document.getElementById('txTable');
-            txTable.innerHTML = '';
-            data.transactions.forEach(tx => {
-                if(tx.status === 'PENDING') pendingCount++;
-                if(tx.status === 'APPROVED' && tx.type === 'DEPOSIT') activeDep += tx.amount;
-                if(tx.status === 'APPROVED' && tx.type === 'WITHDRAW') activeWith += tx.amount;
-                
-                if(tx.status === 'PENDING') {
-                    const typeColor = tx.type === 'DEPOSIT' ? 'text-green-400 bg-green-900/30 border-green-500/50' : 'text-red-400 bg-red-900/30 border-red-500/50';
-                    const icon = tx.type === 'DEPOSIT' ? 'fa-wallet' : 'fa-building-columns';
-                    txTable.innerHTML += `
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-                            <td class="p-4"><div class="font-bold text-white">${tx.mobile}</div><div class="text-xs text-blue-400">UID: ${tx.uid}</div></td>
-                            <td class="p-4 text-xs text-gray-400">${tx.date}</td>
-                            <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-black border ${typeColor}"><i class="fa-solid ${icon} mr-1"></i> ${tx.type}</span></td>
-                            <td class="p-4 font-black text-white">₹${tx.amount.toFixed(2)}</td>
-                            <td class="p-4 text-xs font-mono text-yellow-400 bg-black/20 rounded p-2 border border-gray-800">${tx.type==='DEPOSIT' ? 'UTR: '+tx.utr : tx.bankDetails}</td>
-                            <td class="p-4">
-                                <div class="flex gap-2 justify-center">
-                                    <button onclick="txAction('${tx.id}', 'approve_tx')" class="bg-green-600 hover:bg-green-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center"><i class="fa-solid fa-check"></i></button>
-                                    <button onclick="txAction('${tx.id}', 'reject_tx')" class="bg-red-600 hover:bg-red-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-2" id="liveBetsLog">
+                            <div class="text-center text-slate-600 py-10 text-sm">Waiting for live bets...</div>
+                        </div>
+                        <!-- Bet Totals -->
+                        <div class="p-3 bg-[#080d18] border-t border-[#1e293b]">
+                            <div class="grid grid-cols-3 gap-2 mb-2">
+                                <div class="bg-red-900/20 border border-red-800/30 rounded-xl p-2 text-center">
+                                    <div class="text-red-400 font-black text-[10px] uppercase tracking-wider mb-1">Red</div>
+                                    <div class="font-black text-white text-sm" id="liveTotalRed">₹0</div>
                                 </div>
-                            </td>
-                        </tr>
-                    `;
-                }
-            });
-
-            if(pendingCount === 0) {
-                txTable.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-gray-500">No pending transactions at the moment.</td></tr>';
-                document.getElementById('txBadge').classList.add('hidden');
-            } else {
-                document.getElementById('txBadge').innerText = pendingCount;
-                document.getElementById('txBadge').classList.remove('hidden');
-            }
-
-            document.getElementById('statUsers').innerText = totalUsers;
-            document.getElementById('statDep').innerText = '₹' + activeDep.toFixed(0);
-            document.getElementById('statWith').innerText = '₹' + activeWith.toFixed(0);
-            document.getElementById('statProfit').innerText = '₹' + (activeDep - activeWith).toFixed(0);
-        });
-
-        // --- GAME CONTROL ---
-        let adminCurrentRoom = '30s';
-        
-        function adminSwitchRoom(room) {
-            adminCurrentRoom = room;
-            document.querySelectorAll('[id^="adminBtn-"]').forEach(btn => {
-                btn.className = "px-4 py-2 rounded-md font-bold text-sm text-gray-400 hover:text-white";
-            });
-            document.getElementById('adminBtn-' + room).className = "px-4 py-2 rounded-md font-bold text-sm bg-theme-gold text-black";
-            
-            let titles = {'30s': '30s', '1m': '1 Min'};
-            document.getElementById('adminGameTitle').innerText = 'Win Go : ' + titles[room];
-            
-            // clear the dashboard briefly to prevent visual stutter of wrong room
-            document.getElementById('liveBetsLog').innerHTML = '<div class="text-center text-gray-600 mt-10 text-sm">Loading bets...</div>';
-            document.getElementById('livePeriod').innerText = 'Period: Loading...';
-            document.getElementById('liveTimer').innerText = '00:00';
-            ['Red','Green','Violet','Big','Small'].forEach(k => document.getElementById('liveTotal'+k).innerText = '₹0');
-            for(let i=0; i<=9; i++) document.getElementById('liveTotalN'+i).innerText = '₹0';
-        }
-
-        ['30s', '1m'].forEach(room => {
-            socket.on('admin_live_bets_' + room, (data) => {
-                if(adminCurrentRoom !== room) return; // Only process active room
-                
-                document.getElementById('livePeriod').innerText = 'Period: ' + data.period;
-                
-                // Handle timer text and reset manual outcome lock visually
-                if(data.time === 0) {
-                    document.getElementById('liveTimer').innerText = 'LOCK';
-                    document.getElementById('queuedOutcome').innerText = 'NONE'; // resets visually when round ends
-                } else {
-                    document.getElementById('liveTimer').innerText = `00:${data.time.toString().padStart(2,'0')}`;
-                }
-
-                let sums = { 'Red': 0, 'Green': 0, 'Violet': 0, 'Big': 0, 'Small': 0 };
-                let numSums = [0,0,0,0,0,0,0,0,0,0];
-                const logContainer = document.getElementById('liveBetsLog');
-                
-                if(data.bets.length === 0) {
-                    logContainer.innerHTML = '<div class="text-center text-gray-600 mt-10 text-sm">No bets placed yet for this period. (Auto-calculating lowest payout outcome)</div>';
-                } else {
-                    logContainer.innerHTML = '';
-                    data.bets.forEach(b => {
-                        // Accumulate totals strictly based on the actual button clicked
-                        if (sums[b.selection] !== undefined) sums[b.selection] += b.amount;
-                        if (b.selection.startsWith('Number ')) {
-                            let n = parseInt(b.selection.replace('Number ', ''));
-                            if (n >= 0 && n <= 9) numSums[n] += b.amount;
-                        }
-
-                        // Render bet log
-                        let colorClass = 'text-gray-300';
-                        if(b.selection === 'Red') colorClass = 'text-red-500';
-                        if(b.selection === 'Green') colorClass = 'text-green-500';
-                        if(b.selection === 'Violet') colorClass = 'text-purple-500';
-                        if(['Big', 'Small'].includes(b.selection)) colorClass = 'text-yellow-500';
-
-                        logContainer.innerHTML += `
-                            <div class="flex justify-between items-center bg-gray-900 border border-gray-800 rounded-lg p-2 mb-2">
-                                <span class="text-sm font-bold text-gray-400"><i class="fa-solid fa-user mr-2 text-gray-600"></i>${b.mobile}</span>
-                                <span class="text-xs font-black px-2 py-1 rounded bg-gray-800 border border-gray-700 ${colorClass}">${b.selection}</span>
-                                <span class="font-black text-white">₹${b.amount}</span>
+                                <div class="bg-purple-900/20 border border-purple-800/30 rounded-xl p-2 text-center">
+                                    <div class="text-purple-400 font-black text-[10px] uppercase tracking-wider mb-1">Violet</div>
+                                    <div class="font-black text-white text-sm" id="liveTotalViolet">₹0</div>
+                                </div>
+                                <div class="bg-green-900/20 border border-green-800/30 rounded-xl p-2 text-center">
+                                    <div class="text-green-400 font-black text-[10px] uppercase tracking-wider mb-1">Green</div>
+                                    <div class="font-black text-white text-sm" id="liveTotalGreen">₹0</div>
+                                </div>
                             </div>
-                        `;
-                    });
-                }
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div class="bg-yellow-900/20 border border-yellow-800/30 rounded-xl p-2 text-center">
+                                    <div class="text-yellow-400 font-black text-[10px] uppercase tracking-wider mb-1">Big (5-9)</div>
+                                    <div class="font-black text-white text-sm" id="liveTotalBig">₹0</div>
+                                </div>
+                                <div class="bg-blue-900/20 border border-blue-800/30 rounded-xl p-2 text-center">
+                                    <div class="text-blue-400 font-black text-[10px] uppercase tracking-wider mb-1">Small (0-4)</div>
+                                    <div class="font-black text-white text-sm" id="liveTotalSmall">₹0</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-10 gap-1">
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n0box"><div class="text-slate-500 text-[9px] font-bold">0</div><div class="text-white text-[10px] font-black" id="liveTotalN0">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n1box"><div class="text-slate-500 text-[9px] font-bold">1</div><div class="text-white text-[10px] font-black" id="liveTotalN1">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n2box"><div class="text-slate-500 text-[9px] font-bold">2</div><div class="text-white text-[10px] font-black" id="liveTotalN2">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n3box"><div class="text-slate-500 text-[9px] font-bold">3</div><div class="text-white text-[10px] font-black" id="liveTotalN3">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n4box"><div class="text-slate-500 text-[9px] font-bold">4</div><div class="text-white text-[10px] font-black" id="liveTotalN4">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n5box"><div class="text-slate-500 text-[9px] font-bold">5</div><div class="text-white text-[10px] font-black" id="liveTotalN5">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n6box"><div class="text-slate-500 text-[9px] font-bold">6</div><div class="text-white text-[10px] font-black" id="liveTotalN6">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n7box"><div class="text-slate-500 text-[9px] font-bold">7</div><div class="text-white text-[10px] font-black" id="liveTotalN7">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n8box"><div class="text-slate-500 text-[9px] font-bold">8</div><div class="text-white text-[10px] font-black" id="liveTotalN8">0</div></div>
+                                <div class="bg-[#0f172a] border border-[#1e293b] rounded-lg p-1 text-center" id="n9box"><div class="text-slate-500 text-[9px] font-bold">9</div><div class="text-white text-[10px] font-black" id="liveTotalN9">0</div></div>
+                            </div>
+                        </div>
+                    </div>
 
-                document.getElementById('liveTotalRed').innerText = '₹' + sums['Red'];
-                document.getElementById('liveTotalGreen').innerText = '₹' + sums['Green'];
-                document.getElementById('liveTotalViolet').innerText = '₹' + sums['Violet'];
-                document.getElementById('liveTotalBig').innerText = '₹' + sums['Big'];
-                document.getElementById('liveTotalSmall').innerText = '₹' + sums['Small'];
-                for(let i=0; i<=9; i++) {
-                    document.getElementById('liveTotalN'+i).innerText = '₹' + numSums[i];
-                }
+                    <!-- Outcome Override Panel -->
+                    <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 flex flex-col">
+                        <div class="font-black text-white mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-blue-400"></i> Force Outcome
+                        </div>
+                        <p class="text-xs text-slate-500 mb-5">Select any number below to force the result for the <strong class="text-white">current period</strong>.</p>
+
+                        <!-- Special Numbers -->
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button onclick="forceWingo(0)" class="num-btn num-btn-violet">0 <span class="text-[11px] opacity-80">(Red+V)</span></button>
+                            <button onclick="forceWingo(5)" class="num-btn num-btn-violet">5 <span class="text-[11px] opacity-80">(Green+V)</span></button>
+                        </div>
+
+                        <!-- Red Numbers -->
+                        <div class="mb-1">
+                            <div class="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1.5 px-1">Red Numbers</div>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <button onclick="forceWingo(2)" class="num-btn num-btn-red">2</button>
+                                <button onclick="forceWingo(4)" class="num-btn num-btn-red">4</button>
+                                <button onclick="forceWingo(6)" class="num-btn num-btn-red">6</button>
+                                <button onclick="forceWingo(8)" class="num-btn num-btn-red">8</button>
+                            </div>
+                        </div>
+
+                        <!-- Green Numbers -->
+                        <div class="mb-5">
+                            <div class="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-1.5 mt-3 px-1">Green Numbers</div>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <button onclick="forceWingo(1)" class="num-btn num-btn-green">1</button>
+                                <button onclick="forceWingo(3)" class="num-btn num-btn-green">3</button>
+                                <button onclick="forceWingo(7)" class="num-btn num-btn-green">7</button>
+                                <button onclick="forceWingo(9)" class="num-btn num-btn-green">9</button>
+                            </div>
+                        </div>
+
+                        <!-- Queued Outcome Display -->
+                        <div class="mt-auto bg-[#060a12] border border-[#1e293b] rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Queued Outcome</div>
+                            <div class="text-5xl font-black text-yellow-400 font-mono" id="queuedOutcome">—</div>
+                            <div class="text-xs text-slate-600 mt-2">Will apply on next round lock</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== AVIATOR CONTROL TAB ========== -->
+            <div id="tab-aviator" class="view-section">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-black text-white flex items-center gap-3">
+                        <div class="live-dot"></div>
+                        <i class="fa-solid fa-plane text-red-400"></i> Aviator Live Control
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <div class="badge badge-blue" id="adminAviatorRound">Round: —</div>
+                        <div class="font-black text-2xl font-mono" id="adminAviatorStatus">—</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-5">
+                    <!-- Aviator Live Monitor -->
+                    <div class="col-span-2 bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden flex flex-col" style="height:640px">
+                        <div class="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between bg-[#080d18]">
+                            <span class="font-black text-white text-sm">Active Player Bets</span>
+                            <span class="text-green-400 font-black text-lg">Total: <span id="adminAviatorTotalPool">₹0.00</span></span>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-2" id="adminAviatorBetsLog">
+                            <div class="text-center text-slate-600 py-10 text-sm">Waiting for active bets...</div>
+                        </div>
+                    </div>
+
+                    <!-- Crash Overrider -->
+                    <div class="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 flex flex-col">
+                        <div class="font-black text-white mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-plane-slash text-red-400"></i> Force Crash Point
+                        </div>
+                        <p class="text-xs text-slate-500 mb-5">Set the crash multiplier for the <strong class="text-white">next Aviator round</strong>.</p>
+
+                        <div class="space-y-2 mb-4">
+                            <button onclick="forceAviatorCrash(1.10)" class="crash-btn w-full" style="background:linear-gradient(135deg,#7f1d1d,#991b1b);color:#fca5a5;border:1px solid #b91c1c">
+                                💥 1.10x — Quick Crash
+                            </button>
+                            <button onclick="forceAviatorCrash(1.50)" class="crash-btn w-full" style="background:linear-gradient(135deg,#431407,#7c2d12);color:#fdba74;border:1px solid #c2410c">
+                                🔻 1.50x — Low
+                            </button>
+                            <button onclick="forceAviatorCrash(2.00)" class="crash-btn w-full" style="background:linear-gradient(135deg,#422006,#713f12);color:#fde68a;border:1px solid #b45309">
+                                ⚡ 2.00x — Double
+                            </button>
+                            <button onclick="forceAviatorCrash(5.00)" class="crash-btn w-full" style="background:linear-gradient(135deg,#2e1065,#4c1d95);color:#c4b5fd;border:1px solid #6d28d9">
+                                🚀 5.00x — High
+                            </button>
+                            <button onclick="forceAviatorCrash(10.00)" class="crash-btn w-full" style="background:linear-gradient(135deg,#500724,#881337);color:#fda4af;border:1px solid #be123c">
+                                🌙 10.00x — Moonshot
+                            </button>
+                            <button onclick="forceAviatorCrash(50.00)" class="crash-btn w-full" style="background:linear-gradient(135deg,#052e16,#14532d);color:#86efac;border:1px solid #15803d">
+                                🪐 50.00x — Jackpot
+                            </button>
+                            <button onclick="forceAviatorCrash(null)" class="crash-btn w-full" style="background:#1e293b;color:#94a3b8;border:1px solid #334155">
+                                🎲 Auto / Fair Mode
+                            </button>
+                        </div>
+
+                        <!-- Custom -->
+                        <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-3 mb-4">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Custom Multiplier</label>
+                            <div class="flex gap-2">
+                                <input type="number" step="0.01" min="1.00" id="adminAviatorCustomVal" placeholder="e.g. 3.25" class="inp flex-1">
+                                <button onclick="setAviatorCustomCrash()" class="btn btn-warning">SET</button>
+                            </div>
+                        </div>
+
+                        <!-- Queued -->
+                        <div class="mt-auto bg-[#060a12] border border-[#1e293b] rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Queued Crash Point</div>
+                            <div class="text-4xl font-black text-yellow-400 font-mono" id="adminQueuedCrash">AUTO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end scrollable content -->
+    </div><!-- end main content -->
+</div><!-- end dashboard -->
+
+<!-- ==================== USER DETAIL MODAL ==================== -->
+<div id="userModal" class="modal-bg" onclick="if(event.target===this) closeUserModal()">
+    <div class="modal-box">
+        <div class="px-6 py-4 border-b border-[#1e293b] flex items-center justify-between">
+            <h3 class="font-black text-white" id="userModalTitle">User Details</h3>
+            <button onclick="closeUserModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div class="flex gap-1 p-3 border-b border-[#1e293b]">
+            <button onclick="switchUserTab('info')" id="uTabInfo" class="tab-btn active">Info</button>
+            <button onclick="switchUserTab('bets')" id="uTabBets" class="tab-btn">Bet History</button>
+            <button onclick="switchUserTab('txs')" id="uTabTxs" class="tab-btn">Transactions</button>
+            <button onclick="switchUserTab('edit')" id="uTabEdit" class="tab-btn">Edit</button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5" id="userModalBody">
+            <div class="text-center text-slate-500 py-12"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CREATE USER MODAL ==================== -->
+<div id="createUserModal" class="modal-bg" onclick="if(event.target===this) closeCreateUser()">
+    <div class="modal-box">
+        <div class="px-6 py-4 border-b border-[#1e293b] flex items-center justify-between">
+            <h3 class="font-black text-white">➕ Create New User</h3>
+            <button onclick="closeCreateUser()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Mobile Number *</label>
+                <input type="text" id="newMobile" placeholder="10-digit mobile number" class="inp">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Password *</label>
+                <input type="text" id="newPassword" placeholder="Set password" class="inp">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Initial Balance (₹)</label>
+                <input type="number" id="newBalance" placeholder="0" value="0" class="inp">
+            </div>
+            <button onclick="submitCreateUser()" class="btn btn-primary w-full justify-center py-3">
+                <i class="fa-solid fa-user-plus"></i> Create User
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const socket = io();
+    let currentAdminData = null;
+    let lastHistoryData = null;
+    let currentUserMobile = null;
+    let currentUserTab = 'info';
+    let currentTxFilter = 'PENDING';
+    let adminCurrentRoom = '30s';
+    let allTxData = [];
+    let allUsersData = {};
+
+    // ===== CLOCK =====
+    setInterval(() => {
+        const now = new Date();
+        const el = document.getElementById('topBarTime');
+        if (el) el.innerText = now.toLocaleTimeString('en-IN', { hour12: true });
+    }, 1000);
+
+    // ===== TOGGLE PASSWORD =====
+    function togglePwd() {
+        const inp = document.getElementById('adminPwd');
+        const icon = document.getElementById('eyeIcon');
+        if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+        else { inp.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+    }
+
+    // ===== AUTH =====
+    function loginAdmin() {
+        const pwd = document.getElementById('adminPwd').value.trim();
+        socket.emit('admin_login', pwd);
+    }
+
+    socket.on('admin_auth_success', () => {
+        document.getElementById('adminLogin').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('adminDashboard').style.display = 'flex';
+    });
+
+    socket.on('toast', (data) => {
+        if (data.type === 'error') {
+            const el = document.getElementById('loginError');
+            if (el) { el.textContent = '❌ ' + data.msg; el.classList.remove('hidden'); setTimeout(() => el.classList.add('hidden'), 4000); }
+        }
+        showNotif(data.msg, data.type === 'error' ? 'wd' : 'dep');
+    });
+
+    // ===== NAVIGATION =====
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+        if (el) el.classList.add('active');
+        const titles = {
+            'tab-dash': '📊 Dashboard Overview',
+            'tab-tx': '💳 Transactions',
+            'tab-users': '👥 User Manager',
+            'tab-wingo': '🎯 WinGo Game Control',
+            'tab-aviator': '✈️ Aviator Game Control'
+        };
+        const topTitle = document.getElementById('topBarTitle');
+        if (topTitle) topTitle.innerText = titles[tabId] || '';
+        if (tabId === 'tab-wingo') { socket.emit('admin_action', { action: 'admin_set_room', room: adminCurrentRoom }); }
+        if (tabId === 'tab-aviator') { socket.emit('admin_action', { action: 'admin_set_room', room: 'aviator' }); }
+    }
+
+    // ===== DATA RENDER =====
+    socket.on('admin_data', (data) => {
+        currentAdminData = data;
+        allTxData = data.transactions || [];
+        allUsersData = data.users || {};
+        renderStats(data);
+        renderUsers(data.users);
+        renderTxTable(currentTxFilter);
+        renderQuickPending(data.transactions);
+    });
+
+    function renderStats(data) {
+        let totalUsers = Object.keys(data.users).length;
+        let activeDep = 0, activeWith = 0, pendingCount = 0;
+        (data.transactions || []).forEach(tx => {
+            if (tx.status === 'PENDING') pendingCount++;
+            if (tx.status === 'APPROVED' && tx.type === 'DEPOSIT') activeDep += tx.amount;
+            if (tx.status === 'APPROVED' && tx.type === 'WITHDRAW') activeWith += tx.amount;
+        });
+        document.getElementById('statUsers').innerText = totalUsers;
+        document.getElementById('statDep').innerText = '₹' + activeDep.toFixed(0);
+        document.getElementById('statWith').innerText = '₹' + activeWith.toFixed(0);
+        document.getElementById('statProfit').innerText = '₹' + (activeDep - activeWith).toFixed(0);
+        document.getElementById('topBarUsers').innerText = totalUsers;
+        document.getElementById('topBarDep').innerText = activeDep.toFixed(0);
+        document.getElementById('topBarWd').innerText = activeWith.toFixed(0);
+
+        const txBadge = document.getElementById('txBadge');
+        const pendBadge = document.getElementById('pendingCountBadge');
+        if (pendingCount > 0) {
+            txBadge.innerText = pendingCount; txBadge.classList.remove('hidden');
+            if (pendBadge) { pendBadge.innerText = pendingCount; pendBadge.classList.remove('hidden'); }
+        } else {
+            txBadge.classList.add('hidden');
+            if (pendBadge) pendBadge.classList.add('hidden');
+        }
+    }
+
+    function renderUsers(users) {
+        const tbody = document.getElementById('usersTable');
+        if (!users || Object.keys(users).length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-slate-600 py-12 text-sm">No users found.</td></tr>';
+            return;
+        }
+        const query = (document.getElementById('userSearch')?.value || '').toLowerCase();
+        const entries = Object.entries(users).filter(([mobile, u]) => {
+            if (!query) return true;
+            return mobile.includes(query) || (u.uid || '').toLowerCase().includes(query) || (u.name || '').toLowerCase().includes(query);
+        });
+
+        if (entries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-12 text-sm">No users match your search.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        entries.forEach(([mobile, u], index) => {
+            const vipBadge = u.vipLevel > 0 ? `<span class="badge badge-yellow">VIP ${u.vipLevel}</span>` : `<span class="badge" style="background:#0f172a;color:#475569;border:1px solid #1e293b">VIP 0</span>`;
+            const hasDeposit = (u.totalDeposit || 0) > 0;
+            tbody.innerHTML += `
+                <tr>
+                    <td class="text-slate-600 text-xs font-mono">${index + 1}</td>
+                    <td>
+                        <div class="font-black text-white text-sm font-mono">${mobile}</div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">${hasDeposit ? '<span class="text-green-400">✓ Deposited</span>' : 'Not deposited'}</div>
+                    </td>
+                    <td><span class="badge badge-blue font-mono">${u.uid || 'N/A'}</span></td>
+                    <td>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-mono text-yellow-300 text-xs bg-yellow-900/30 border border-yellow-700/30 rounded px-2 py-0.5" id="pwdDisplay_${mobile}">${u.password ? '••••••••' : 'N/A'}</span>
+                            <button onclick="togglePwdDisplay('${mobile}', '${(u.password || '').replace(/'/g, "\\'")}');" title="Show/Hide" class="text-slate-600 hover:text-white transition-colors text-xs"><i class="fa-solid fa-eye" id="pwdIcon_${mobile}"></i></button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400 font-black text-sm">₹${(u.balance || 0).toFixed(2)}</span>
+                        </div>
+                    </td>
+                    <td class="text-xs">
+                        <div class="text-green-400 font-bold">+₹${(u.totalDeposit||0).toFixed(2)}</div>
+                        <div class="text-red-400 font-bold">-₹${(u.totalWithdraw||0).toFixed(2)}</div>
+                    </td>
+                    <td>${vipBadge}<div class="text-[10px] text-slate-500 mt-1">Code: ${u.myInviteCode||'—'}</div></td>
+                    <td class="text-xs text-slate-500 font-mono">${u.joinDate || '—'}</td>
+                    <td>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openUserModal('${mobile}')" class="btn btn-ghost text-xs py-1.5 px-3"><i class="fa-solid fa-eye"></i></button>
+                            <button onclick="quickEditBalance('${mobile}', ${u.balance || 0})" class="btn btn-primary text-xs py-1.5 px-3"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    let pwdVisible = {};
+    function togglePwdDisplay(mobile, pwd) {
+        const el = document.getElementById('pwdDisplay_' + mobile);
+        const icon = document.getElementById('pwdIcon_' + mobile);
+        if (!el) return;
+        if (pwdVisible[mobile]) {
+            el.innerText = '••••••••';
+            icon.className = 'fa-solid fa-eye';
+            pwdVisible[mobile] = false;
+        } else {
+            el.innerText = pwd || 'N/A';
+            icon.className = 'fa-solid fa-eye-slash';
+            pwdVisible[mobile] = true;
+        }
+    }
+
+    function filterUsers() { renderUsers(allUsersData); }
+
+    function renderTxTable(filter) {
+        currentTxFilter = filter;
+        document.querySelectorAll('[id^="txFilter-"]').forEach(btn => btn.classList.remove('active'));
+        const fBtn = document.getElementById('txFilter-' + filter);
+        if (fBtn) fBtn.classList.add('active');
+
+        const tbody = document.getElementById('txTable');
+        const txList = filter === 'ALL' ? allTxData : allTxData.filter(tx => tx.status === filter);
+
+        if (txList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-slate-600 py-12 text-sm">No ${filter.toLowerCase()} transactions.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = '';
+        txList.forEach(tx => {
+            const statusBadge = tx.status === 'APPROVED' ? '<span class="badge badge-green">Approved</span>' :
+                tx.status === 'REJECTED' ? '<span class="badge badge-red">Rejected</span>' :
+                '<span class="badge badge-yellow">Pending</span>';
+            const typeColor = tx.type === 'DEPOSIT' ? 'text-green-400' : 'text-red-400';
+            const typeIcon = tx.type === 'DEPOSIT' ? 'fa-arrow-down' : 'fa-arrow-up';
+            const payInfo = tx.type === 'DEPOSIT' ? `<span class="text-yellow-300 font-mono">UTR: ${tx.utr || 'N/A'}</span>` : `<span class="text-blue-300 font-mono text-xs">${tx.bankDetails || 'N/A'}</span>`;
+            const actionBtns = tx.status === 'PENDING' ? `
+                <div class="flex gap-1.5 justify-center">
+                    <button onclick="txAction('${tx.id}', 'approve_tx')" class="btn btn-success text-xs py-1.5 px-3"><i class="fa-solid fa-check"></i> Approve</button>
+                    <button onclick="txAction('${tx.id}', 'reject_tx')" class="btn btn-danger text-xs py-1.5 px-3"><i class="fa-solid fa-xmark"></i> Reject</button>
+                </div>` : '—';
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="font-black text-white text-sm font-mono">${tx.mobile || '—'}</div>
+                        <div class="text-[10px] text-blue-400 mt-0.5">UID: ${tx.uid || '—'}</div>
+                    </td>
+                    <td class="text-xs text-slate-400 font-mono">${tx.date || '—'}</td>
+                    <td><span class="${typeColor} font-black flex items-center gap-1.5 text-sm"><i class="fa-solid ${typeIcon} text-xs"></i>${tx.type}</span></td>
+                    <td class="font-black text-white text-base">₹${(tx.amount || 0).toFixed(2)}</td>
+                    <td class="text-xs">${payInfo}</td>
+                    <td>${statusBadge}</td>
+                    <td class="text-center">${actionBtns}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function filterTx(filter) { renderTxTable(filter); }
+
+    function renderQuickPending(transactions) {
+        const container = document.getElementById('quickPendingTable');
+        const pending = (transactions || []).filter(tx => tx.status === 'PENDING');
+        if (pending.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-slate-600 text-sm">No pending transactions 🎉</div>';
+            return;
+        }
+        container.innerHTML = pending.slice(0, 5).map(tx => {
+            const typeColor = tx.type === 'DEPOSIT' ? 'text-green-400' : 'text-red-400';
+            const icon = tx.type === 'DEPOSIT' ? 'fa-arrow-down' : 'fa-arrow-up';
+            return `
+                <div class="flex items-center justify-between px-5 py-3 border-b border-[#1e293b] hover:bg-[#1e293b]/30 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center ${tx.type === 'DEPOSIT' ? 'bg-green-900/40' : 'bg-red-900/40'}">
+                            <i class="fa-solid ${icon} ${typeColor} text-xs"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm font-mono">${tx.mobile}</div>
+                            <div class="text-[10px] text-slate-500">${tx.date}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-black ${typeColor} text-sm">₹${tx.amount.toFixed(2)}</span>
+                        <button onclick="txAction('${tx.id}', 'approve_tx')" class="btn btn-success text-xs py-1 px-2.5"><i class="fa-solid fa-check"></i></button>
+                        <button onclick="txAction('${tx.id}', 'reject_tx')" class="btn btn-danger text-xs py-1 px-2.5"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        if (pending.length > 5) {
+            container.innerHTML += `<div class="p-3 text-center text-xs text-slate-500">+${pending.length - 5} more pending...</div>`;
+        }
+    }
+
+    // ===== USER MODAL =====
+    function openUserModal(mobile) {
+        currentUserMobile = mobile;
+        currentUserTab = 'info';
+        document.getElementById('userModalTitle').innerText = '📋 User: ' + mobile;
+        document.getElementById('userModal').classList.add('open');
+        switchUserTab('info');
+        document.getElementById('userModalBody').innerHTML = '<div class="text-center text-slate-500 py-12"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>';
+        socket.emit('admin_action', { action: 'get_user_history', mobile: mobile });
+    }
+
+    function closeUserModal() {
+        document.getElementById('userModal').classList.remove('open');
+        currentUserMobile = null;
+        lastHistoryData = null;
+    }
+
+    function switchUserTab(tab) {
+        currentUserTab = tab;
+        ['info','bets','txs','edit'].forEach(t => {
+            const btn = document.getElementById('uTab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (btn) btn.classList.toggle('active', t === tab);
+        });
+        renderUserModalBody();
+    }
+
+    socket.on('admin_user_history', (data) => {
+        lastHistoryData = data;
+        renderUserModalBody();
+    });
+
+    function renderUserModalBody() {
+        const container = document.getElementById('userModalBody');
+        if (!currentUserMobile) return;
+        const u = allUsersData[currentUserMobile];
+        if (!u && currentUserTab !== 'bets' && currentUserTab !== 'txs') {
+            container.innerHTML = '<div class="text-center text-slate-500 py-12">User not found.</div>';
+            return;
+        }
+
+        if (currentUserTab === 'info') {
+            container.innerHTML = `
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Mobile</div>
+                        <div class="font-black text-white font-mono">${currentUserMobile}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">User ID</div>
+                        <div class="font-black text-blue-400 font-mono">${u?.uid || 'N/A'}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Password</div>
+                        <div class="font-black text-yellow-300 font-mono">${u?.password || 'N/A'}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Balance</div>
+                        <div class="font-black text-green-400 text-xl">₹${(u?.balance || 0).toFixed(2)}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Total Deposit</div>
+                        <div class="font-black text-green-400">₹${(u?.totalDeposit||0).toFixed(2)}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Total Withdraw</div>
+                        <div class="font-black text-red-400">₹${(u?.totalWithdraw||0).toFixed(2)}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">VIP Level</div>
+                        <div class="font-black text-yellow-400">VIP ${u?.vipLevel || 0}</div>
+                    </div>
+                    <div class="bg-[#060a12] border border-[#1e293b] rounded-xl p-4">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Invite Code</div>
+                        <div class="font-black text-purple-400 font-mono">${u?.myInviteCode || '—'}</div>
+                    </div>
+                </div>
+            `;
+        } else if (currentUserTab === 'bets') {
+            if (!lastHistoryData) { container.innerHTML = '<div class="text-center text-slate-500 py-12"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>'; return; }
+            const bets = lastHistoryData.bets || [];
+            if (bets.length === 0) { container.innerHTML = '<div class="text-center text-slate-600 py-12 text-sm">No bet history found.</div>'; return; }
+            container.innerHTML = bets.map(b => {
+                const won = b.won > 0;
+                return `
+                    <div class="flex items-center justify-between bg-[#060a12] border border-[#1e293b] rounded-xl p-3 mb-2">
+                        <div>
+                            <div class="text-[10px] text-slate-500">${b.period || '—'} · ${b.date || ''}</div>
+                            <div class="font-bold text-white text-sm mt-0.5">${b.selection || '—'}</div>
+                            <div class="text-xs text-slate-500">Bet: ₹${b.amount}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-lg ${won ? 'text-green-400' : 'text-red-400'}">${won ? '+₹'+b.won : '-₹'+b.amount}</div>
+                            <div class="badge ${won ? 'badge-green' : 'badge-red'} mt-1">${won ? 'WON' : 'LOST'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else if (currentUserTab === 'txs') {
+            if (!lastHistoryData) { container.innerHTML = '<div class="text-center text-slate-500 py-12"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>'; return; }
+            const txs = lastHistoryData.transactions || [];
+            if (txs.length === 0) { container.innerHTML = '<div class="text-center text-slate-600 py-12 text-sm">No transactions found.</div>'; return; }
+            container.innerHTML = txs.map(t => {
+                const statusBadge = t.status === 'APPROVED' ? 'badge-green' : (t.status === 'REJECTED' ? 'badge-red' : 'badge-yellow');
+                const sign = t.type === 'DEPOSIT' ? '+' : '-';
+                return `
+                    <div class="flex items-center justify-between bg-[#060a12] border border-[#1e293b] rounded-xl p-3 mb-2">
+                        <div>
+                            <div class="font-bold text-white text-sm">${t.type}</div>
+                            <div class="text-[10px] text-slate-500">${t.date || '—'}</div>
+                            <div class="text-[10px] text-slate-600 mt-1">${t.type === 'DEPOSIT' ? 'UTR: '+(t.utr||'N/A') : (t.bankDetails||'N/A')}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-lg ${t.type === 'DEPOSIT' ? 'text-green-400' : 'text-red-400'}">${sign}₹${t.amount.toFixed(2)}</div>
+                            <span class="badge ${statusBadge} mt-1">${t.status}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else if (currentUserTab === 'edit') {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Set New Balance (₹)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="editBal" value="${(u?.balance || 0).toFixed(2)}" class="inp flex-1">
+                            <button onclick="updateBalance('${currentUserMobile}')" class="btn btn-primary">Set Balance</button>
+                        </div>
+                    </div>
+                    <div class="border-t border-[#1e293b] pt-4">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">Add / Deduct Balance</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="editBalAdj" placeholder="Amount" class="inp flex-1">
+                            <button onclick="adjustBalance('${currentUserMobile}', 1)" class="btn btn-success">+ Add</button>
+                            <button onclick="adjustBalance('${currentUserMobile}', -1)" class="btn btn-danger">- Deduct</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // ===== QUICK EDIT BALANCE =====
+    function quickEditBalance(mobile, currentBal) {
+        const newBal = prompt(`Set balance for ${mobile}\nCurrent: ₹${currentBal.toFixed(2)}\n\nEnter new balance:`);
+        if (newBal === null) return;
+        const val = parseFloat(newBal);
+        if (isNaN(val) || val < 0) return alert('Invalid amount!');
+        socket.emit('admin_action', { action: 'update_balance', mobile, newBalance: val });
+    }
+
+    // ===== BALANCE ACTIONS =====
+    function updateBalance(mobile) {
+        const newBal = parseFloat(document.getElementById('editBal')?.value);
+        if (isNaN(newBal) || newBal < 0) return alert('Invalid amount!');
+        socket.emit('admin_action', { action: 'update_balance', mobile, newBalance: newBal });
+        showNotif(`Balance set to ₹${newBal.toFixed(2)} for ${mobile}`, 'dep');
+    }
+
+    function adjustBalance(mobile, sign) {
+        const u = allUsersData[mobile];
+        if (!u) return;
+        const adj = parseFloat(document.getElementById('editBalAdj')?.value);
+        if (isNaN(adj) || adj <= 0) return alert('Enter a valid amount!');
+        const newBal = Math.max(0, (u.balance || 0) + (sign * adj));
+        socket.emit('admin_action', { action: 'update_balance', mobile, newBalance: newBal });
+        showNotif(`Balance ${sign > 0 ? 'added' : 'deducted'} ₹${adj.toFixed(2)} for ${mobile}`, sign > 0 ? 'dep' : 'wd');
+    }
+
+    // ===== TX ACTIONS =====
+    function txAction(txId, action) {
+        socket.emit('admin_action', { action, txId });
+    }
+
+    // ===== CREATE USER =====
+    function createNewUser() {
+        document.getElementById('createUserModal').classList.add('open');
+    }
+    function closeCreateUser() {
+        document.getElementById('createUserModal').classList.remove('open');
+    }
+    function submitCreateUser() {
+        const mobile = document.getElementById('newMobile').value.trim();
+        const password = document.getElementById('newPassword').value.trim();
+        const balance = parseFloat(document.getElementById('newBalance').value || '0');
+        if (!mobile || mobile.length !== 10 || !/^\d+$/.test(mobile)) return alert('Enter a valid 10-digit mobile number!');
+        if (!password || password.length < 4) return alert('Password must be at least 4 characters!');
+        socket.emit('admin_action', { action: 'create_user', mobile, password, balance: isNaN(balance) ? 0 : balance });
+        closeCreateUser();
+        showNotif('User ' + mobile + ' created!', 'dep');
+    }
+
+    // ===== GAME CONTROL =====
+    function adminSwitchRoom(room) {
+        adminCurrentRoom = room;
+        ['30s','1m'].forEach(r => {
+            const btn = document.getElementById('adminBtn-' + r);
+            if (btn) btn.classList.toggle('active', r === room);
+        });
+        socket.emit('admin_action', { action: 'admin_set_room', room });
+        const titles = { '30s': 'WinGo : 30 Sec', '1m': 'WinGo : 1 Min' };
+        const titleEl = document.getElementById('adminGameTitle');
+        if (titleEl) titleEl.innerText = titles[room] || room;
+        document.getElementById('liveBetsLog').innerHTML = '<div class="text-center text-slate-600 py-10 text-sm">Switching room...</div>';
+        document.getElementById('livePeriod').innerText = 'Period: —';
+        document.getElementById('liveTimer').innerText = '00';
+        ['Red','Green','Violet','Big','Small'].forEach(k => { const el = document.getElementById('liveTotal'+k); if(el) el.innerText = '₹0'; });
+        for (let i = 0; i <= 9; i++) { const el = document.getElementById('liveTotalN'+i); if(el) el.innerText = '0'; }
+        document.getElementById('queuedOutcome').innerText = '—';
+    }
+
+    function forceWingo(num) {
+        socket.emit('admin_action', { action: 'set_wingo_result', room: adminCurrentRoom, num });
+        document.getElementById('queuedOutcome').innerText = num;
+        showNotif(`WinGo outcome forced: ${num}`, 'dep');
+    }
+
+    ['30s', '1m'].forEach(room => {
+        socket.on('admin_live_bets_' + room, (data) => {
+            if (adminCurrentRoom !== room) return;
+            document.getElementById('livePeriod').innerText = 'Period: ' + data.period;
+            if (data.time === 0) {
+                document.getElementById('liveTimer').innerText = '🔒';
+                document.getElementById('queuedOutcome').innerText = '—';
+            } else {
+                document.getElementById('liveTimer').innerText = data.time.toString().padStart(2,'0');
+            }
+            let sums = { Red:0, Green:0, Violet:0, Big:0, Small:0 };
+            let numSums = [0,0,0,0,0,0,0,0,0,0];
+            const logEl = document.getElementById('liveBetsLog');
+            if (data.bets.length === 0) {
+                logEl.innerHTML = '<div class="text-center text-slate-600 py-10 text-sm">No bets placed yet.</div>';
+            } else {
+                logEl.innerHTML = '';
+                data.bets.forEach(b => {
+                    if (sums[b.selection] !== undefined) sums[b.selection] += b.amount;
+                    if (b.selection.startsWith('Number ')) numSums[parseInt(b.selection.replace('Number ',''))] += b.amount;
+                    const colorMap = { Red:'text-red-400', Green:'text-green-400', Violet:'text-purple-400', Big:'text-yellow-400', Small:'text-blue-400' };
+                    const cc = colorMap[b.selection] || 'text-slate-300';
+                    logEl.innerHTML += `
+                        <div class="flex items-center justify-between bg-[#060a12] border border-[#1e293b] rounded-lg p-2.5">
+                            <span class="text-xs font-bold text-slate-400 font-mono"><i class="fa-solid fa-user mr-1.5 text-slate-600"></i>${b.mobile}</span>
+                            <span class="badge ${cc === 'text-red-400' ? 'badge-red' : cc === 'text-green-400' ? 'badge-green' : cc === 'text-yellow-400' ? 'badge-yellow' : 'badge-blue'} text-xs">${b.selection}</span>
+                            <span class="font-black text-white text-sm">₹${b.amount}</span>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('liveTotalRed').innerText = '₹'+sums.Red;
+            document.getElementById('liveTotalGreen').innerText = '₹'+sums.Green;
+            document.getElementById('liveTotalViolet').innerText = '₹'+sums.Violet;
+            document.getElementById('liveTotalBig').innerText = '₹'+sums.Big;
+            document.getElementById('liveTotalSmall').innerText = '₹'+sums.Small;
+            for (let i=0; i<=9; i++) {
+                const el = document.getElementById('liveTotalN'+i);
+                if (el) el.innerText = numSums[i];
+            }
+        });
+    });
+
+    // ===== AVIATOR CONTROL =====
+    function forceAviatorCrash(mult) {
+        socket.emit('admin_action', { action: 'set_aviator_crash', mult });
+        document.getElementById('adminQueuedCrash').innerText = mult ? `${mult.toFixed(2)}x` : 'AUTO';
+        showNotif(mult ? `Aviator crash forced: ${mult.toFixed(2)}x` : 'Aviator reset to Auto mode', mult ? 'wd' : 'dep');
+    }
+
+    function setAviatorCustomCrash() {
+        const val = parseFloat(document.getElementById('adminAviatorCustomVal').value);
+        if (!val || val < 1.00) return alert('Enter a valid multiplier (min 1.00x)');
+        forceAviatorCrash(val);
+        document.getElementById('adminAviatorCustomVal').value = '';
+    }
+
+    socket.on('admin_aviator_sync', (data) => {
+        const roundEl = document.getElementById('adminAviatorRound');
+        const statusEl = document.getElementById('adminAviatorStatus');
+        const poolEl = document.getElementById('adminAviatorTotalPool');
+        const logEl = document.getElementById('adminAviatorBetsLog');
+        const queuedEl = document.getElementById('adminQueuedCrash');
+        if (roundEl) roundEl.innerText = 'Round #' + data.roundId;
+        if (queuedEl) queuedEl.innerText = data.queuedCrash ? `${data.queuedCrash.toFixed(2)}x` : 'AUTO';
+        if (statusEl) {
+            if (data.state === 'WAITING') { statusEl.innerText = `⏳ WAIT ${data.waitingTime.toFixed(1)}s`; statusEl.className = 'font-black text-2xl font-mono text-blue-400'; }
+            else if (data.state === 'FLYING') { statusEl.innerText = `✈️ ${data.multiplier.toFixed(2)}x`; statusEl.className = 'font-black text-2xl font-mono text-yellow-400 animate-pulse'; }
+            else { statusEl.innerText = `💥 ${data.crashPoint.toFixed(2)}x`; statusEl.className = 'font-black text-2xl font-mono text-red-500'; }
+        }
+        let totalPool = 0;
+        if (data.activeBets && data.activeBets.length > 0) {
+            logEl.innerHTML = '';
+            data.activeBets.forEach(b => {
+                totalPool += b.amount;
+                const statusText = b.cashedOut ? `<span class="badge badge-green">Cashed Out</span>` : `<span class="badge badge-yellow">Flying</span>`;
+                logEl.innerHTML += `
+                    <div class="flex items-center justify-between bg-[#060a12] border border-[#1e293b] rounded-xl p-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-blue-900/40 flex items-center justify-center"><i class="fa-solid fa-user text-blue-400 text-xs"></i></div>
+                            <div>
+                                <div class="text-xs font-bold text-slate-300 font-mono">${b.mobile}</div>
+                                <div class="text-[10px] text-slate-600">Slot ${b.slot}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-white">₹${b.amount}</span>
+                            ${statusText}
+                        </div>
+                    </div>
+                `;
             });
-        });
+        } else {
+            logEl.innerHTML = '<div class="text-center text-slate-600 py-10 text-sm">No active bets this round.</div>';
+        }
+        if (poolEl) poolEl.innerText = '₹' + totalPool.toFixed(2);
+    });
 
-        function forceWingo(num) {
-            socket.emit('admin_action', { action: 'set_wingo_result', room: adminCurrentRoom, num: num });
-            document.getElementById('queuedOutcome').innerText = num;
-        }
-
-        // --- USER HISTORY MODAL ---
-        function viewUserHistory(mobile) {
-            document.getElementById('userHistoryModal').classList.remove('hidden');
-            setTimeout(() => { document.getElementById('uhmContent').classList.remove('translate-x-full'); }, 10);
-            document.getElementById('uhmTitle').innerText = 'History: ' + mobile;
-            document.getElementById('uhmList').innerHTML = '<div class="text-center text-gray-500 mt-10"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>';
-            socket.emit('admin_action', { action: 'get_user_history', mobile: mobile });
-        }
-        function closeUserHistory() {
-            document.getElementById('uhmContent').classList.add('translate-x-full');
-            setTimeout(() => { document.getElementById('userHistoryModal').classList.add('hidden'); }, 300);
-        }
-        
-        socket.on('admin_user_history', (data) => {
-            lastHistoryData = data;
-            renderUhm();
-        });
-
-        function switchUhmTab(tab) {
-            uhmTab = tab;
-            if(tab === 'bets') {
-                document.getElementById('uhmBtnBets').className = 'flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm';
-                document.getElementById('uhmBtnTxs').className = 'flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm';
-            } else {
-                document.getElementById('uhmBtnTxs').className = 'flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-sm';
-                document.getElementById('uhmBtnBets').className = 'flex-1 bg-gray-800 text-gray-400 py-2 rounded-lg font-bold text-sm';
-            }
-            renderUhm();
-        }
-
-        function renderUhm() {
-            if(!lastHistoryData) return;
-            const container = document.getElementById('uhmList');
-            container.innerHTML = '';
-            
-            if (uhmTab === 'bets') {
-                if(lastHistoryData.bets.length === 0) return container.innerHTML = '<div class="text-center text-gray-500 mt-10">No bets found.</div>';
-                lastHistoryData.bets.forEach(b => {
-                    const color = b.won > 0 ? 'text-green-500' : 'text-red-500';
-                    const amount = b.won > 0 ? '+₹'+b.won : '-₹'+b.amount;
-                    container.innerHTML += `
-                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-3 mb-2 flex justify-between items-center">
-                            <div><div class="text-xs text-gray-500">${b.period}</div><div class="font-bold text-sm text-white">${b.selection}</div></div>
-                            <div class="text-right"><div class="font-black ${color}">${amount}</div><div class="text-[10px] text-gray-400">Bet: ₹${b.amount}</div></div>
-                        </div>
-                    `;
-                });
-            } else {
-                if(lastHistoryData.transactions.length === 0) return container.innerHTML = '<div class="text-center text-gray-500 mt-10">No transactions found.</div>';
-                lastHistoryData.transactions.forEach(t => {
-                    const color = t.status === 'APPROVED' ? 'text-green-500' : (t.status === 'REJECTED' ? 'text-red-500' : 'text-yellow-500');
-                    const sign = t.type === 'DEPOSIT' ? '+' : '-';
-                    container.innerHTML += `
-                        <div class="bg-gray-800 border border-gray-700 rounded-lg p-3 mb-2 flex justify-between items-center">
-                            <div><div class="font-bold text-sm text-white">${t.type}</div><div class="text-[10px] text-gray-400">${t.date}</div></div>
-                            <div class="text-right"><div class="font-black text-white">${sign}₹${t.amount}</div><div class="text-[10px] font-black ${color}">${t.status}</div></div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        // --- ACTIONS ---
-        function updateBalance(mobile) {
-            const newBal = document.getElementById('bal_' + mobile).value;
-            socket.emit('admin_action', { action: 'update_balance', mobile, newBalance: newBal });
-        }
-        function txAction(txId, action) {
-            socket.emit('admin_action', { action, txId });
-        }
-
-        // --- ALERTS ---
-        socket.on('admin_alert', (data) => {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `fixed top-6 right-6 text-white px-6 py-4 rounded-xl shadow-2xl font-bold z-50 animate-bounce flex items-center gap-3 ${data.type === 'deposit' ? 'bg-green-600 border border-green-500' : 'bg-red-600 border border-red-500'}`;
-            alertDiv.innerHTML = `<i class="fa-solid fa-bell text-2xl"></i> <div>${data.msg}</div>`;
-            document.body.appendChild(alertDiv);
-            
+    // ===== NOTIFICATION BANNER =====
+    const notifQueue = [];
+    let notifVisible = false;
+    function showNotif(msg, type) {
+        notifQueue.push({ msg, type });
+        if (!notifVisible) processNotif();
+    }
+    function processNotif() {
+        if (notifQueue.length === 0) { notifVisible = false; document.getElementById('notifBanner').style.display = 'none'; return; }
+        notifVisible = true;
+        const { msg, type } = notifQueue.shift();
+        const banner = document.getElementById('notifBanner');
+        banner.style.display = 'block';
+        banner.innerHTML = `
+            <div class="notif-item ${type === 'dep' ? 'notif-dep' : 'notif-wd'}">
+                <i class="fa-solid ${type === 'dep' ? 'fa-arrow-down text-green-400' : 'fa-arrow-up text-red-400'} text-sm"></i>
+                <span class="${type === 'dep' ? 'text-green-300' : 'text-red-300'}">${msg}</span>
+                <button onclick="processNotif()" class="ml-auto text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        `;
+        // Play beep
+        try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ctx.createOscillator();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(data.type === 'deposit' ? 880 : 440, ctx.currentTime);
-            osc.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.3);
+            osc.frequency.setValueAtTime(type === 'dep' ? 880 : 440, ctx.currentTime);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.25);
+        } catch(e) {}
+        setTimeout(processNotif, 4000);
+    }
 
-            setTimeout(() => { alertDiv.remove(); }, 5000);
-        });
-    </script>
+    socket.on('admin_alert', (data) => {
+        showNotif(data.msg, data.type === 'deposit' ? 'dep' : 'wd');
+    });
+</script>
 </body>
 </html>

@@ -11,8 +11,28 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #121212; color: #fff; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { display: none; }
-        .app-frame { max-width: 414px; margin: 0 auto; background-color: #121212; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); overflow-x: hidden; }
+        /* Responsive Base Frame for Mobile & Desktop */
+        /* Responsive Base Frame for Mobile & Desktop (Tiranga / BDG Layout) */
+        .app-frame {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #121212;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            overflow-x: hidden;
+            transition: max-width 0.2s ease;
+        }
+
+        /* Fullscreen Game Mode (Aviator Spribe for Laptop & Mobile) */
+        .app-frame.game-fullscreen-mode {
+            max-width: 100% !important;
+            width: 100% !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+        }
 
         /* BIG KING GAME - BKG Theme Colors */
         .bg-theme-gold { background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); color: #000 !important; }
@@ -75,7 +95,7 @@
     <div class="app-frame" id="mainContainer">
         
         <!-- AUTHENTICATION OVERLAY -->
-        <div id="authOverlay" class="fixed inset-0 bg-[#121212] z-[9999] flex flex-col items-center max-w-[414px] mx-auto overflow-y-auto">
+        <div id="authOverlay" class="fixed inset-0 bg-[#121212] z-[9999] flex flex-col items-center max-w-md mx-auto overflow-y-auto shadow-2xl">
             <div class="bg-theme-gold w-full p-4 flex items-center justify-between text-black shadow-md sticky top-0 z-50">
                 <i class="fa-solid fa-angle-left text-xl"></i>
                 <span class="font-black text-lg tracking-widest">BIG KING GAME</span>
@@ -146,80 +166,310 @@
         <!-- ================= HOME TAB ================= -->
         <div id="view-home" class="view-section active">
             <!-- Header -->
-            <div class="bg-[#1c1c1c] p-3 flex justify-between items-center sticky top-0 z-40 shadow-md border-b border-[#333]">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-crown text-theme-gold text-xl"></i>
-                    <h1 class="text-xl font-black text-theme-gold tracking-widest">BIG KING GAME - BKG</h1>
-                </div>
-                <div class="flex gap-4">
-                    <i class="fa-solid fa-download text-gray-400 text-xl hover:text-theme-gold"></i>
-                    <i class="fa-solid fa-headset text-gray-400 text-xl hover:text-theme-gold"></i>
-                </div>
-            </div>
-            
-            <!-- Carousel -->
-            <div class="p-3">
-                <div class="w-full h-40 rounded-xl bg-[#2a2a2a] overflow-hidden relative shadow-md border border-[#333]">
-                    <img src="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=600&q=80" class="w-full h-full object-cover opacity-80">
+            <div class="sticky top-0 z-40 shadow-lg" style="background: linear-gradient(135deg, #1a1200, #1c1c1c, #1a1200);">
+                <div class="px-3 py-2.5 flex justify-between items-center border-b border-[#D4AF37]/30">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-theme-gold flex items-center justify-center shadow-md">
+                            <i class="fa-solid fa-crown text-black text-sm"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-base font-black text-theme-gold tracking-widest leading-none">BIG KING</h1>
+                            <p class="text-[9px] text-gray-400 font-bold tracking-wider">GAME - BKG</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-theme-gold transition-colors">
+                            <i class="fa-solid fa-download text-lg"></i>
+                            <span class="text-[8px] font-bold">App</span>
+                        </button>
+                        <button onclick="alert('Customer Support coming soon!')" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-theme-gold transition-colors">
+                            <i class="fa-solid fa-headset text-lg"></i>
+                            <span class="text-[8px] font-bold">Help</span>
+                        </button>
+                        <button class="bg-theme-gold text-black text-[10px] font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1" onclick="openDepositModal()">
+                            <i class="fa-solid fa-plus text-[8px]"></i> Deposit
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Marquee -->
+            <!-- ===== AUTO-SLIDING PROMOTIONAL BANNER ===== -->
+            <div class="relative w-full overflow-hidden" style="height:175px" id="homeBannerOuter">
+                <!-- Slides wrapper (3 slides, 300% width) -->
+                <div id="bannerTrack" class="flex h-full" style="width:300%;transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)">
+
+                    <!-- SLIDE 1: RUMMY/CARD GAMES (Deep Red Gold) -->
+                    <div class="flex-shrink-0 relative h-full" style="width:33.333%;background:linear-gradient(135deg,#1a0000 0%,#5a0000 50%,#8b1a00 100%);">
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(255,255,255,0.15) 1px,transparent 1px);background-size:18px 18px;"></div>
+                        <div class="absolute right-0 top-0 w-44 h-44 rounded-full -mr-12 -mt-12" style="background:radial-gradient(circle,rgba(255,200,0,0.25),transparent 70%)"></div>
+                        <!-- Floating playing cards -->
+                        <div class="absolute right-3 top-2 w-12 h-16 rounded-lg bg-white shadow-2xl flex items-center justify-center text-3xl" style="transform:rotate(12deg);box-shadow:0 4px 15px rgba(0,0,0,0.6)">♠</div>
+                        <div class="absolute right-9 top-6 w-12 h-16 rounded-lg bg-white shadow-2xl flex items-center justify-center text-3xl text-red-600" style="transform:rotate(-6deg);box-shadow:0 4px 15px rgba(0,0,0,0.6)">♥</div>
+                        <div class="absolute right-1 bottom-4 w-10 h-14 rounded-lg flex items-center justify-center text-2xl" style="background:linear-gradient(135deg,#b8860b,#ffd700);transform:rotate(5deg);box-shadow:0 4px 10px rgba(0,0,0,0.5)">🃏</div>
+                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-center pl-4 z-10" style="max-width:58%">
+                            <div class="inline-flex items-center gap-1 bg-yellow-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full mb-2 w-fit">
+                                <i class="fa-solid fa-star text-[8px]"></i> RUMMY SPECIAL
+                            </div>
+                            <div class="text-white font-black leading-tight mb-1" style="font-size:22px">Win Big <span style="color:#ffd700">Every Day!</span></div>
+                            <div class="text-gray-200 text-[11px] font-semibold mb-3">₹500 Bonus on First Deposit</div>
+                            <button onclick="openDepositModal()" class="text-black text-xs font-black px-4 py-1.5 rounded-full w-fit active:scale-95 shadow-lg" style="background:linear-gradient(135deg,#ffd700,#ffb300)">CLAIM NOW →</button>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 2: WINGO COLOR PREDICTION -->
+                    <div class="flex-shrink-0 relative h-full" style="width:33.333%;background:linear-gradient(135deg,#0a1628 0%,#0d2040 50%,#0a1a35 100%);">
+                        <div class="absolute inset-0 opacity-15" style="background-image:radial-gradient(circle,rgba(255,255,255,0.2) 1px,transparent 1px);background-size:22px 22px;"></div>
+                        <div class="absolute right-0 top-0 w-44 h-44 rounded-full -mr-12 -mt-12" style="background:radial-gradient(circle,rgba(100,220,120,0.2),transparent 70%)"></div>
+                        <!-- Floating lottery balls -->
+                        <div class="absolute right-2 top-4 w-11 h-11 rounded-full border-[2.5px] border-white shadow-lg flex items-center justify-center font-black text-white text-lg" style="background:#18b660">7</div>
+                        <div class="absolute right-14 top-3 w-9 h-9 rounded-full border-[2.5px] border-white shadow-lg flex items-center justify-center font-black text-white text-base" style="background:#fb4e4e">3</div>
+                        <div class="absolute right-2 bottom-4 w-11 h-11 rounded-full border-[2.5px] border-white shadow-lg flex items-center justify-center font-black text-white text-lg" style="background:#eb43dd">5</div>
+                        <div class="absolute right-14 bottom-3 w-9 h-9 rounded-full border-[2.5px] border-white shadow-lg flex items-center justify-center font-black text-white text-base" style="background:#18b660">1</div>
+                        <div class="absolute right-7 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-[2.5px] border-white shadow-xl flex items-center justify-center font-black text-white text-lg z-10" style="background:#fb4e4e">9</div>
+                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-center pl-4 z-10" style="max-width:58%">
+                            <div class="inline-flex items-center gap-1 bg-green-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full mb-2 w-fit">
+                                <i class="fa-solid fa-dice text-[8px]"></i> WIN GO GAME
+                            </div>
+                            <div class="text-white font-black leading-tight mb-1" style="font-size:22px">Predict &amp; <span style="color:#4ade80">Win Instant!</span></div>
+                            <div class="text-gray-200 text-[11px] font-semibold mb-3">Green · Violet · Red — Pick &amp; Win!</div>
+                            <button onclick="switchView('wingo')" class="text-black text-xs font-black px-4 py-1.5 rounded-full w-fit active:scale-95 shadow-lg" style="background:linear-gradient(135deg,#22c55e,#16a34a)">BET NOW →</button>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: AVIATOR CRASH GAME -->
+                    <div class="flex-shrink-0 relative h-full" style="width:33.333%;background:linear-gradient(135deg,#0d0614 0%,#1a0a20 50%,#1e0a0a 100%);">
+                        <div class="absolute inset-0 opacity-30" style="background-image:radial-gradient(circle,rgba(255,255,255,0.12) 1px,transparent 1px);background-size:16px 16px;"></div>
+                        <!-- Glow effects -->
+                        <div class="absolute right-0 top-0 w-48 h-48 rounded-full -mr-16 -mt-16" style="background:radial-gradient(circle,rgba(220,38,38,0.35),transparent 70%)"></div>
+                        <div class="absolute right-0 bottom-0 w-32 h-32 rounded-full -mr-8" style="background:radial-gradient(circle,rgba(239,68,68,0.2),transparent 70%)"></div>
+                        <!-- Plane & trajectory line -->
+                        <div class="absolute right-4 top-1/2 text-6xl" style="transform:translateY(-60%) rotate(-22deg);filter:drop-shadow(0 0 20px rgba(239,68,68,0.9))">✈️</div>
+                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-center pl-4 z-10" style="max-width:60%">
+                            <div class="inline-flex items-center gap-1 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full mb-2 w-fit">
+                                <i class="fa-solid fa-rocket text-[8px]"></i> AVIATOR LIVE
+                            </div>
+                            <div class="text-white font-black leading-tight mb-1" style="font-size:22px">Fly High,<br><span style="color:#f87171">Cash Out!</span></div>
+                            <div class="text-gray-200 text-[11px] font-semibold mb-3">Real-time multiplier — Max 10,000x!</div>
+                            <button type="button" onclick="openAviatorGame()" class="text-white text-xs font-black px-4 py-1.5 rounded-full w-fit active:scale-95 shadow-lg cursor-pointer" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">FLY NOW →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Dots -->
+                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+                    <div class="banner-dot rounded-full bg-white transition-all duration-300 cursor-pointer" style="width:20px;height:5px" onclick="goBannerSlide(0)"></div>
+                    <div class="banner-dot rounded-full bg-white/40 transition-all duration-300 cursor-pointer" style="width:8px;height:5px" onclick="goBannerSlide(1)"></div>
+                    <div class="banner-dot rounded-full bg-white/40 transition-all duration-300 cursor-pointer" style="width:8px;height:5px" onclick="goBannerSlide(2)"></div>
+                </div>
+            </div>
+
+            <!-- Marquee Notice -->
+            <div class="px-3 py-2">
+                <div class="rounded-full px-3 py-1.5 flex items-center border" style="background:#1a1200;border-color:#D4AF37/40">
+                    <i class="fa-solid fa-bullhorn text-theme-gold text-xs mr-2 flex-shrink-0"></i>
+                    <marquee class="text-[11px] font-bold text-gray-300 flex-1">🎉 Welcome to BIG KING GAME! Biggest wins daily — Play WinGo, Aviator &amp; more! Deposit ₹100 and get ₹148 free bonus!</marquee>
+                    <button class="bg-theme-gold text-black text-[9px] font-black px-2 py-0.5 rounded-full ml-2 flex-shrink-0">Detail</button>
+                </div>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="px-3 mb-3 overflow-x-auto whitespace-nowrap scrollbar-none">
+                <div class="inline-flex gap-2 pb-1">
+                    <button class="bg-theme-gold text-black px-4 py-1.5 rounded-full font-black text-xs shadow-md flex items-center gap-1.5"><i class="fa-solid fa-gem text-[10px]"></i>Lottery</button>
+                    <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-dice text-[10px]"></i>Slots</button>
+                    <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-futbol text-[10px]"></i>Sports</button>
+                    <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-cards text-[10px]"></i>Rummy</button>
+                    <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-gamepad text-[10px]"></i>Casino</button>
+                </div>
+            </div>
+
+            <!-- Quick Stats Bar -->
             <div class="px-3 mb-3">
-                <div class="bg-[#1c1c1c] rounded-full px-3 py-1.5 flex items-center shadow-sm border border-[#333]">
-                    <i class="fa-solid fa-volume-high text-theme-gold mr-2"></i>
-                    <marquee class="text-xs font-bold text-gray-300 flex-1">Welcome to BIG KING GAME - BKG! Play safely and win huge amounts daily.</marquee>
-                    <button class="bg-theme-gold text-black text-[10px] font-black px-2 py-0.5 rounded-full ml-2">Detail</button>
+                <div class="rounded-xl p-3 grid grid-cols-3 gap-2 border" style="background:linear-gradient(135deg,#1a1200,#1c1c1c);border-color:#D4AF37/30">
+                    <div class="text-center">
+                        <div class="text-theme-gold font-black text-base">₹4.8Cr+</div>
+                        <div class="text-gray-400 text-[10px] font-bold">Total Paid Out</div>
+                    </div>
+                    <div class="text-center border-l border-r border-[#333]">
+                        <div class="text-green-400 font-black text-base">52,000+</div>
+                        <div class="text-gray-400 text-[10px] font-bold">Active Players</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-red-400 font-black text-base">24/7</div>
+                        <div class="text-gray-400 text-[10px] font-bold">Live Games</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Categories -->
-            <div class="px-3 mb-4 overflow-x-auto whitespace-nowrap">
-                <div class="inline-flex gap-2 pb-2">
-                    <div class="bg-theme-gold px-5 py-2 rounded-xl font-black shadow-md text-sm"><i class="fa-solid fa-gem mr-1"></i> Lottery</div>
-                    <div class="bg-[#1c1c1c] text-gray-300 px-5 py-2 rounded-xl font-bold shadow-sm text-sm border border-[#333]"><i class="fa-solid fa-dice mr-1"></i> Slots</div>
-                    <div class="bg-[#1c1c1c] text-gray-300 px-5 py-2 rounded-xl font-bold shadow-sm text-sm border border-[#333]"><i class="fa-solid fa-futbol mr-1"></i> Sports</div>
-                    <div class="bg-[#1c1c1c] text-gray-300 px-5 py-2 rounded-xl font-bold shadow-sm text-sm border border-[#333]"><i class="fa-solid fa-gamepad mr-1"></i> Casino</div>
+            <!-- Section Title: Popular Games -->
+            <div class="px-3 mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-1 h-5 rounded-full bg-theme-gold"></div>
+                    <h2 class="text-sm font-black text-white tracking-wide">Popular Games</h2>
+                </div>
+                <span class="text-[10px] text-theme-gold font-bold">View All →</span>
+            </div>
+
+            <!-- Game Cards (2-col grid) -->
+            <div class="px-3 mb-4 grid grid-cols-2 gap-3">
+
+                <!-- Win Go Card -->
+                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-lg border border-[#2a2a2a] active:scale-95 transition-transform" onclick="switchView('wingo')" style="background:linear-gradient(135deg,#0a1a0d,#0d2512)">
+                    <!-- Top colorful band -->
+                    <div class="h-[90px] relative overflow-hidden">
+                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#064e10,#0f6b1a,#164f2c)"></div>
+                        <!-- Stars -->
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(255,255,255,0.3) 1px,transparent 1px);background-size:12px 12px;"></div>
+                        <!-- Balls grid -->
+                        <div class="absolute inset-0 flex items-center justify-center gap-1.5 p-2">
+                            <div class="flex flex-col gap-1">
+                                <div class="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-xs" style="background:#18b660">1</div>
+                                <div class="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-xs" style="background:#18b660">7</div>
+                            </div>
+                            <div class="flex flex-col gap-1 mt-2">
+                                <div class="w-8 h-8 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-sm" style="background:#fb4e4e">5</div>
+                                <div class="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-xs" style="background:#eb43dd">0</div>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-xs" style="background:#18b660">3</div>
+                                <div class="w-7 h-7 rounded-full border-2 border-white/80 shadow-lg flex items-center justify-center font-black text-white text-xs" style="background:#fb4e4e">9</div>
+                            </div>
+                        </div>
+                        <!-- HOT badge -->
+                        <div class="absolute top-1.5 right-1.5 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">🔥 HOT</div>
+                    </div>
+                    <div class="p-2.5">
+                        <h3 class="font-black text-white text-sm mb-0.5">Win Go</h3>
+                        <p class="text-[10px] text-green-400 font-bold mb-2">Guess Color &amp; Win!</p>
+                        <button type="button" onclick="event.stopPropagation(); switchView('wingo');" class="w-full py-1.5 rounded-xl font-black text-black text-xs active:scale-95 shadow-md cursor-pointer" style="background:linear-gradient(135deg,#22c55e,#16a34a)">PLAY →</button>
+                    </div>
+                </div>
+
+                <!-- Aviator Card -->
+                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-lg border border-[#2a1a1a] active:scale-95 transition-transform" onclick="openAviatorGame()" style="background:linear-gradient(135deg,#0d0614,#180a0a)">
+                    <div class="h-[90px] relative overflow-hidden">
+                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a0000,#4a0000,#2d0000)"></div>
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(255,255,255,0.2) 1px,transparent 1px);background-size:12px 12px;"></div>
+                        <!-- Glow -->
+                        <div class="absolute right-0 bottom-0 w-24 h-24 rounded-full" style="background:radial-gradient(circle,rgba(239,68,68,0.4),transparent 70%)"></div>
+                        <!-- Plane -->
+                        <div class="absolute inset-0 flex items-center justify-center text-5xl" style="filter:drop-shadow(0 0 15px rgba(239,68,68,0.9));transform:rotate(-15deg)">✈️</div>
+                        <!-- Multiplier hint -->
+                        <div class="absolute top-1.5 left-1.5 bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">x10,000</div>
+                        <div class="absolute top-1.5 right-1.5 bg-yellow-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">⚡ LIVE</div>
+                    </div>
+                    <div class="p-2.5">
+                        <h3 class="font-black text-white text-sm mb-0.5">Aviator</h3>
+                        <p class="text-[10px] text-red-400 font-bold mb-2">Crash Multiplier Game</p>
+                        <button type="button" onclick="event.stopPropagation(); openAviatorGame();" class="w-full py-1.5 rounded-xl font-black text-white text-xs active:scale-95 shadow-md cursor-pointer" style="background:linear-gradient(135deg,#dc2626,#991b1b)">FLY →</button>
+                    </div>
+                </div>
+
+                <!-- K3 Lottery Card -->
+                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-lg border border-[#1a1a2a] active:scale-95 transition-transform" onclick="showToast('K3 Lottery coming soon!','success')" style="background:linear-gradient(135deg,#080b1a,#0d1229)">
+                    <div class="h-[90px] relative overflow-hidden">
+                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#0f0c33,#1a1655,#120e3a)"></div>
+                        <div class="absolute inset-0 opacity-15" style="background-image:radial-gradient(circle,rgba(255,255,255,0.2) 1px,transparent 1px);background-size:14px 14px;"></div>
+                        <!-- Dice icons -->
+                        <div class="absolute inset-0 flex items-center justify-center gap-2">
+                            <div class="w-10 h-10 rounded-xl bg-white shadow-xl flex items-center justify-center text-2xl font-black text-indigo-600" style="transform:rotate(-10deg)">⚀</div>
+                            <div class="w-12 h-12 rounded-xl bg-white shadow-xl flex items-center justify-center text-3xl font-black text-indigo-600 z-10">⚄</div>
+                            <div class="w-10 h-10 rounded-xl bg-white shadow-xl flex items-center justify-center text-2xl font-black text-indigo-600" style="transform:rotate(10deg)">⚂</div>
+                        </div>
+                        <div class="absolute top-1.5 right-1.5 bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">SOON</div>
+                    </div>
+                    <div class="p-2.5">
+                        <h3 class="font-black text-white text-sm mb-0.5">K3 Lottery</h3>
+                        <p class="text-[10px] text-indigo-400 font-bold mb-2">Guess the dice numbers</p>
+                        <button class="w-full py-1.5 rounded-xl font-black text-white text-xs active:scale-95 shadow-md" style="background:linear-gradient(135deg,#4f46e5,#3730a3)">SOON →</button>
+                    </div>
+                </div>
+
+                <!-- Rummy Card -->
+                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-lg border border-[#2a1500] active:scale-95 transition-transform" onclick="showToast('Rummy coming soon!','success')" style="background:linear-gradient(135deg,#1a0800,#2a1000)">
+                    <div class="h-[90px] relative overflow-hidden">
+                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#3d1a00,#5c2700,#3d1a00)"></div>
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(255,255,255,0.2) 1px,transparent 1px);background-size:14px 14px;"></div>
+                        <!-- Cards -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-13 rounded-lg bg-white shadow-xl flex items-center justify-center text-2xl" style="transform:rotate(-12deg);width:40px;height:54px">♠</div>
+                            <div class="w-10 h-14 rounded-lg bg-white shadow-2xl flex items-center justify-center text-2xl text-red-600 z-10 mx-1" style="width:44px;height:58px">♥</div>
+                            <div class="w-10 h-13 rounded-lg bg-white shadow-xl flex items-center justify-center text-2xl text-red-600" style="transform:rotate(12deg);width:40px;height:54px">♦</div>
+                        </div>
+                        <div class="absolute top-1.5 right-1.5 bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">SOON</div>
+                    </div>
+                    <div class="p-2.5">
+                        <h3 class="font-black text-white text-sm mb-0.5">Rummy</h3>
+                        <p class="text-[10px] text-orange-400 font-bold mb-2">Classic Card Game</p>
+                        <button class="w-full py-1.5 rounded-xl font-black text-white text-xs active:scale-95 shadow-md" style="background:linear-gradient(135deg,#ea580c,#c2410c)">SOON →</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Recent Winners -->
+            <div class="px-3 mb-2 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-1 h-5 rounded-full bg-green-500"></div>
+                    <h2 class="text-sm font-black text-white tracking-wide">Recent Winners</h2>
+                </div>
+                <div class="flex items-center gap-1 text-green-400 text-[10px] font-bold">
+                    <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> Live
                 </div>
             </div>
 
-            <!-- Game List (Lottery) -->
-            <div class="px-3 mb-6 flex flex-col gap-3">
-                <div class="bg-[#1c1c1c] rounded-xl shadow-md border border-[#333] p-3 flex justify-between items-center cursor-pointer relative overflow-hidden" onclick="switchView('wingo')">
-                    <div class="absolute right-0 top-0 w-32 h-32 bg-[#2a2a2a] rounded-full -mr-10 -mt-10 z-0 opacity-50"></div>
-                    <div class="flex items-center gap-4 z-10">
-                        <img src="https://images.unsplash.com/photo-1611956558296-654dbed9c30c?w=100&q=80" class="w-16 h-16 rounded-xl object-cover shadow-sm border border-[#333]">
+            <!-- Winners Ticker -->
+            <div class="px-3 pb-24 space-y-2">
+                <div class="rounded-xl p-3 flex items-center justify-between border border-[#252525]" style="background:linear-gradient(135deg,#141414,#1c1c1c)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white font-black text-sm shadow-md">M</div>
                         <div>
-                            <h3 class="font-black text-white text-lg">Win Go</h3>
-                            <p class="text-[11px] text-gray-400 font-bold">Guess Green/Purple/Red</p>
+                            <p class="text-xs font-black text-white">Mem***524</p>
+                            <p class="text-[10px] text-gray-400 font-bold">Win Go 30sec</p>
                         </div>
                     </div>
-                    <button class="z-10 bg-theme-gold px-4 py-1.5 rounded-full font-black shadow-md text-sm active:scale-95">GO</button>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-green-400">+₹1,420.00</p>
+                        <p class="text-[10px] text-gray-500">Just won</p>
+                    </div>
                 </div>
-
-                <div class="bg-[#1c1c1c] rounded-xl shadow-md border border-[#333] p-3 flex justify-between items-center cursor-pointer relative overflow-hidden" onclick="handleGameClick('k3')">
-                    <div class="flex items-center gap-4 z-10">
-                        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-[#444] to-[#111] border border-[#333] flex items-center justify-center text-theme-gold shadow-sm font-black text-xl">K3</div>
+                <div class="rounded-xl p-3 flex items-center justify-between border border-[#252525]" style="background:linear-gradient(135deg,#141414,#1c1c1c)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-black text-sm shadow-md">M</div>
                         <div>
-                            <h3 class="font-black text-white text-lg">K3 Lottery</h3>
-                            <p class="text-[11px] text-gray-400 font-bold">Guess the numbers</p>
+                            <p class="text-xs font-black text-white">Mem***198</p>
+                            <p class="text-[10px] text-gray-400 font-bold">Win Go 30sec</p>
                         </div>
                     </div>
-                    <button class="z-10 bg-[#333] text-gray-300 px-4 py-1.5 rounded-full font-bold shadow-md text-sm active:scale-95 border border-[#555]">GO</button>
-                </div>
-            </div>
-            
-            <!-- Winning Information -->
-            <div class="px-3 pb-4">
-                <h3 class="font-bold text-white border-l-4 border-theme-gold pl-2 mb-3">Winning information</h3>
-                <div class="bg-[#1c1c1c] rounded-xl shadow-md p-3 border border-[#333]">
-                    <div class="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
-                        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-[#333] flex items-center justify-center text-xs"><i class="fa-solid fa-user text-gray-500"></i></div><span class="text-xs font-bold text-gray-300">Mem***524</span></div>
-                        <div class="flex items-center gap-2"><img src="https://images.unsplash.com/photo-1611956558296-654dbed9c30c?w=50&q=80" class="w-8 h-8 rounded"><div class="text-right"><p class="text-xs font-bold text-theme-gold">Receive ₹1,420.00</p><p class="text-[10px] text-gray-500">Win Go</p></div></div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-green-400">+₹5,000.00</p>
+                        <p class="text-[10px] text-gray-500">2 min ago</p>
                     </div>
-                    <div class="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
-                        <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-[#333] flex items-center justify-center text-xs"><i class="fa-solid fa-user text-gray-500"></i></div><span class="text-xs font-bold text-gray-300">Mem***198</span></div>
-                        <div class="flex items-center gap-2"><img src="https://images.unsplash.com/photo-1611956558296-654dbed9c30c?w=50&q=80" class="w-8 h-8 rounded"><div class="text-right"><p class="text-xs font-bold text-theme-gold">Receive ₹5,000.00</p><p class="text-[10px] text-gray-500">Win Go</p></div></div>
+                </div>
+                <div class="rounded-xl p-3 flex items-center justify-between border border-[#252525]" style="background:linear-gradient(135deg,#141414,#1c1c1c)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-800 flex items-center justify-center text-white font-black text-sm shadow-md">A</div>
+                        <div>
+                            <p class="text-xs font-black text-white">Avi***991</p>
+                            <p class="text-[10px] text-gray-400 font-bold">Aviator</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-green-400">+₹8,340.00</p>
+                        <p class="text-[10px] text-gray-500">5 min ago</p>
+                    </div>
+                </div>
+                <div class="rounded-xl p-3 flex items-center justify-between border border-[#252525]" style="background:linear-gradient(135deg,#141414,#1c1c1c)">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center text-black font-black text-sm shadow-md">R</div>
+                        <div>
+                            <p class="text-xs font-black text-white">Ram***742</p>
+                            <p class="text-[10px] text-gray-400 font-bold">Win Go 1Min</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-black text-green-400">+₹12,500.00</p>
+                        <p class="text-[10px] text-gray-500">8 min ago</p>
                     </div>
                 </div>
             </div>
@@ -588,6 +838,282 @@
             </div>
         </div>
 
+        <!-- ================= AVIATOR TAB (SPRIBE AUTHENTIC) ================= -->
+        <div id="view-aviator" class="view-section">
+            <!-- Full Responsive Container (Mobile / Tablet / Laptop) -->
+            <div class="w-full bg-[#0d0e17] text-white min-h-[90vh] flex flex-col font-sans select-none">
+                
+                <!-- TOP HEADER BAR -->
+                <div class="bg-[#141522] border-b border-[#222436] px-3 py-2.5 flex items-center justify-between sticky top-0 z-40 shadow-md">
+                    <!-- Left: Back Button & Spribe Logo -->
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-angle-left text-xl text-gray-400 hover:text-white cursor-pointer transition-colors" onclick="switchView('home')"></i>
+                        <div class="flex items-center gap-1.5 cursor-pointer" onclick="switchView('home')">
+                            <i class="fa-solid fa-plane text-red-500 text-lg transform -rotate-12"></i>
+                            <span class="text-xl font-black italic tracking-wider text-red-500">Aviator</span>
+                        </div>
+                        <button onclick="openAviatorHowToPlay()" class="hidden sm:flex items-center gap-1 bg-[#1e2033] hover:bg-[#282b45] text-gray-300 text-[11px] font-bold px-2.5 py-1 rounded-full border border-[#2d304d] transition-colors">
+                            <i class="fa-solid fa-circle-question text-red-400"></i> How to play?
+                        </button>
+                    </div>
+
+                    <!-- Center: Round ID & Ping (on wide screens) -->
+                    <div class="hidden md:flex items-center gap-3 text-xs text-gray-400 font-mono">
+                        <span id="aviatorTopRoundId">Round ID: 31619481</span>
+                        <span class="text-green-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Ping: 42ms</span>
+                    </div>
+
+                    <!-- Right: Balance, Sound, Menu -->
+                    <div class="flex items-center gap-2">
+                        <div class="bg-[#0b0b14] border border-[#2f314d] rounded-full px-3 py-1 flex items-center gap-1.5 shadow-inner">
+                            <i class="fa-solid fa-wallet text-theme-gold text-xs"></i>
+                            <span class="text-xs font-black text-theme-gold user-balance-display">₹0.00</span>
+                            <span class="text-[10px] text-gray-500 font-bold ml-0.5">INR</span>
+                        </div>
+                        <button id="aviatorSoundBtn" onclick="toggleAviatorSound()" class="w-8 h-8 rounded-full bg-[#1e2033] border border-[#2d304d] text-gray-300 hover:text-white flex items-center justify-center text-xs transition-colors">
+                            <i class="fa-solid fa-volume-high" id="aviatorSoundIcon"></i>
+                        </button>
+                        <button onclick="toggleAviatorRoundHistoryModal()" class="w-8 h-8 rounded-full bg-[#1e2033] border border-[#2d304d] text-gray-300 hover:text-white flex items-center justify-center text-xs transition-colors" title="Round History">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOP MULTIPLIER HISTORY STRIP -->
+                <div class="bg-[#10111d] border-b border-[#1f2033] px-3 py-1.5 flex items-center justify-between gap-2 overflow-hidden">
+                    <div class="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none py-0.5 flex-1" id="aviatorHistoryStrip">
+                        <!-- Dynamic Multiplier Badges -->
+                        <div id="aviatorPillsContainer" class="flex items-center gap-1.5"></div>
+                    </div>
+                    <!-- Dropdown History Icon (as seen at 00:20 in video) -->
+                    <button onclick="toggleAviatorRoundHistoryModal()" class="w-7 h-7 rounded-md bg-[#1d1f33] border border-[#2c2f4d] text-gray-400 hover:text-white flex items-center justify-center text-xs flex-shrink-0 transition-colors" title="View Full History">
+                        <i class="fa-solid fa-clock-rotate-left text-xs text-red-400"></i>
+                    </button>
+                </div>
+
+                <!-- MAIN WORKSPACE: 2-COLUMN ON LAPTOP/TAB, STACKED ON MOBILE -->
+                <div class="flex-1 flex flex-col md:flex-row p-2 md:p-4 gap-3 md:gap-4 overflow-hidden max-w-[1560px] mx-auto w-full">
+                    
+                    <!-- LEFT COLUMN: LIVE BETS DRAWER (Laptop / Tab) -->
+                    <div class="hidden md:flex flex-col w-72 lg:w-80 bg-[#121322] border border-[#212338] rounded-xl overflow-hidden shadow-lg flex-shrink-0">
+                        <!-- Drawer Tabs -->
+                        <div class="flex border-b border-[#212338] bg-[#0d0e1a]">
+                            <button id="avDeskTabAll" onclick="switchAviatorTableTab('all')" class="flex-1 py-2.5 text-xs font-black text-theme-gold border-b-2 border-theme-gold">All Bets (<span id="avDeskBetsCount">1577</span>)</button>
+                            <button id="avDeskTabMy" onclick="switchAviatorTableTab('my')" class="flex-1 py-2.5 text-xs font-bold text-gray-400 hover:text-white">My Bets</button>
+                            <button id="avDeskTabTop" onclick="switchAviatorTableTab('top')" class="flex-1 py-2.5 text-xs font-bold text-gray-400 hover:text-white">Top</button>
+                        </div>
+                        <!-- ALL BETS PANEL -->
+                        <div id="aviatorDeskAllPanel">
+                            <div class="grid grid-cols-4 px-3 py-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider bg-[#10111f] border-b border-[#1d1f33]">
+                                <span class="col-span-1">User</span>
+                                <span class="text-right">Bet INR</span>
+                                <span class="text-center text-purple-400">X</span>
+                                <span class="text-right">Cash out</span>
+                            </div>
+                            <div id="aviatorDeskAllBetsFeed" class="overflow-y-auto divide-y divide-[#18192b] text-xs" style="max-height:480px"></div>
+                        </div>
+                        <!-- MY BETS PANEL -->
+                        <div id="aviatorDeskMyPanel" class="hidden overflow-y-auto divide-y divide-[#18192b] text-xs" style="max-height:540px">
+                            <div class="text-center text-gray-500 py-8 text-xs font-bold">No bets placed yet</div>
+                        </div>
+                        <!-- TOP WINNERS PANEL -->
+                        <div id="aviatorDeskTopPanel" class="hidden flex flex-col" style="max-height:540px">
+                            <div class="flex border-b border-[#1d1f33] bg-[#0d0e1a]">
+                                <button onclick="switchTopFilter('x')" id="topFiltX" class="flex-1 py-1.5 text-[10px] font-black text-theme-gold border-b-2 border-theme-gold">X</button>
+                                <button onclick="switchTopFilter('win')" id="topFiltWin" class="flex-1 py-1.5 text-[10px] font-bold text-gray-400 hover:text-white">Win</button>
+                                <button onclick="switchTopFilter('rounds')" id="topFiltRounds" class="flex-1 py-1.5 text-[10px] font-bold text-gray-400 hover:text-white">Rounds</button>
+                            </div>
+                            <div class="flex border-b border-[#1d1f33] bg-[#0b0c17]">
+                                <button onclick="switchTopPeriod('day')" id="topPeriodDay" class="flex-1 py-1.5 text-[10px] font-black text-theme-gold border-b-2 border-theme-gold">Day</button>
+                                <button onclick="switchTopPeriod('month')" id="topPeriodMonth" class="flex-1 py-1.5 text-[10px] font-bold text-gray-400 hover:text-white">Month</button>
+                                <button onclick="switchTopPeriod('year')" id="topPeriodYear" class="flex-1 py-1.5 text-[10px] font-bold text-gray-400 hover:text-white">Year</button>
+                            </div>
+                            <div id="aviatorTopWinnersList" class="overflow-y-auto divide-y divide-[#18192b] flex-1"></div>
+                        </div>
+
+                        <!-- Provably Fair Footer (SPRIBE style) -->
+                        <div class="mt-auto flex items-center justify-center gap-1.5 py-2 bg-[#0d0e1a] border-t border-[#1d1f33] text-[11px] text-gray-400">
+                            <i class="fa-solid fa-shield-halved text-green-400"></i>
+                            <span>This game is</span>
+                            <span class="text-gray-300 font-bold underline cursor-pointer hover:text-white">Provably Fair</span>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: FLIGHT CANVAS & DUAL BET CONTROLS -->
+                    <div class="flex-1 flex flex-col gap-2 md:gap-3 min-w-0">
+                        
+                        <!-- FLIGHT CANVAS ARENA -->
+                        <div class="w-full h-[240px] sm:h-[300px] md:h-[380px] lg:h-[440px] xl:h-[500px] rounded-xl bg-gradient-to-b from-[#08080f] via-[#0b0c16] to-[#0e0f1c] border border-[#212338] relative overflow-hidden shadow-2xl flex items-center justify-center select-none" id="aviatorStageContainer">
+                            <!-- Radar sunburst grid lines -->
+                            <div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: radial-gradient(circle at 10% 90%, rgba(239,68,68,0.2) 0%, transparent 60%), linear-gradient(#2d2f4d 1px, transparent 1px), linear-gradient(90deg, #2d2f4d 1px, transparent 1px); background-size: 100% 100%, 32px 32px, 32px 32px;"></div>
+                            
+                            <!-- HTML5 Flight Canvas -->
+                            <canvas id="aviatorCanvas" class="w-full h-full absolute inset-0 block z-10"></canvas>
+
+                            <!-- CENTER STATE DISPLAY OVERLAY -->
+                            <div id="aviatorCenterDisplay" class="relative z-20 text-center pointer-events-none">
+                                
+                                <!-- FLYING MULTIPLIER -->
+                                <div id="aviatorFlyingBox" class="hidden">
+                                    <div id="aviatorMultText" class="text-5xl sm:text-6xl md:text-7xl font-black italic tracking-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">1.00x</div>
+                                </div>
+
+                                <!-- WAITING FOR NEXT ROUND (with Spribe Partner Watermark) -->
+                                <div id="aviatorWaitingBox" class="flex flex-col items-center">
+                                    <div class="flex items-center gap-3 mb-2 opacity-80">
+                                        <span class="text-xs font-black tracking-widest text-red-500 border border-red-500/50 px-2 py-0.5 rounded">UFC</span>
+                                        <span class="text-[11px] font-extrabold tracking-wider text-gray-300">Aviator OFFICIAL PARTNERS</span>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full border-4 border-red-500/30 border-t-red-500 animate-spin mb-2"></div>
+                                    <div class="text-xs font-black tracking-widest uppercase text-gray-400 mb-1.5">Waiting for next round</div>
+                                    <div class="w-48 h-2 bg-[#1b1c2e] rounded-full overflow-hidden border border-[#2c2e4d]">
+                                        <div id="aviatorProgressBar" class="h-full bg-gradient-to-r from-red-600 via-yellow-500 to-green-500 rounded-full transition-all duration-100" style="width: 100%;"></div>
+                                    </div>
+                                    <div id="aviatorWaitTimeText" class="text-xs font-bold text-gray-300 font-mono mt-1">5.0s</div>
+                                </div>
+
+                                <!-- FLEW AWAY! CRASH DISPLAY (Matching video 00:15) -->
+                                <div id="aviatorCrashedBox" class="hidden flex flex-col items-center">
+                                    <div class="text-3xl sm:text-4xl md:text-5xl font-black italic text-red-500 tracking-wider mb-1 drop-shadow-[0_0_20px_rgba(239,68,68,0.7)] animate-bounce">FLEW AWAY!</div>
+                                    <div id="aviatorCrashFinalMult" class="text-2xl sm:text-3xl font-black text-red-400 font-mono">4.54x</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DUAL BET PANELS (SIDE BY SIDE ON LAPTOP/TAB & MOBILE) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+                            
+                            <!-- BET PANEL 1 -->
+                            <div class="bg-[#141524] rounded-xl p-2.5 sm:p-3 border border-[#23253b] shadow-lg flex flex-col justify-between">
+                                <!-- Mode Switcher: Bet | Auto -->
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex bg-[#0b0c16] rounded-lg p-0.5 border border-[#222338]">
+                                        <button id="avTabModeBet1" onclick="switchBetPanelMode(1, 'bet')" class="px-3 py-1 rounded-md text-[11px] font-black bg-[#282a42] text-white shadow">Bet</button>
+                                        <button id="avTabModeAuto1" onclick="switchBetPanelMode(1, 'auto')" class="px-3 py-1 rounded-md text-[11px] font-bold text-gray-400 hover:text-white">Auto</button>
+                                    </div>
+                                    <span class="text-[10px] font-black text-gray-500 tracking-wider uppercase">Bet #1</span>
+                                </div>
+
+                                <!-- Amount Inputs & Main Action Button -->
+                                <div class="flex items-center gap-2 mb-2">
+                                    <!-- Amount Stepper -->
+                                    <div class="flex-1 bg-[#0b0c16] rounded-xl border border-[#26283f] p-1.5 flex items-center justify-between">
+                                        <button onclick="changeAviatorBetAmt(1, -10)" class="w-8 h-8 rounded-lg bg-[#1f2136] text-gray-200 hover:text-white font-black text-lg active:scale-95 flex items-center justify-center">-</button>
+                                        <div class="text-center px-1">
+                                            <input type="number" id="aviatorAmtInput1" value="10.00" min="10" step="10" class="w-20 bg-transparent text-center font-black text-white text-base outline-none">
+                                        </div>
+                                        <button onclick="changeAviatorBetAmt(1, 10)" class="w-8 h-8 rounded-lg bg-[#1f2136] text-gray-200 hover:text-white font-black text-lg active:scale-95 flex items-center justify-center">+</button>
+                                    </div>
+
+                                    <!-- Big Action Button (BET / CASH OUT / CANCEL) -->
+                                    <button id="aviatorActionBtn1" onclick="handleAviatorAction(1)" class="w-36 sm:w-40 h-13 sm:h-14 rounded-xl font-black transition-all transform active:scale-95 flex flex-col items-center justify-center bg-[#18b660] text-white shadow-lg border-b-2 border-green-700">
+                                        <span id="aviatorBtnTitle1" class="text-base font-black">BET</span>
+                                        <span id="aviatorBtnSub1" class="text-[11px] font-bold text-white/90">10.00 INR</span>
+                                    </button>
+                                </div>
+
+                                <!-- Normal Quick Chips (in Bet Mode) -->
+                                <div id="avQuickChipsBox1" class="flex gap-1.5">
+                                    <button onclick="setAviatorQuickAmt(1, 10)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">10</button>
+                                    <button onclick="setAviatorQuickAmt(1, 20)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">20</button>
+                                    <button onclick="setAviatorQuickAmt(1, 50)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">50</button>
+                                    <button onclick="setAviatorQuickAmt(1, 100)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">100</button>
+                                </div>
+
+                                <!-- Auto Mode Controls (in Auto Mode) -->
+                                <div id="avAutoControlsBox1" class="hidden flex items-center justify-between pt-1">
+                                    <button onclick="openAutoPlayOptionsModal(1)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[11px] font-black px-3 py-1.5 rounded-lg active:scale-95">AUTO PLAY</button>
+                                    <div class="flex items-center gap-1.5">
+                                        <label class="text-[10px] font-bold text-gray-300 flex items-center gap-1 cursor-pointer">
+                                            <input type="checkbox" id="aviatorAutoCheck1" class="w-3.5 h-3.5 rounded accent-theme-gold" onchange="toggleAviatorAuto(1)"> Auto Cash Out
+                                        </label>
+                                        <input type="number" id="aviatorAutoVal1" value="1.10" step="0.1" min="1.05" class="w-14 bg-[#0b0c16] border border-[#26283f] rounded px-1.5 py-0.5 text-right font-mono font-bold text-xs text-theme-gold outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BET PANEL 2 -->
+                            <div class="bg-[#141524] rounded-xl p-2.5 sm:p-3 border border-[#23253b] shadow-lg flex flex-col justify-between">
+                                <!-- Mode Switcher: Bet | Auto -->
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex bg-[#0b0c16] rounded-lg p-0.5 border border-[#222338]">
+                                        <button id="avTabModeBet2" onclick="switchBetPanelMode(2, 'bet')" class="px-3 py-1 rounded-md text-[11px] font-black bg-[#282a42] text-white shadow">Bet</button>
+                                        <button id="avTabModeAuto2" onclick="switchBetPanelMode(2, 'auto')" class="px-3 py-1 rounded-md text-[11px] font-bold text-gray-400 hover:text-white">Auto</button>
+                                    </div>
+                                    <span class="text-[10px] font-black text-gray-500 tracking-wider uppercase">Bet #2</span>
+                                </div>
+
+                                <!-- Amount Inputs & Main Action Button -->
+                                <div class="flex items-center gap-2 mb-2">
+                                    <!-- Amount Stepper -->
+                                    <div class="flex-1 bg-[#0b0c16] rounded-xl border border-[#26283f] p-1.5 flex items-center justify-between">
+                                        <button onclick="changeAviatorBetAmt(2, -10)" class="w-8 h-8 rounded-lg bg-[#1f2136] text-gray-200 hover:text-white font-black text-lg active:scale-95 flex items-center justify-center">-</button>
+                                        <div class="text-center px-1">
+                                            <input type="number" id="aviatorAmtInput2" value="10.00" min="10" step="10" class="w-20 bg-transparent text-center font-black text-white text-base outline-none">
+                                        </div>
+                                        <button onclick="changeAviatorBetAmt(2, 10)" class="w-8 h-8 rounded-lg bg-[#1f2136] text-gray-200 hover:text-white font-black text-lg active:scale-95 flex items-center justify-center">+</button>
+                                    </div>
+
+                                    <!-- Big Action Button (BET / CASH OUT / CANCEL) -->
+                                    <button id="aviatorActionBtn2" onclick="handleAviatorAction(2)" class="w-36 sm:w-40 h-13 sm:h-14 rounded-xl font-black transition-all transform active:scale-95 flex flex-col items-center justify-center bg-[#18b660] text-white shadow-lg border-b-2 border-green-700">
+                                        <span id="aviatorBtnTitle2" class="text-base font-black">BET</span>
+                                        <span id="aviatorBtnSub2" class="text-[11px] font-bold text-white/90">10.00 INR</span>
+                                    </button>
+                                </div>
+
+                                <!-- Normal Quick Chips (in Bet Mode) -->
+                                <div id="avQuickChipsBox2" class="flex gap-1.5">
+                                    <button onclick="setAviatorQuickAmt(2, 10)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">10</button>
+                                    <button onclick="setAviatorQuickAmt(2, 20)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">20</button>
+                                    <button onclick="setAviatorQuickAmt(2, 50)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">50</button>
+                                    <button onclick="setAviatorQuickAmt(2, 100)" class="flex-1 py-1 bg-[#1c1e30] hover:bg-[#252840] text-gray-300 text-[11px] font-bold rounded-lg border border-[#26283f] active:scale-95">100</button>
+                                </div>
+
+                                <!-- Auto Mode Controls (in Auto Mode) -->
+                                <div id="avAutoControlsBox2" class="hidden flex items-center justify-between pt-1">
+                                    <button onclick="openAutoPlayOptionsModal(2)" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[11px] font-black px-3 py-1.5 rounded-lg active:scale-95">AUTO PLAY</button>
+                                    <div class="flex items-center gap-1.5">
+                                        <label class="text-[10px] font-bold text-gray-300 flex items-center gap-1 cursor-pointer">
+                                            <input type="checkbox" id="aviatorAutoCheck2" class="w-3.5 h-3.5 rounded accent-theme-gold" onchange="toggleAviatorAuto(2)"> Auto Cash Out
+                                        </label>
+                                        <input type="number" id="aviatorAutoVal2" value="1.10" step="0.1" min="1.05" class="w-14 bg-[#0b0c16] border border-[#26283f] rounded px-1.5 py-0.5 text-right font-mono font-bold text-xs text-theme-gold outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MOBILE BETS LIST (visible only on mobile screens < 768px) -->
+                        <div class="md:hidden bg-[#121322] border border-[#212338] rounded-xl overflow-hidden mt-2">
+                            <div class="flex border-b border-[#212338] bg-[#0d0e1a]">
+                                <button id="avMobTabAll" onclick="switchAviatorTableTab('all')" class="flex-1 py-2 text-xs font-black text-theme-gold border-b-2 border-theme-gold">All Bets (<span id="avMobBetsCount">1577</span>)</button>
+                                <button id="avMobTabMy" onclick="switchAviatorTableTab('my')" class="flex-1 py-2 text-xs font-bold text-gray-400 hover:text-white">My Bets</button>
+                            </div>
+                            <!-- Mobile 4-Column Header -->
+                            <div class="grid grid-cols-4 px-2 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider bg-[#10111f] border-b border-[#1d1f33]">
+                                <span class="col-span-1">User</span>
+                                <span class="text-right">Bet INR</span>
+                                <span class="text-center text-purple-400">X</span>
+                                <span class="text-right">Cash out</span>
+                            </div>
+                            <div id="aviatorMobAllBetsFeed" class="max-h-48 overflow-y-auto divide-y divide-[#18192b] text-xs">
+                                <!-- Mobile player rows -->
+                            </div>
+                            <div id="aviatorMobMyBetsFeed" class="max-h-48 overflow-y-auto divide-y divide-[#18192b] text-xs hidden">
+                                <div class="text-center text-gray-500 py-6 text-xs font-bold">No bets placed yet in Aviator</div>
+                            </div>
+                            <!-- Mobile Provably Fair Footer -->
+                            <div class="flex items-center justify-center gap-1.5 py-1.5 bg-[#0d0e1a] border-t border-[#1d1f33] text-[10px] text-gray-400">
+                                <i class="fa-solid fa-shield-halved text-green-400"></i>
+                                <span>This game is</span>
+                                <span class="text-gray-300 font-bold underline cursor-pointer">Provably Fair</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ================= FULL SCREEN HISTORY MODAL ================= -->
         <div id="historyModal" class="fixed inset-0 bg-[#121212] z-[200] hidden flex-col transition-transform transform translate-x-full">
             <div class="bg-[#1c1c1c] p-4 flex items-center sticky top-0 z-40 shadow-sm border-b border-[#333]">
@@ -601,7 +1127,7 @@
 
         <!-- ================= LANGUAGE BOTTOM SHEET ================= -->
         <div id="langSheet" class="fixed inset-0 bg-black/80 z-[200] flex justify-center items-end hidden transition-opacity">
-            <div class="bg-[#1c1c1c] w-full max-w-[414px] rounded-t-[30px] overflow-hidden transform transition-transform translate-y-full shadow-[0_-5px_30px_rgba(0,0,0,0.8)] border-t border-[#333]" id="langSheetContent">
+            <div class="bg-[#1c1c1c] w-full max-w-[480px] md:max-w-lg rounded-t-[30px] overflow-hidden transform transition-transform translate-y-full shadow-[0_-5px_30px_rgba(0,0,0,0.8)] border-t border-[#333]" id="langSheetContent">
                 <div class="p-4 text-center text-white font-black text-xl relative shadow-md">
                     Select Language
                     <button onclick="closeLanguageSheet()" class="absolute right-4 top-4 text-white hover:opacity-80"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -614,7 +1140,7 @@
         </div>
 
         <!-- FIXED BOTTOM NAVIGATION -->
-        <nav class="fixed bottom-0 w-full max-w-[414px] bg-[#1c1c1c] border-t border-[#333] flex justify-around px-1 py-2 z-30 shadow-[0_-2px_10px_rgba(0,0,0,0.5)]" id="bottomNav">
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-[#1c1c1c] border-t border-[#333] flex justify-around px-2 py-2 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.7)] transition-all" id="bottomNav">
             <button class="nav-btn active flex flex-col items-center w-16" onclick="switchView('home', this)">
                 <i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px] font-bold">Home</span>
             </button>
@@ -635,7 +1161,7 @@
 
         <!-- WINGO BET MODAL -->
         <div id="betModal" class="fixed inset-0 bg-black/80 z-[10001] flex justify-center items-end pb-0 hidden transition-opacity">
-            <div class="bg-[#1c1c1c] w-full max-w-[414px] rounded-t-[30px] overflow-hidden transform transition-transform translate-y-full shadow-[0_-5px_30px_rgba(0,0,0,0.8)] border-t border-[#333]" id="betModalContent">
+            <div class="bg-[#1c1c1c] w-full max-w-[480px] md:max-w-lg rounded-t-[30px] overflow-hidden transform transition-transform translate-y-full shadow-[0_-5px_30px_rgba(0,0,0,0.8)] border-t border-[#333]" id="betModalContent">
                 <div class="p-4 text-center text-white font-black text-xl relative shadow-md" id="modalHeader">
                     Join Green
                     <button onclick="closeBetModal()" class="absolute right-4 top-4 text-white hover:opacity-80"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -882,19 +1408,71 @@
         }
 
         function handleGameClick(gameId) {
-            if (userTotalDeposit <= 0) {
-                openDepositRequiredModal();
-                return;
-            }
             if (gameId === 'wingo') switchView('wingo');
+            else if (gameId === 'aviator') openAviatorGame();
             else showToast('Coming soon!', 'success');
         }
 
-        function switchView(viewId, btnEl, push = true) {
-            if (viewId === 'wingo' && userTotalDeposit <= 0) {
-                openDepositRequiredModal();
+        // Aviator Entry Flow (Smooth 0-100% Spribe Loader & Direct Launch)
+        function openAviatorGame() {
+            // First switch view immediately so Aviator container is in DOM and active
+            switchView('aviator');
+
+            const overlay = document.getElementById('aviatorLoadingOverlay');
+            const prog = document.getElementById('aviatorLoadingProgress');
+            const pct = document.getElementById('aviatorLoadingPercent');
+            if (!overlay || !prog || !pct) {
+                initAviatorCanvas();
                 return;
             }
+
+            // Show Spribe authentic plane loading animation
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            overlay.classList.remove('opacity-0');
+            prog.style.width = '0%';
+            pct.innerText = '0%';
+
+            let currentPct = 0;
+            const interval = setInterval(() => {
+                currentPct += 25;
+                if (currentPct >= 100) {
+                    currentPct = 100;
+                    clearInterval(interval);
+                    prog.style.width = '100%';
+                    pct.innerText = '100%';
+                    setTimeout(() => {
+                        overlay.classList.add('opacity-0');
+                        setTimeout(() => {
+                            overlay.classList.add('hidden');
+                            overlay.classList.remove('flex', 'opacity-0');
+                            initAviatorCanvas();
+                        }, 200);
+                    }, 50);
+                } else {
+                    prog.style.width = currentPct + '%';
+                    pct.innerText = currentPct + '%';
+                }
+            }, 30);
+        }
+
+        function openAviatorJoinModal() {
+            openAviatorGame();
+        }
+
+        function closeAviatorJoinModal() {
+            const modal = document.getElementById('aviatorJoinModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function confirmJoinAviator() {
+            openAviatorGame();
+        }
+
+        function switchView(viewId, btnEl, push = true) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             
             let targetView = document.getElementById('view-' + viewId);
@@ -902,8 +1480,29 @@
                 targetView.classList.add('active');
             }
             
+            const bottomNav = document.getElementById('bottomNav');
+            const mainContainer = document.getElementById('mainContainer');
+
             if (viewId === 'promotion') socket.emit('get_promo_data');
             if (viewId === 'wingo') socket.emit('join_game', currentRoom);
+            if (viewId === 'aviator') {
+                if (bottomNav) bottomNav.classList.add('hidden');
+                if (mainContainer) mainContainer.classList.add('game-fullscreen-mode');
+                socket.emit('join_aviator');
+                initAviatorGame();
+                setTimeout(() => initAviatorCanvas(), 60);
+                setTimeout(() => initAviatorCanvas(), 260);
+            } else if (viewId === 'wingo') {
+                if (bottomNav) bottomNav.classList.add('hidden');
+                if (mainContainer) mainContainer.classList.remove('game-fullscreen-mode');
+                socket.emit('leave_aviator');
+                stopAviatorAudio();
+            } else {
+                if (bottomNav) bottomNav.classList.remove('hidden');
+                if (mainContainer) mainContainer.classList.remove('game-fullscreen-mode');
+                socket.emit('leave_aviator');
+                stopAviatorAudio();
+            }
 
             if(btnEl) {
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -1194,6 +1793,47 @@
         });
 
         socket.on('balance_update', (bal) => { document.querySelectorAll('.user-balance-display').forEach(el => el.innerText = `₹${bal.toFixed(2)}`); });
+
+        // ===== HOME BANNER AUTO-SLIDER =====
+        let bannerSlideIdx = 0;
+        const bannerTotal = 3;
+        function goBannerSlide(idx) {
+            bannerSlideIdx = idx;
+            const track = document.getElementById('bannerTrack');
+            if (track) track.style.transform = `translateX(-${idx * 33.333}%)`;
+            document.querySelectorAll('.banner-dot').forEach((dot, i) => {
+                if (i === idx) {
+                    dot.style.width = '20px';
+                    dot.style.background = 'white';
+                    dot.style.opacity = '1';
+                } else {
+                    dot.style.width = '8px';
+                    dot.style.background = 'rgba(255,255,255,0.4)';
+                    dot.style.opacity = '0.7';
+                }
+            });
+        }
+        // Touch swipe support for banner
+        (function() {
+            let startX = 0;
+            let isDragging = false;
+            document.addEventListener('DOMContentLoaded', () => {
+                const outer = document.getElementById('homeBannerOuter');
+                if (!outer) return;
+                outer.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; }, { passive: true });
+                outer.addEventListener('touchend', e => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    const diff = startX - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) goBannerSlide((bannerSlideIdx + 1) % bannerTotal);
+                        else goBannerSlide((bannerSlideIdx - 1 + bannerTotal) % bannerTotal);
+                    }
+                }, { passive: true });
+            });
+        })();
+        // Auto rotate every 3.5 seconds
+        setInterval(() => { goBannerSlide((bannerSlideIdx + 1) % bannerTotal); }, 3500);
         
         function showToast(msg, type) {
             const container = document.getElementById('toastContainer');
@@ -1231,10 +1871,6 @@
 
         let randomAnimating = false;
         function pickRandomNumber() {
-            if (userTotalDeposit <= 0) {
-                openDepositRequiredModal();
-                return;
-            }
             if (randomAnimating) return;
             randomAnimating = true;
             let steps = 0;
@@ -1271,10 +1907,6 @@
         });
 
         function openBetModal(selection) {
-            if (userTotalDeposit <= 0) {
-                openDepositRequiredModal();
-                return;
-            }
             winGoSel = selection; baseAmt = 10; qty = boardMultiplier || 1; 
             updateBetUI();
             
@@ -2113,6 +2745,1108 @@
             }
         });
 
+        // ----------------------------------------------------
+        // AVIATOR (CRASH GAME) CLIENT ENGINE & SOUND
+        // ----------------------------------------------------
+        let aviatorState = 'WAITING';
+        let aviatorMultiplier = 1.00;
+        let aviatorWaitingTime = 5.0;
+        let aviatorRoundId = 1001;
+        let aviatorHistory = [];
+        let aviatorActiveSlot = 1;
+        let aviatorSoundMuted = false;
+        
+        let aviatorBets = {
+            1: { placed: false, amount: 10, autoCash: false, autoVal: 2.00, cashedOut: false, winAmt: 0 },
+            2: { placed: false, amount: 10, autoCash: false, autoVal: 2.00, cashedOut: false, winAmt: 0 }
+        };
+
+        // =========================================================================
+        // BDG / DAMAN / TIRANGA AUTHENTIC AVIATOR AUDIO ENGINE
+        // Soft aerodynamic jet wind rush + crystal casino bells (Zero ear fatigue)
+        // =========================================================================
+        let aviatorAudioCtx = null;
+        let aviatorNoiseNode = null;
+        let aviatorNoiseFilter = null;
+        let aviatorNoiseGain = null;
+        let aviatorSubOsc = null;
+        let aviatorSubGain = null;
+
+        function getAviatorAudioContext() {
+            if (!aviatorAudioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) aviatorAudioCtx = new AudioCtx();
+            }
+            if (aviatorAudioCtx && aviatorAudioCtx.state === 'suspended') {
+                aviatorAudioCtx.resume();
+            }
+            return aviatorAudioCtx;
+        }
+
+        function toggleAviatorSound() {
+            aviatorSoundMuted = !aviatorSoundMuted;
+            const icon = document.getElementById('aviatorSoundIcon');
+            if (icon) {
+                icon.className = aviatorSoundMuted ? 'fa-solid fa-volume-xmark text-red-400' : 'fa-solid fa-volume-high text-gray-300';
+            }
+            if (aviatorSoundMuted) {
+                stopAviatorAudio();
+            } else if (aviatorState === 'FLYING') {
+                startAviatorEngineSound(aviatorDisplayMult);
+            }
+        }
+
+        // 1. Soothing Aerodynamic Jet Engine Wind (Filtered pink noise + warm sub rumble)
+        function startAviatorEngineSound(mult = 1.00) {
+            if (aviatorSoundMuted) return;
+            try {
+                const ctx = getAviatorAudioContext();
+                if (!ctx) return;
+
+                if (!aviatorNoiseNode) {
+                    // 2-second smooth pink/brown noise buffer
+                    const bufferSize = ctx.sampleRate * 2;
+                    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    let b0 = 0, b1 = 0, b2 = 0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        b0 = 0.99765 * b0 + white * 0.0990460;
+                        b1 = 0.96300 * b1 + white * 0.1600000;
+                        b2 = 0.57000 * b2 + white * 0.5600000;
+                        output[i] = (b0 + b1 + b2) * 0.07;
+                    }
+
+                    aviatorNoiseNode = ctx.createBufferSource();
+                    aviatorNoiseNode.buffer = noiseBuffer;
+                    aviatorNoiseNode.loop = true;
+
+                    // Bandpass filter for soft wind rush
+                    aviatorNoiseFilter = ctx.createBiquadFilter();
+                    aviatorNoiseFilter.type = 'bandpass';
+                    aviatorNoiseFilter.frequency.setValueAtTime(260, ctx.currentTime);
+                    aviatorNoiseFilter.Q.setValueAtTime(2.2, ctx.currentTime);
+
+                    aviatorNoiseGain = ctx.createGain();
+                    aviatorNoiseGain.gain.setValueAtTime(0.04, ctx.currentTime);
+
+                    aviatorNoiseNode.connect(aviatorNoiseFilter);
+                    aviatorNoiseFilter.connect(aviatorNoiseGain);
+                    aviatorNoiseGain.connect(ctx.destination);
+                    aviatorNoiseNode.start();
+
+                    // Deep sub-bass sine tone (55 Hz) for mellow cockpit rumble
+                    aviatorSubOsc = ctx.createOscillator();
+                    aviatorSubOsc.type = 'sine';
+                    aviatorSubOsc.frequency.setValueAtTime(55, ctx.currentTime);
+
+                    aviatorSubGain = ctx.createGain();
+                    aviatorSubGain.gain.setValueAtTime(0.022, ctx.currentTime);
+
+                    aviatorSubOsc.connect(aviatorSubGain);
+                    aviatorSubGain.connect(ctx.destination);
+                    aviatorSubOsc.start();
+                }
+                updateAviatorEnginePitch(mult);
+            } catch(e) {}
+        }
+
+        function updateAviatorEnginePitch(mult = 1.00) {
+            if (aviatorSoundMuted || !aviatorNoiseFilter || !aviatorAudioCtx) return;
+            try {
+                // Gentle elevation of wind rush (260Hz up to 380Hz max) - NEVER harsh or screechy
+                const freq = Math.min(385, 260 + (mult - 1.0) * 16);
+                aviatorNoiseFilter.frequency.setTargetAtTime(freq, aviatorAudioCtx.currentTime, 0.12);
+                if (aviatorSubOsc) {
+                    const subFreq = Math.min(80, 55 + (mult - 1.0) * 2.5);
+                    aviatorSubOsc.frequency.setTargetAtTime(subFreq, aviatorAudioCtx.currentTime, 0.12);
+                }
+            } catch(e) {}
+        }
+
+        function stopAviatorAudio() {
+            try {
+                if (aviatorNoiseNode) {
+                    aviatorNoiseNode.stop();
+                    aviatorNoiseNode.disconnect();
+                    aviatorNoiseNode = null;
+                }
+                if (aviatorNoiseFilter) { aviatorNoiseFilter.disconnect(); aviatorNoiseFilter = null; }
+                if (aviatorNoiseGain) { aviatorNoiseGain.disconnect(); aviatorNoiseGain = null; }
+                if (aviatorSubOsc) {
+                    aviatorSubOsc.stop();
+                    aviatorSubOsc.disconnect();
+                    aviatorSubOsc = null;
+                }
+                if (aviatorSubGain) { aviatorSubGain.disconnect(); aviatorSubGain = null; }
+            } catch(e) {}
+        }
+
+        // 2. BDG Style Cashout Chime (Crystal Bell Chime / Casino Jackpot Sound)
+        function playAviatorCashoutSound() {
+            if (aviatorSoundMuted) return;
+            try {
+                const ctx = getAviatorAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                // Harmonized bells (C6 + G6 + high C7 sparkle)
+                const freqs = [1046.50, 1567.98, 2093.00];
+                const gains = [0.12, 0.08, 0.035];
+
+                freqs.forEach((f, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(f, now);
+                    gain.gain.setValueAtTime(gains[idx], now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.65);
+                });
+            } catch(e) {}
+        }
+
+        // 3. BDG Style Flew Away / Zoom Sound (High-speed airplane swoosh)
+        function playAviatorCrashSound() {
+            stopAviatorAudio();
+            if (aviatorSoundMuted) return;
+            try {
+                const ctx = getAviatorAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                const bufferSize = ctx.sampleRate * 0.7;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.16;
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.Q.setValueAtTime(3.0, now);
+                filter.frequency.setValueAtTime(320, now);
+                filter.frequency.exponentialRampToValueAtTime(1300, now + 0.22);
+                filter.frequency.exponentialRampToValueAtTime(240, now + 0.65);
+
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.01, now);
+                gain.gain.linearRampToValueAtTime(0.18, now + 0.18);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start(now);
+                noise.stop(now + 0.65);
+            } catch(e) {}
+        }
+
+        // 4. Subtle countdown tick
+        function playAviatorTickSound() {
+            if (aviatorSoundMuted) return;
+            try {
+                const ctx = getAviatorAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.04);
+            } catch(e) {}
+        }
+
+        // =========================================================================
+        // BDG / SPRIBE HIGH-DEFINITION CANVAS ENGINE (60 FPS BUTTERY FLIGHT)
+        // =========================================================================
+        let aviatorCanvas = null;
+        let aviatorCtx = null;
+        let aviatorAnimFrame = null;
+        let aviatorParticles = [];
+        let aviatorTargetMult = 1.00;
+        let aviatorDisplayMult = 1.00;
+        let aviatorCrashedZoomTime = 0;
+        let aviatorLastPlanePos = { x: 40, y: 200, angle: -18 };
+
+        function initAviatorCanvas() {
+            aviatorCanvas = document.getElementById('aviatorCanvas');
+            if (!aviatorCanvas) return;
+            const container = document.getElementById('aviatorStageContainer');
+            if (container) {
+                aviatorCanvas.width = container.clientWidth || 600;
+                aviatorCanvas.height = container.clientHeight || 340;
+            }
+            aviatorCtx = aviatorCanvas.getContext('2d');
+            if (!aviatorAnimFrame) {
+                renderAviatorCanvasFrame();
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const avView = document.getElementById('view-aviator');
+            if (avView && avView.classList.contains('active')) {
+                initAviatorCanvas();
+            }
+        });
+
+        function renderAviatorCanvasFrame() {
+            if (!aviatorCanvas || !aviatorCtx) return;
+            const w = aviatorCanvas.width;
+            const h = aviatorCanvas.height;
+            aviatorCtx.clearRect(0, 0, w, h);
+
+            if (aviatorState === 'FLYING') {
+                // Buttery 60FPS LERP Interpolation towards server target multiplier
+                aviatorDisplayMult += (aviatorTargetMult - aviatorDisplayMult) * 0.18;
+                if (aviatorDisplayMult < aviatorTargetMult) {
+                    aviatorDisplayMult += 0.0022;
+                }
+
+                // Update Flying Multiplier Text with 60 FPS fluidity
+                const multText = document.getElementById('aviatorMultText');
+                if (multText) {
+                    multText.innerText = aviatorDisplayMult.toFixed(2) + 'x';
+                }
+
+                // Live Win amounts in Cash Out buttons update with 60 FPS smoothness
+                [1, 2].forEach(slot => {
+                    const bet = aviatorBets[slot];
+                    if (bet && bet.placed && !bet.cashedOut) {
+                        const winNow = (bet.amount * aviatorDisplayMult).toFixed(2);
+                        const sub = document.getElementById(`aviatorBtnSub${slot}`);
+                        if (sub) sub.innerText = `₹${winNow} (${aviatorDisplayMult.toFixed(2)}x)`;
+                    }
+                });
+
+                // Calculate smooth curve progress (0.0 to 1.0)
+                const progress = Math.min(1.0, (aviatorDisplayMult - 1.00) / 7.5);
+                
+                // Subtle aerodynamic turbulence (floating motion)
+                const floatY = Math.sin(Date.now() / 200) * 3.5;
+                const floatAngle = Math.sin(Date.now() / 250) * 1.8;
+
+                const startX = 30;
+                const startY = h - 25;
+                const endX = startX + (w - 110) * Math.min(0.92, 0.22 + progress * 0.74);
+                const endY = startY - (h - 90) * Math.min(0.88, 0.18 + Math.pow(progress, 0.78) * 0.75) + floatY;
+                const ctrlX = startX + (endX - startX) * 0.52;
+                const ctrlY = startY;
+
+                // Save last position for smooth Flew Away zoom
+                aviatorLastPlanePos = { x: endX, y: endY, angle: -18 + floatAngle };
+
+                // Glowing Neon Ruby Gradient under Curve
+                const grad = aviatorCtx.createLinearGradient(0, endY, 0, h);
+                grad.addColorStop(0, 'rgba(234, 27, 53, 0.42)');
+                grad.addColorStop(0.5, 'rgba(234, 27, 53, 0.15)');
+                grad.addColorStop(1, 'rgba(234, 27, 53, 0.00)');
+
+                aviatorCtx.beginPath();
+                aviatorCtx.moveTo(startX, startY);
+                aviatorCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+                aviatorCtx.lineTo(endX, startY);
+                aviatorCtx.closePath();
+                aviatorCtx.fillStyle = grad;
+                aviatorCtx.fill();
+
+                // Luminous Neon Red Flight Line
+                aviatorCtx.save();
+                aviatorCtx.shadowColor = '#ff2b51';
+                aviatorCtx.shadowBlur = 14;
+                aviatorCtx.strokeStyle = '#ea1b35';
+                aviatorCtx.lineWidth = 3.8;
+                aviatorCtx.beginPath();
+                aviatorCtx.moveTo(startX, startY);
+                aviatorCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+                aviatorCtx.stroke();
+                aviatorCtx.restore();
+
+                // Smoke particles emitting from engine
+                if (Math.random() < 0.75) {
+                    aviatorParticles.push({
+                        x: endX - 16,
+                        y: endY + 4,
+                        vx: -2.0 - Math.random() * 2.0,
+                        vy: (Math.random() - 0.5) * 1.2,
+                        alpha: 0.75,
+                        size: 3.0 + Math.random() * 2.5
+                    });
+                }
+
+                // Render billowing smoke exhaust
+                for (let i = aviatorParticles.length - 1; i >= 0; i--) {
+                    const p = aviatorParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.size += 0.18;
+                    p.alpha -= 0.035;
+                    if (p.alpha <= 0) {
+                        aviatorParticles.splice(i, 1);
+                    } else {
+                        aviatorCtx.fillStyle = `rgba(251, 146, 60, ${p.alpha * 0.75})`;
+                        aviatorCtx.beginPath();
+                        aviatorCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        aviatorCtx.fill();
+                    }
+                }
+
+                // Draw authentic red monoplane
+                drawAviatorPlane(endX, endY, -18 + floatAngle);
+
+            } else if (aviatorState === 'CRASHED') {
+                // Flew Away Exit Zoom Animation
+                if (Date.now() - aviatorCrashedZoomTime < 850) {
+                    const elapsed = (Date.now() - aviatorCrashedZoomTime) / 1000;
+                    const speed = 750;
+                    const zoomX = aviatorLastPlanePos.x + Math.cos(-22 * Math.PI / 180) * speed * elapsed;
+                    const zoomY = aviatorLastPlanePos.y + Math.sin(-22 * Math.PI / 180) * speed * elapsed;
+                    drawAviatorPlane(zoomX, zoomY, -26);
+                }
+                aviatorParticles = [];
+            } else if (aviatorState === 'WAITING') {
+                // Plane resting on the runway before takeoff (Matching video 00:09)
+                const runwayX = 46;
+                const runwayY = h - 38;
+                drawAviatorPlane(runwayX, runwayY, 0);
+                aviatorParticles = [];
+            } else {
+                aviatorParticles = [];
+            }
+
+            aviatorAnimFrame = requestAnimationFrame(renderAviatorCanvasFrame);
+        }
+
+        // Authentic BDG / Spribe Red Monoplane Drawing
+        function drawAviatorPlane(x, y, angleDeg) {
+            if (!aviatorCtx) return;
+            aviatorCtx.save();
+            aviatorCtx.translate(x, y);
+            aviatorCtx.rotate(angleDeg * Math.PI / 180);
+
+            const s = 1.35; // crisp enlarged vector profile
+            aviatorCtx.scale(s, s);
+
+            // Drop Shadow underneath plane
+            aviatorCtx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+            aviatorCtx.shadowBlur = 8;
+            aviatorCtx.shadowOffsetY = 4;
+
+            // 1. Fuselage Body (Glossy Crimson Red Gradient)
+            const bodyGrad = aviatorCtx.createLinearGradient(0, -9, 0, 9);
+            bodyGrad.addColorStop(0, '#ff3b47');
+            bodyGrad.addColorStop(0.4, '#dc2626');
+            bodyGrad.addColorStop(1, '#991b1b');
+            aviatorCtx.fillStyle = bodyGrad;
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(24, 0);
+            aviatorCtx.quadraticCurveTo(12, -9, -16, -6);
+            aviatorCtx.lineTo(-26, -2);
+            aviatorCtx.lineTo(-26, 2);
+            aviatorCtx.quadraticCurveTo(12, 9, 24, 0);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            aviatorCtx.shadowColor = 'transparent';
+
+            // 2. White Racing Stripe on Fuselage
+            aviatorCtx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(8, -2.5);
+            aviatorCtx.lineTo(-18, -2.5);
+            aviatorCtx.lineTo(-20, -0.5);
+            aviatorCtx.lineTo(6, -0.5);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            // 3. Main Wing
+            const wingGrad = aviatorCtx.createLinearGradient(0, -20, 0, 0);
+            wingGrad.addColorStop(0, '#ef4444');
+            wingGrad.addColorStop(1, '#b91c1c');
+            aviatorCtx.fillStyle = wingGrad;
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(-3, -2);
+            aviatorCtx.lineTo(2, -22);
+            aviatorCtx.lineTo(11, -22);
+            aviatorCtx.lineTo(7, -2);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            // Wing tip accent
+            aviatorCtx.fillStyle = '#fef08a';
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(2, -22);
+            aviatorCtx.lineTo(11, -22);
+            aviatorCtx.lineTo(9.5, -19);
+            aviatorCtx.lineTo(3.5, -19);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            // 4. Tail Fin / Rudder
+            const tailGrad = aviatorCtx.createLinearGradient(0, -18, 0, -4);
+            tailGrad.addColorStop(0, '#f87171');
+            tailGrad.addColorStop(1, '#991b1b');
+            aviatorCtx.fillStyle = tailGrad;
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(-16, -4);
+            aviatorCtx.lineTo(-28, -17);
+            aviatorCtx.lineTo(-23, -17);
+            aviatorCtx.lineTo(-12, -3);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            // Tail trim
+            aviatorCtx.fillStyle = '#ffffff';
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(-28, -17);
+            aviatorCtx.lineTo(-23, -17);
+            aviatorCtx.lineTo(-21.5, -14);
+            aviatorCtx.lineTo(-26.5, -14);
+            aviatorCtx.closePath();
+            aviatorCtx.fill();
+
+            // 5. Cockpit Canopy (Dark Glass with Glossy Reflection)
+            aviatorCtx.fillStyle = '#0f172a';
+            aviatorCtx.beginPath();
+            aviatorCtx.ellipse(5, -3.2, 5.5, 3.2, 0, 0, Math.PI * 2);
+            aviatorCtx.fill();
+
+            aviatorCtx.fillStyle = 'rgba(224, 242, 254, 0.75)';
+            aviatorCtx.beginPath();
+            aviatorCtx.ellipse(4, -4.2, 3.5, 1.2, -0.15, 0, Math.PI * 2);
+            aviatorCtx.fill();
+
+            // 6. Propeller Hub & Motion Blur Disc (Spinning Propeller)
+            const propAngle = (Date.now() / 20) % (Math.PI * 2);
+
+            const blurGrad = aviatorCtx.createRadialGradient(25, 0, 1, 25, 0, 14);
+            blurGrad.addColorStop(0, 'rgba(254, 240, 138, 0.45)');
+            blurGrad.addColorStop(0.7, 'rgba(254, 240, 138, 0.15)');
+            blurGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+            aviatorCtx.fillStyle = blurGrad;
+            aviatorCtx.beginPath();
+            aviatorCtx.arc(25, 0, 14, 0, Math.PI * 2);
+            aviatorCtx.fill();
+
+            aviatorCtx.strokeStyle = 'rgba(254, 240, 138, 0.95)';
+            aviatorCtx.lineWidth = 2.4;
+            aviatorCtx.beginPath();
+            aviatorCtx.moveTo(25, -Math.sin(propAngle) * 12);
+            aviatorCtx.lineTo(25, Math.sin(propAngle) * 12);
+            aviatorCtx.stroke();
+
+            // Golden Nose Cap
+            const noseGrad = aviatorCtx.createRadialGradient(24.5, -1, 1, 25, 0, 3.5);
+            noseGrad.addColorStop(0, '#fef08a');
+            noseGrad.addColorStop(1, '#d97706');
+            aviatorCtx.fillStyle = noseGrad;
+            aviatorCtx.beginPath();
+            aviatorCtx.arc(24.5, 0, 3.2, 0, Math.PI * 2);
+            aviatorCtx.fill();
+
+            aviatorCtx.restore();
+        }
+
+        function switchAviatorBetSlot(slot) {
+            aviatorActiveSlot = slot;
+            const b1 = document.getElementById('aviatorTabBet1');
+            const b2 = document.getElementById('aviatorTabBet2');
+            const p1 = document.getElementById('aviatorBetPanel1');
+            const p2 = document.getElementById('aviatorBetPanel2');
+            if (!b1 || !b2 || !p1 || !p2) return;
+            if (slot === 1) {
+                b1.className = 'flex-1 py-1.5 rounded-lg text-xs font-black bg-theme-gold text-black shadow transition-all';
+                b2.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all';
+                p1.classList.remove('hidden');
+                p2.classList.add('hidden');
+            } else {
+                b2.className = 'flex-1 py-1.5 rounded-lg text-xs font-black bg-theme-gold text-black shadow transition-all';
+                b1.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all';
+                p2.classList.remove('hidden');
+                p1.classList.add('hidden');
+            }
+        }
+
+        function changeAviatorBetAmt(slot, delta) {
+            const input = document.getElementById('aviatorAmtInput' + slot);
+            if (!input) return;
+            let val = parseInt(input.value) || 10;
+            val = Math.max(10, val + delta);
+            input.value = val;
+            aviatorBets[slot].amount = val;
+            updateAviatorActionBtn(slot);
+        }
+
+        function setAviatorQuickAmt(slot, val) {
+            const input = document.getElementById('aviatorAmtInput' + slot);
+            if (!input) return;
+            input.value = val;
+            aviatorBets[slot].amount = val;
+            updateAviatorActionBtn(slot);
+        }
+
+        function toggleAviatorAuto(slot) {
+            const chk = document.getElementById('aviatorAutoCheck' + slot);
+            const valInput = document.getElementById('aviatorAutoVal' + slot);
+            if (chk) aviatorBets[slot].autoCash = chk.checked;
+            if (valInput) aviatorBets[slot].autoVal = parseFloat(valInput.value) || 2.00;
+        }
+
+        function updateAviatorActionBtn(slot) {
+            const btn = document.getElementById('aviatorActionBtn' + slot);
+            const title = document.getElementById('aviatorBtnTitle' + slot);
+            const sub = document.getElementById('aviatorBtnSub' + slot);
+            if (!btn || !title || !sub) return;
+
+            const bet = aviatorBets[slot];
+            const amtInput = document.getElementById('aviatorAmtInput' + slot);
+            const curAmt = parseInt(amtInput ? amtInput.value : 10) || 10;
+
+            if (aviatorState === 'WAITING') {
+                if (bet.placed) {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-base transition-all transform active:scale-95 flex flex-col items-center justify-center bg-[#dc2626] text-white shadow-lg';
+                    title.innerText = 'CANCEL';
+                    sub.innerText = `₹${bet.amount.toFixed(2)}`;
+                } else {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-base transition-all transform active:scale-95 flex flex-col items-center justify-center bg-[#18b660] text-white shadow-lg';
+                    title.innerText = 'BET';
+                    sub.innerText = `₹${curAmt.toFixed(2)}`;
+                }
+            } else if (aviatorState === 'FLYING') {
+                if (bet.placed && !bet.cashedOut) {
+                    const winNow = (bet.amount * aviatorMultiplier).toFixed(2);
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-base transition-all transform active:scale-95 flex flex-col items-center justify-center bg-gradient-to-r from-[#d97706] to-[#f59e0b] text-white shadow-[0_0_18px_rgba(245,158,11,0.65)] animate-pulse';
+                    title.innerText = 'CASH OUT';
+                    sub.innerText = `₹${winNow} (${aviatorMultiplier.toFixed(2)}x)`;
+                } else if (bet.cashedOut) {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center bg-[#15803d] text-white opacity-85';
+                    title.innerText = 'CASHED OUT';
+                    sub.innerText = `₹${bet.winAmt.toFixed(2)}`;
+                } else {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center bg-[#252536] text-gray-500 cursor-not-allowed';
+                    title.innerText = 'WAITING';
+                    sub.innerText = 'Next Round';
+                }
+            } else { // CRASHED
+                if (bet.cashedOut) {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center bg-[#15803d] text-white';
+                    title.innerText = 'WON';
+                    sub.innerText = `₹${bet.winAmt.toFixed(2)}`;
+                } else if (bet.placed) {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center bg-[#7f1d1d] text-gray-300';
+                    title.innerText = 'FLEW AWAY';
+                    sub.innerText = `₹${bet.amount.toFixed(2)}`;
+                } else {
+                    btn.className = 'w-36 h-14 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center bg-[#252536] text-gray-500';
+                    title.innerText = 'ROUND OVER';
+                    sub.innerText = 'Next in 2s';
+                }
+            }
+        }
+
+        function handleAviatorAction(slot) {
+            const bet = aviatorBets[slot];
+            if (aviatorState === 'WAITING') {
+                if (bet.placed) {
+                    socket.emit('aviator_cancel_bet', { slot });
+                } else {
+                    const amtInput = document.getElementById('aviatorAmtInput' + slot);
+                    const amt = parseFloat(amtInput ? amtInput.value : 10) || 10;
+                    const chk = document.getElementById('aviatorAutoCheck' + slot);
+                    const autoValInput = document.getElementById('aviatorAutoVal' + slot);
+                    const autoCashout = (chk && chk.checked) ? parseFloat(autoValInput.value) : null;
+                    socket.emit('aviator_place_bet', { slot, amount: amt, autoCashout });
+                }
+            } else if (aviatorState === 'FLYING') {
+                if (bet.placed && !bet.cashedOut) {
+                    socket.emit('aviator_cashout', { slot });
+                }
+            }
+        }
+
+        function renderAviatorHistory() {
+            const container = document.getElementById('aviatorPillsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            const list = (aviatorHistory && aviatorHistory.length > 0) ? aviatorHistory : [1.23, 2.25, 1.52, 3.10, 1.02, 4.54, 1.86];
+            list.slice(0, 25).forEach(mult => {
+                const val = parseFloat(mult);
+                let colorClass = 'bg-[#162338] text-[#34b4ff] border-[#1d3350]';
+                if (val >= 10.0) {
+                    colorClass = 'bg-[#3c1236] text-[#c017b0] border-[#56164d]';
+                } else if (val >= 2.0) {
+                    colorClass = 'bg-[#281744] text-[#913ef8] border-[#3b1d68]';
+                }
+                container.innerHTML += `
+                    <div onclick="toggleAviatorRoundHistoryModal()" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${colorClass} shadow-sm flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+                        ${val.toFixed(2)}x
+                    </div>
+                `;
+            });
+        }
+
+        // ================= FULL ROUND HISTORY MODAL (Video 00:20) =================
+        function toggleAviatorRoundHistoryModal() {
+            const modal = document.getElementById('aviatorRoundHistoryModal');
+            if (!modal) return;
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                renderAviatorFullHistory();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function renderAviatorFullHistory() {
+            const grid = document.getElementById('aviatorFullHistoryGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const list = (aviatorHistory && aviatorHistory.length > 0) ? aviatorHistory : [
+                1.23, 2.25, 1.52, 3.10, 1.02, 4.54, 1.86, 12.45, 1.15, 2.78,
+                1.05, 5.20, 1.40, 2.05, 1.95, 8.40, 1.10, 1.35, 3.65, 1.00,
+                2.15, 1.62, 1.88, 14.80, 1.09, 2.45, 1.70, 3.20, 1.18, 1.55
+            ];
+
+            let html = '<div class="grid grid-cols-5 sm:grid-cols-6 gap-2">';
+            list.slice(0, 36).forEach((mult, idx) => {
+                const val = parseFloat(mult);
+                let bg = 'bg-[#162338] text-[#34b4ff] border-[#1d3350]';
+                if (val >= 10.0) bg = 'bg-[#3c1236] text-[#c017b0] border-[#56164d]';
+                else if (val >= 2.0) bg = 'bg-[#281744] text-[#913ef8] border-[#3b1d68]';
+
+                html += `
+                    <div class="px-2 py-2 rounded-lg font-mono text-xs font-black border ${bg} text-center shadow-sm hover:scale-105 transition-transform cursor-pointer" title="Round #${(aviatorRoundId || 31619481) - idx}">
+                        ${val.toFixed(2)}x
+                    </div>
+                `;
+            });
+            html += '</div>';
+            grid.innerHTML = html;
+        }
+
+        // ================= AUTO PLAY OPTIONS MODAL (Video 00:45) =================
+        let currentAutoSlot = 1;
+        let autoPlayRounds = 10;
+
+        function openAutoPlayOptionsModal(slot) {
+            currentAutoSlot = slot;
+            const modal = document.getElementById('aviatorAutoPlayModal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAutoPlayOptionsModal() {
+            const modal = document.getElementById('aviatorAutoPlayModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function selectAutoRounds(num, btn) {
+            autoPlayRounds = num;
+            document.querySelectorAll('.auto-round-btn').forEach(b => {
+                b.className = 'auto-round-btn py-2 rounded-xl bg-[#1e2033] text-gray-300 font-bold text-xs hover:text-white active:scale-95 border border-[#2c2f4d]';
+            });
+            if (btn) {
+                btn.className = 'auto-round-btn py-2 rounded-xl bg-[#2563eb] text-white font-black text-xs active:scale-95 shadow';
+            }
+        }
+
+        function startAutoPlay() {
+            closeAutoPlayOptionsModal();
+            showToast(`Auto Play started for ${autoPlayRounds} rounds!`, 'success');
+            const autoCheck = document.getElementById(`aviatorAutoCheck${currentAutoSlot}`);
+            if (autoCheck) {
+                autoCheck.checked = true;
+                toggleAviatorAuto(currentAutoSlot);
+            }
+        }
+
+        // ─── SPRIBE-style Avatar Colors ───────────────────────────────────
+        const AVATAR_COLORS = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#00bcd4','#ff5722','#607d8b','#8bc34a'];
+        function getAvatarColor(name) {
+            let h = 0; for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+            return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+        }
+        function avatarHtml(name) {
+            const letter = name ? name[0].toUpperCase() : '?';
+            const bg = getAvatarColor(name || '?');
+            return `<div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black text-white flex-shrink-0" style="background:${bg}">${letter}</div>`;
+        }
+
+        // ─── Top Winners Data ─────────────────────────────────────────────
+        const TOP_WINNERS_X = [
+            { name:'q***5', date:'26-10-13', betINR:50,   result:'16,000.00x', roundMax:'3,27,019.21x', winINR:'8,00,000.00' },
+            { name:'l***4', date:'26-10-13', betINR:72,   result:'11,111.11x', roundMax:'3,27,019.21x', winINR:'7,99,999.92' },
+            { name:'l***7', date:'26-10-13', betINR:170,  result:'4,705.88x',  roundMax:'3,27,019.21x', winINR:'7,99,999.60' },
+            { name:'l***8', date:'26-10-13', betINR:210,  result:'3,809.52x',  roundMax:'3,27,019.21x', winINR:'7,99,999.20' },
+            { name:'a***3', date:'26-10-13', betINR:500,  result:'1,600.00x',  roundMax:'3,27,019.21x', winINR:'8,00,000.00' },
+            { name:'r***9', date:'26-10-13', betINR:100,  result:'7,500.00x',  roundMax:'2,10,450.00x', winINR:'7,50,000.00' },
+            { name:'s***2', date:'26-10-13', betINR:80,   result:'9,375.00x',  roundMax:'2,10,450.00x', winINR:'7,50,000.00' },
+        ];
+        const TOP_WINNERS_WIN = [
+            { name:'q***5', date:'26-10-13', betINR:50,   result:'16,000.00x', roundMax:'3,27,019.21x', winINR:'8,00,000.00' },
+            { name:'a***9', date:'26-10-13', betINR:6400, result:'1.14x',      roundMax:'8.50x',        winINR:'7,296.00' },
+            { name:'a***4', date:'26-10-13', betINR:5900, result:'2.04x',      roundMax:'8.50x',        winINR:'12,036.00' },
+            { name:'z***8', date:'26-10-13', betINR:5400, result:'1.22x',      roundMax:'8.50x',        winINR:'6,588.00' },
+            { name:'x***0', date:'26-10-13', betINR:5200, result:'1.55x',      roundMax:'8.50x',        winINR:'8,060.00' },
+        ];
+        let currentTopFilter = 'x';
+        let currentTopPeriod = 'day';
+
+        function renderTopWinners() {
+            const list = document.getElementById('aviatorTopWinnersList');
+            if (!list) return;
+            const data = currentTopFilter === 'x' || currentTopFilter === 'rounds' ? TOP_WINNERS_X : TOP_WINNERS_WIN;
+            list.innerHTML = data.map(w => `
+                <div class="p-2.5 hover:bg-[#15162a] transition-colors">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        ${avatarHtml(w.name)}
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-white text-[11px]">${w.name}</div>
+                            <div class="text-[9px] text-gray-500 font-mono">${w.date}</div>
+                        </div>
+                        <i class="fa-solid fa-shield-halved text-gray-600 text-[10px]"></i>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 text-[10px]">
+                        <div class="bg-[#0d0e1a] rounded p-1">
+                            <div class="text-gray-500 font-bold">Bet INR</div>
+                            <div class="text-white font-black">${w.betINR.toLocaleString('en-IN')}.00</div>
+                        </div>
+                        <div class="bg-[#0d0e1a] rounded p-1">
+                            <div class="text-gray-500 font-bold">Result</div>
+                            <div class="text-purple-400 font-black">${w.result}</div>
+                        </div>
+                        <div class="bg-[#0d0e1a] rounded p-1">
+                            <div class="text-gray-500 font-bold">Win INR</div>
+                            <div class="text-green-400 font-black">${w.winINR}</div>
+                        </div>
+                        <div class="bg-[#0d0e1a] rounded p-1">
+                            <div class="text-gray-500 font-bold">Round max.</div>
+                            <div class="text-purple-400 font-black">${w.roundMax}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTopFilter(f) {
+            currentTopFilter = f;
+            ['x','win','rounds'].forEach(id => {
+                const el = document.getElementById('topFilt' + id.charAt(0).toUpperCase() + id.slice(1));
+                if (el) el.className = `flex-1 py-1.5 text-[10px] font-${id === f ? 'black text-theme-gold border-b-2 border-theme-gold' : 'bold text-gray-400 hover:text-white'}`;
+            });
+            renderTopWinners();
+        }
+        function switchTopPeriod(p) {
+            currentTopPeriod = p;
+            ['day','month','year'].forEach(id => {
+                const el = document.getElementById('topPeriod' + id.charAt(0).toUpperCase() + id.slice(1));
+                if (el) el.className = `flex-1 py-1.5 text-[10px] font-${id === p ? 'black text-theme-gold border-b-2 border-theme-gold' : 'bold text-gray-400 hover:text-white'}`;
+            });
+            renderTopWinners();
+        }
+
+        // ─── Realistic bets count fluctuation ────────────────────────────
+        let _fakeBetsBase = 931 + Math.floor(Math.random() * 600);
+        function updateFakeBetsCount(delta) {
+            _fakeBetsBase = Math.max(500, _fakeBetsBase + delta);
+            ['avDeskBetsCount','avMobBetsCount'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.innerText = _fakeBetsBase;
+            });
+        }
+        setInterval(() => updateFakeBetsCount(Math.floor(Math.random() * 7) - 2), 3000);
+
+        function switchAviatorTableTab(tab) {
+            // Desk tabs
+            const deskTabs = {all:'avDeskTabAll', my:'avDeskTabMy', top:'avDeskTabTop'};
+            const deskPanels = {all:'aviatorDeskAllPanel', my:'aviatorDeskMyPanel', top:'aviatorDeskTopPanel'};
+            Object.keys(deskTabs).forEach(k => {
+                const btn = document.getElementById(deskTabs[k]);
+                const panel = document.getElementById(deskPanels[k]);
+                const isActive = k === tab;
+                if (btn) btn.className = `flex-1 py-2.5 text-xs font-${isActive ? 'black text-theme-gold border-b-2 border-theme-gold' : 'bold text-gray-400 hover:text-white'}`;
+                if (panel) panel.classList.toggle('hidden', !isActive);
+            });
+            // Mob tabs
+            const mobTabs = {all:'avMobTabAll', my:'avMobTabMy'};
+            const mobPanels = {all:'aviatorMobAllBetsFeed', my:'aviatorMobMyBetsFeed'};
+            if (tab !== 'top') {
+                Object.keys(mobTabs).forEach(k => {
+                    const btn = document.getElementById(mobTabs[k]);
+                    const panel = document.getElementById(mobPanels[k]);
+                    const isActive = k === tab;
+                    if (btn) btn.className = `flex-1 py-2 text-xs font-${isActive ? 'black text-theme-gold border-b-2 border-theme-gold' : 'bold text-gray-400 hover:text-white'}`;
+                    if (panel) panel.classList.toggle('hidden', !isActive);
+                });
+            }
+            if (tab === 'my') renderAviatorMyBets();
+            if (tab === 'top') renderTopWinners();
+        }
+
+        function renderAviatorMyBets() {
+            const deskPanel = document.getElementById('aviatorDeskMyPanel');
+            const mobPanel = document.getElementById('aviatorMobMyBetsFeed');
+            const targets = [deskPanel, mobPanel].filter(Boolean);
+            if (targets.length === 0) return;
+
+            if (!profileDataCache || !profileDataCache.bets) {
+                targets.forEach(el => el.innerHTML = '<div class="text-center text-gray-500 py-6 text-xs font-bold">No bets placed yet in Aviator</div>');
+                return;
+            }
+            const avBets = profileDataCache.bets.filter(b => b.room === 'aviator');
+            if (avBets.length === 0) {
+                targets.forEach(el => el.innerHTML = '<div class="text-center text-gray-500 py-6 text-xs font-bold">No bets placed yet in Aviator</div>');
+                return;
+            }
+            let html = '';
+            avBets.slice(0, 30).forEach(b => {
+                const statusColor = b.won > 0 ? 'text-green-400' : 'text-red-400';
+                const wonText = b.won > 0 ? `+₹${b.won.toFixed(2)}` : `-₹${b.amount.toFixed(2)}`;
+                const xText = b.won > 0 && b.amount > 0 ? (b.won / b.amount).toFixed(2) + 'x' : '—';
+                html += `
+                    <div class="grid gap-1 px-2 py-1.5 text-xs border-b border-[#1e1f2e]" style="grid-template-columns:2fr 1fr 1fr 1fr">
+                        <div class="flex items-center gap-1.5 font-bold text-gray-300">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white" style="background:#7c3aed">Me</span>
+                            <span class="truncate">You</span>
+                        </div>
+                        <div class="font-bold text-white self-center">₹${parseFloat(b.amount).toFixed(2)}</div>
+                        <div class="font-bold ${statusColor} self-center">${xText}</div>
+                        <div class="font-bold ${statusColor} self-center">${wonText}</div>
+                    </div>
+                `;
+            });
+            targets.forEach(el => el.innerHTML = html);
+        }
+
+        function initAviatorGame() {
+            initAviatorCanvas();
+            renderAviatorHistory();
+            updateAviatorActionBtn(1);
+            updateAviatorActionBtn(2);
+        }
+
+        socket.on('aviator_init', (data) => {
+            aviatorState = data.state;
+            aviatorHistory = data.history || [];
+            aviatorRoundId = data.roundId || 1001;
+            renderAviatorHistory();
+
+            const countEl = document.getElementById('aviatorTotalBetsCount');
+            if (countEl) countEl.innerText = (data.activeBets || []).length;
+
+            // Populate initial bets into the new 4-col panels
+            if (data.activeBets && data.activeBets.length > 0) {
+                ['aviatorDeskAllBetsFeed', 'aviatorMobAllBetsFeed'].forEach(feedId => {
+                    const feed = document.getElementById(feedId);
+                    if (!feed) return;
+                    feed.innerHTML = '';
+                    data.activeBets.slice(0, 60).forEach(b => {
+                        const label = (b.mobile || '???').toString().slice(-4);
+                        const color = getAvatarColor(b.mobile || '');
+                        const rowId = `avrow_init_${feedId}_${b.mobile}_${Date.now()}_${Math.random()}`;
+                        const row = document.createElement('div');
+                        row.id = rowId;
+                        row.className = 'grid gap-1 px-2 py-1.5 text-xs border-b border-[#1e1f2e]';
+                        row.style.gridTemplateColumns = '2fr 1fr 1fr 1fr';
+                        row.innerHTML = `
+                            <div class="flex items-center gap-1.5 font-bold text-gray-300 truncate">
+                                ${avatarHtml(label, color)}
+                                <span class="truncate">${label}</span>
+                            </div>
+                            <div class="font-bold text-white self-center">₹${parseFloat(b.amount || 0).toFixed(2)}</div>
+                            <div class="font-bold text-purple-400 self-center x-col">—</div>
+                            <div class="font-bold text-gray-400 self-center cashout-col">—</div>
+                        `;
+                        feed.appendChild(row);
+                    });
+                });
+            }
+        });
+
+        let lastWaitTickSec = -1;
+        socket.on('aviator_waiting', (data) => {
+            aviatorState = 'WAITING';
+            aviatorWaitingTime = data.timeLeft;
+            const flyBox = document.getElementById('aviatorFlyingBox');
+            const crashBox = document.getElementById('aviatorCrashedBox');
+            const waitBox = document.getElementById('aviatorWaitingBox');
+            if (flyBox) flyBox.classList.add('hidden');
+            if (crashBox) crashBox.classList.add('hidden');
+            if (waitBox) waitBox.classList.remove('hidden');
+
+            const prog = document.getElementById('aviatorProgressBar');
+            const txt = document.getElementById('aviatorWaitTimeText');
+            if (prog) prog.style.width = `${Math.min(100, Math.max(0, (data.timeLeft / 5.0) * 100))}%`;
+            if (txt) txt.innerText = `${data.timeLeft.toFixed(1)}s`;
+
+            const currentSec = Math.floor(data.timeLeft);
+            if (currentSec !== lastWaitTickSec && currentSec > 0) {
+                lastWaitTickSec = currentSec;
+                playAviatorTickSound();
+            }
+
+            updateAviatorActionBtn(1);
+            updateAviatorActionBtn(2);
+        });
+
+        socket.on('aviator_start', (data) => {
+            aviatorState = 'FLYING';
+            aviatorMultiplier = 1.00;
+            aviatorTargetMult = 1.00;
+            aviatorDisplayMult = 1.00;
+            lastWaitTickSec = -1;
+
+            const flyBox = document.getElementById('aviatorFlyingBox');
+            const crashBox = document.getElementById('aviatorCrashedBox');
+            const waitBox = document.getElementById('aviatorWaitingBox');
+            if (waitBox) waitBox.classList.add('hidden');
+            if (crashBox) crashBox.classList.add('hidden');
+            if (flyBox) flyBox.classList.remove('hidden');
+            const mText = document.getElementById('aviatorMultText');
+            if (mText) mText.innerText = '1.00x';
+
+            const countEl = document.getElementById('aviatorTotalBetsCount');
+            if (countEl) countEl.innerText = (data.activeBets || []).length;
+
+            startAviatorEngineSound(1.00);
+            updateAviatorActionBtn(1);
+            updateAviatorActionBtn(2);
+        });
+
+        socket.on('aviator_tick', (data) => {
+            if (aviatorState !== 'FLYING') return;
+            aviatorMultiplier = data.multiplier;
+            aviatorTargetMult = data.multiplier;
+
+            updateAviatorEnginePitch(data.multiplier);
+            updateAviatorActionBtn(1);
+            updateAviatorActionBtn(2);
+        });
+
+        socket.on('aviator_crash', (data) => {
+            aviatorState = 'CRASHED';
+            aviatorCrashedZoomTime = Date.now();
+
+            const flyBox = document.getElementById('aviatorFlyingBox');
+            const waitBox = document.getElementById('aviatorWaitingBox');
+            const crashBox = document.getElementById('aviatorCrashedBox');
+            if (flyBox) flyBox.classList.add('hidden');
+            if (waitBox) waitBox.classList.add('hidden');
+            if (crashBox) crashBox.classList.remove('hidden');
+            const fText = document.getElementById('aviatorCrashFinalMult');
+            if (fText) fText.innerText = `@ ${data.crashMult.toFixed(2)}x`;
+
+            playAviatorCrashSound();
+
+            aviatorHistory = data.history || [];
+            renderAviatorHistory();
+
+            updateAviatorActionBtn(1);
+            updateAviatorActionBtn(2);
+
+            setTimeout(() => {
+                aviatorBets[1].placed = false;
+                aviatorBets[1].cashedOut = false;
+                aviatorBets[2].placed = false;
+                aviatorBets[2].cashedOut = false;
+                updateAviatorActionBtn(1);
+                updateAviatorActionBtn(2);
+            }, 2000);
+        });
+
+        socket.on('aviator_bet_accepted', (data) => {
+            aviatorBets[data.slot].placed = true;
+            aviatorBets[data.slot].amount = data.amount;
+            aviatorBets[data.slot].cashedOut = false;
+            updateAviatorActionBtn(data.slot);
+        });
+
+        socket.on('aviator_bet_cancelled', (data) => {
+            aviatorBets[data.slot].placed = false;
+            updateAviatorActionBtn(data.slot);
+        });
+
+        socket.on('aviator_cashout_success', (data) => {
+            aviatorBets[data.slot].cashedOut = true;
+            aviatorBets[data.slot].winAmt = data.winAmt;
+            playAviatorCashoutSound();
+            updateAviatorActionBtn(data.slot);
+            showToast(`Cashed Out ₹${data.winAmt.toFixed(2)} at ${data.mult.toFixed(2)}x!`, 'success');
+        });
+
+        socket.on('aviator_new_bet', (data) => {
+            const rowId = 'avrow_' + data.mobile.replace(/\*/g,'x') + '_' + Date.now();
+            const row = `
+                <div id="${rowId}" class="grid grid-cols-4 items-center px-3 py-1.5 text-xs bg-[#1a1c30]/60 transition-all duration-700 hover:bg-[#1e2035]">
+                    <div class="flex items-center gap-1.5 col-span-1 min-w-0">
+                        ${avatarHtml(data.mobile)}
+                        <span class="font-bold text-gray-300 truncate">${data.mobile}</span>
+                    </div>
+                    <span class="text-right font-bold text-white">${parseFloat(data.amount).toFixed(2)}</span>
+                    <span class="text-center text-gray-600 font-bold" id="${rowId}_x">—</span>
+                    <span class="text-right text-gray-600 font-bold" id="${rowId}_cash">—</span>
+                </div>`;
+            // Add to both desk and mob feeds
+            ['aviatorDeskAllBetsFeed','aviatorMobAllBetsFeed'].forEach(id => {
+                const feed = document.getElementById(id);
+                if (!feed) return;
+                feed.insertAdjacentHTML('afterbegin', row);
+                // Keep max 60 rows
+                while (feed.children.length > 60) feed.removeChild(feed.lastChild);
+            });
+            updateFakeBetsCount(1);
+        });
+
+        socket.on('aviator_player_cashed', (data) => {
+            // Update existing row if found, else add new green row
+            const mobiles = document.querySelectorAll('[id^="avrow_"]');
+            let found = false;
+            document.querySelectorAll('[id$="_x"]').forEach(el => {
+                const rowId = el.id.replace('_x','');
+                const nameEl = document.getElementById(rowId);
+                if (nameEl && nameEl.innerText && nameEl.innerText.includes && nameEl.querySelector && nameEl.querySelector('span') && nameEl.querySelector('span').textContent.includes(data.mobile.slice(0,3))) {
+                    // fill X and cashout
+                    el.innerHTML = `<span class="text-purple-400 font-black">${data.mult.toFixed(2)}x</span>`;
+                    const cashEl = document.getElementById(rowId + '_cash');
+                    if (cashEl) cashEl.innerHTML = `<span class="text-green-400 font-black">${parseFloat(data.winAmt).toFixed(2)}</span>`;
+                    if (nameEl) nameEl.classList.add('bg-green-500/10');
+                    found = true;
+                }
+            });
+            if (!found) {
+                const row = `
+                    <div class="grid grid-cols-4 items-center px-3 py-1.5 text-xs bg-green-500/10 hover:bg-green-500/15 transition-colors">
+                        <div class="flex items-center gap-1.5 col-span-1 min-w-0">
+                            ${avatarHtml(data.mobile)}
+                            <span class="font-bold text-green-300 truncate">${data.mobile}</span>
+                        </div>
+                        <span class="text-right font-bold text-white">—</span>
+                        <span class="text-center font-black text-purple-400">${data.mult.toFixed(2)}x</span>
+                        <span class="text-right font-black text-green-400">${parseFloat(data.winAmt).toFixed(2)}</span>
+                    </div>`;
+                ['aviatorDeskAllBetsFeed','aviatorMobAllBetsFeed'].forEach(id => {
+                    const feed = document.getElementById(id);
+                    if (feed) feed.insertAdjacentHTML('afterbegin', row);
+                });
+            }
+        });
+
     </script>
     <!-- WinGo Win / Loss Result Modal -->
     <div id="wingoResultModal" class="fixed inset-0 bg-black/75 z-[10005] hidden flex-col items-center justify-center p-4 backdrop-blur-[2px]" onclick="if(event.target === this) closeWingoResultModal()">
@@ -2268,6 +4002,94 @@
                 <!-- Secondary Action Button -->
                 <button onclick="closeDepositRequiredModal()" class="w-full bg-transparent hover:bg-[#222] text-gray-400 font-bold py-2.5 rounded-full text-xs transition-colors">
                     Maybe Later
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= AVIATOR JOIN TIPS MODAL (Video 00:00 - 00:03) ================= -->
+        <div id="aviatorJoinModal" class="fixed inset-0 bg-black/80 z-[10005] hidden items-center justify-center p-4 transition-opacity" onclick="if(event.target === this) closeAviatorJoinModal()">
+            <div class="bg-[#1c1c1c] w-full max-w-sm rounded-2xl border border-[#333] shadow-2xl p-6 text-center transform transition-all scale-95" id="aviatorJoinCard">
+                <div class="text-white font-black text-lg mb-2">Tips</div>
+                <p class="text-gray-300 text-sm font-semibold mb-6">Are you sure you want to join the game?</p>
+                <div class="flex gap-3">
+                    <button onclick="closeAviatorJoinModal()" class="flex-1 py-2.5 rounded-full border border-[#444] text-gray-400 font-bold text-sm active:scale-95 transition-transform hover:bg-[#252525]">Cancel</button>
+                    <button onclick="confirmJoinAviator()" class="flex-1 py-2.5 rounded-full bg-theme-gold text-black font-black text-sm active:scale-95 shadow-md transition-transform">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= AVIATOR LOADING SCREEN (Video 00:03 - 00:06) ================= -->
+        <div id="aviatorLoadingOverlay" class="fixed inset-0 bg-[#0c0d14] z-[10006] hidden flex-col items-center justify-center select-none transition-opacity duration-300">
+            <div class="flex flex-col items-center">
+                <div class="w-24 h-24 relative flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-plane text-red-500 text-6xl transform -rotate-12 animate-pulse drop-shadow-[0_0_24px_rgba(239,68,68,0.7)]"></i>
+                </div>
+                <div class="text-4xl font-black italic tracking-widest text-red-500 mb-6 drop-shadow-md">Aviator</div>
+                <!-- Progress Bar -->
+                <div class="w-64 h-2.5 bg-[#1b1c28] rounded-full overflow-hidden border border-[#2c2d42] p-0.5 shadow-inner">
+                    <div id="aviatorLoadingProgress" class="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-75" style="width: 0%;"></div>
+                </div>
+                <div id="aviatorLoadingPercent" class="text-xs font-mono font-bold text-gray-400 mt-2.5">0%</div>
+            </div>
+        </div>
+
+        <!-- ================= AVIATOR FULL ROUND HISTORY MODAL (Video 00:20) ================= -->
+        <div id="aviatorRoundHistoryModal" class="fixed inset-0 bg-black/80 z-[10007] hidden items-center justify-center p-4 transition-opacity">
+            <div class="bg-[#141524] w-full max-w-lg rounded-2xl border border-[#23253b] shadow-2xl p-4 sm:p-5 flex flex-col max-h-[85vh]">
+                <div class="flex items-center justify-between pb-3 border-b border-[#23253b] mb-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-red-500"></i>
+                        <h3 class="text-base font-black text-white tracking-wide">Round History</h3>
+                    </div>
+                    <button onclick="toggleAviatorRoundHistoryModal()" class="w-8 h-8 rounded-full bg-[#1e2033] text-gray-400 hover:text-white flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <!-- Grid of past multipliers -->
+                <div class="overflow-y-auto flex-1 pr-1" id="aviatorFullHistoryGrid">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="mt-4 pt-3 border-t border-[#23253b] flex items-center justify-between text-[11px] text-gray-400">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-green-400"></i>
+                        <span>Provably Fair Blockchain Verified</span>
+                    </div>
+                    <span class="font-mono text-gray-500">SHA-256</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= AVIATOR AUTO PLAY OPTIONS MODAL (Video 00:45) ================= -->
+        <div id="aviatorAutoPlayModal" class="fixed inset-0 bg-black/80 z-[10008] hidden items-center justify-center p-4 transition-opacity">
+            <div class="bg-[#141524] w-full max-w-sm rounded-2xl border border-[#23253b] shadow-2xl p-5">
+                <div class="flex items-center justify-between pb-3 border-b border-[#23253b] mb-4">
+                    <h3 class="text-base font-black text-white tracking-wide">Auto Play Options</h3>
+                    <button onclick="closeAutoPlayOptionsModal()" class="w-8 h-8 rounded-full bg-[#1e2033] text-gray-400 hover:text-white flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <!-- Number of Rounds -->
+                <label class="block text-xs font-bold text-gray-400 mb-2">Number of Rounds:</label>
+                <div class="grid grid-cols-4 gap-2 mb-4">
+                    <button onclick="selectAutoRounds(10, this)" class="auto-round-btn py-2 rounded-xl bg-[#2563eb] text-white font-black text-xs active:scale-95 shadow">10</button>
+                    <button onclick="selectAutoRounds(20, this)" class="auto-round-btn py-2 rounded-xl bg-[#1e2033] text-gray-300 font-bold text-xs hover:text-white active:scale-95 border border-[#2c2f4d]">20</button>
+                    <button onclick="selectAutoRounds(50, this)" class="auto-round-btn py-2 rounded-xl bg-[#1e2033] text-gray-300 font-bold text-xs hover:text-white active:scale-95 border border-[#2c2f4d]">50</button>
+                    <button onclick="selectAutoRounds(100, this)" class="auto-round-btn py-2 rounded-xl bg-[#1e2033] text-gray-300 font-bold text-xs hover:text-white active:scale-95 border border-[#2c2f4d]">100</button>
+                </div>
+                <!-- Stop Limits -->
+                <div class="space-y-3 mb-5">
+                    <div class="flex items-center justify-between bg-[#0b0c16] p-2.5 rounded-xl border border-[#222338]">
+                        <span class="text-xs font-bold text-gray-300">Stop if cash decreases by</span>
+                        <input type="number" id="autoStopLoss" value="100" class="w-16 bg-transparent text-right font-mono font-bold text-xs text-white outline-none">
+                    </div>
+                    <div class="flex items-center justify-between bg-[#0b0c16] p-2.5 rounded-xl border border-[#222338]">
+                        <span class="text-xs font-bold text-gray-300">Stop if single win exceeds</span>
+                        <input type="number" id="autoStopWin" value="500" class="w-16 bg-transparent text-right font-mono font-bold text-xs text-theme-gold outline-none">
+                    </div>
+                </div>
+                <!-- Start Button -->
+                <button onclick="startAutoPlay()" class="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-3 rounded-xl font-black text-sm active:scale-95 shadow-lg transition-transform">
+                    START AUTO
                 </button>
             </div>
         </div>
