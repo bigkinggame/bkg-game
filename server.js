@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const cricketApi = require('./cricketApi');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,8 +14,22 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Persistent DB
-let db = { users: {}, transactions: [], boundAccounts: {} };
+// Persistent DB with local fallback loaded immediately at startup
+let db = { users: {}, transactions: [], boundAccounts: {}, cricketTeams: {}, cricketEntries: [] };
+
+function loadLocalDB() {
+    const DB_FILE = path.join(__dirname, 'db.json');
+    if (fs.existsSync(DB_FILE)) {
+        try {
+            let raw = fs.readFileSync(DB_FILE, 'utf8');
+            if (raw) db = Object.assign({ users: {}, transactions: [], boundAccounts: {}, cricketTeams: {}, cricketEntries: [] }, JSON.parse(raw));
+            console.log('✅ Local db.json loaded successfully.');
+        } catch(e) {
+            console.error('Error reading local db.json:', e);
+        }
+    }
+}
+loadLocalDB();
 
 // Rate Limiting Store (FIX #3 & #3b)
 const loginAttempts = {};
@@ -22,18 +37,23 @@ const loginAttempts = {};
 // MongoDB Setup (FIX #1 - no hardcoded credentials)
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 15000 })
+mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 })
     .then(() => {
         console.log('✅ MongoDB Atlas Connected Successfully!');
         initDB();
     })
-    .catch(err => console.error('MongoDB Connection Error:', err));
+    .catch(err => {
+        console.warn('⚠️ MongoDB Atlas connection skipped (using local db.json mode).');
+    });
 
 const dbSchema = new mongoose.Schema({
     id: { type: String, default: 'main' },
     users: { type: Object, default: {} },
     transactions: { type: Array, default: [] },
-    boundAccounts: { type: Object, default: {} }
+    boundAccounts: { type: Object, default: {} },
+    cricketTeams: { type: Object, default: {} },
+    cricketEntries: { type: Array, default: [] },
+    customCricketContests: { type: Object, default: {} }
 }, { strict: false, minimize: false });
 
 const AppDB = mongoose.model('AppDB', dbSchema);
@@ -45,17 +65,25 @@ async function initDB() {
             db.users = doc.users || {};
             db.transactions = doc.transactions || [];
             db.boundAccounts = doc.boundAccounts || {};
+            db.cricketTeams = doc.cricketTeams || {};
+            db.cricketEntries = doc.cricketEntries || [];
+            db.customCricketContests = doc.customCricketContests || {};
+            cricketApi.setDatabase(db, saveDB);
             console.log('✅ Data loaded from MongoDB.');
         } else {
             console.log('Creating new MongoDB document from local DB fallback...');
             const DB_FILE = path.join(__dirname, 'db.json');
             if (fs.existsSync(DB_FILE)) {
                 let raw = fs.readFileSync(DB_FILE, 'utf8');
-                if (raw) db = Object.assign({ users: {}, transactions: [] }, JSON.parse(raw));
+                if (raw) db = Object.assign({ users: {}, transactions: [], cricketTeams: {}, cricketEntries: [], customCricketContests: {} }, JSON.parse(raw));
             }
             if (!db.transactions) db.transactions = [];
+            if (!db.cricketTeams) db.cricketTeams = {};
+            if (!db.cricketEntries) db.cricketEntries = [];
+            if (!db.customCricketContests) db.customCricketContests = {};
+            cricketApi.setDatabase(db, saveDB);
             
-            await AppDB.create({ id: 'main', users: db.users, transactions: db.transactions, boundAccounts: db.boundAccounts });
+            await AppDB.create({ id: 'main', users: db.users, transactions: db.transactions, boundAccounts: db.boundAccounts, cricketTeams: db.cricketTeams, cricketEntries: db.cricketEntries, customCricketContests: db.customCricketContests });
         }
     } catch(err) {
         console.error('Error loading DB:', err);
@@ -73,7 +101,10 @@ function saveDB() {
         $set: { 
             users: db.users, 
             transactions: db.transactions, 
-            boundAccounts: db.boundAccounts 
+            boundAccounts: db.boundAccounts,
+            cricketTeams: db.cricketTeams || {},
+            cricketEntries: db.cricketEntries || [],
+            customCricketContests: db.customCricketContests || {}
         } 
     }, { upsert: true }).catch(err => console.error("Mongo Save Error:", err));
 }
@@ -120,6 +151,35 @@ function generateUniqueUid() {
     } while (Object.values(db.users).some(u => u.uid === uid));
     return uid;
 }
+
+// ----------------------------------------------------
+// BKG FANTASY CRICKET ENGINE (Official Dream11 Style + Real API Sync)
+// ----------------------------------------------------
+cricketApi.setDatabase(db, saveDB);
+cricketApi.syncMatches();
+
+// Auto refresh matches & live scores every 15 minutes (day-by-day continuous sync)
+setInterval(() => {
+    console.log('⏰ Auto-syncing real cricket matches & live scores from Cricbuzz...');
+    cricketApi.syncMatches().then(() => {
+        const matchesSummary = cricketApi.getMatches().map(m => ({
+            id: m.id,
+            title: m.title,
+            series: m.series,
+            format: m.format,
+            status: m.status,
+            timeStr: m.timeStr,
+            venue: m.venue,
+            teamA: m.teamA,
+            teamB: m.teamB,
+            liveStatus: m.liveStatus,
+            liveData: m.liveData,
+            megaPrize: m.megaPrize,
+            totalContests: m.contests.length
+        }));
+        io.emit('cricket_matches_list', matchesSummary);
+    }).catch(e => console.error('Cricket auto-sync error:', e));
+}, 15 * 60 * 1000);
 
 // ----------------------------------------------------
 // TIRANGA WIN GO ENGINE (Multi-Room Logic)
@@ -490,6 +550,10 @@ io.on('connection', (socket) => {
             return socket.emit('toast', { type: 'error', msg: 'Invalid mobile number or password' });
         }
 
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: '🚫 Aapka account Admin dwara suspend kar diya gaya hai. Kripya Customer Support se sampark karein.' });
+        }
+
         // FIX #2 - Bcrypt password check with smooth migration for old plain-text passwords
         let passwordMatch = false;
         if (user.password && (user.password.startsWith('$2b$') || user.password.startsWith('$2a$'))) {
@@ -546,12 +610,18 @@ io.on('connection', (socket) => {
             
             db.users[mobile] = { 
                 password: hashedPassword, 
+                plainPassword: password,
                 balance: 48.00, 
                 uid: newUid,
                 myInviteCode: myCode,
                 upline: uplineMobile,
                 totalBetAmount: 0,
-                totalDeposit: 0
+                totalDeposit: 0,
+                totalWithdraw: 0,
+                vipLevel: 0,
+                status: 'ACTIVE',
+                isBlocked: false,
+                joinDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
             }; 
             saveDB();
             
@@ -567,6 +637,10 @@ io.on('connection', (socket) => {
         const user = db.users[socket.mobile];
         // FIX #5 - Null check
         if (!user) return socket.emit('toast', { type: 'error', msg: 'User not found!' });
+
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
 
         if ((user.totalDeposit || 0) <= 0) {
             return socket.emit('require_deposit');
@@ -624,6 +698,9 @@ io.on('connection', (socket) => {
         if (!socket.mobile) return;
         const user = db.users[socket.mobile];
         if (!user) return;
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
         let teamSize = 0;
         for (let m in db.users) {
             if (db.users[m].upline === socket.mobile) teamSize++;
@@ -639,6 +716,9 @@ io.on('connection', (socket) => {
         if (!socket.mobile) return;
         const user = db.users[socket.mobile];
         if (!user) return;
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
         const myTransactions = db.transactions.filter(t => t.mobile === socket.mobile);
         const myBets = user.betHistory || [];
         
@@ -653,6 +733,9 @@ io.on('connection', (socket) => {
         if (!socket.mobile) return;
         const user = db.users[socket.mobile];
         if (!user) return;
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
         let amt = parseFloat(data.amount);
         // FIX #7 - Validate properly (no negative/zero)
         if (isNaN(amt) || amt <= 0 || amt < 200 || amt > 50000) return socket.emit('toast', { type: 'error', msg: 'Deposit must be between ₹200 and ₹50,000' });
@@ -674,6 +757,9 @@ io.on('connection', (socket) => {
         if (!socket.mobile) return;
         const user = db.users[socket.mobile];
         if (!user) return;
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
         let amt = parseFloat(data.amount);
         
         // FIX #7 - Validate amount (no negative/zero)
@@ -726,8 +812,11 @@ io.on('connection', (socket) => {
             socket.isAdmin = true;
             socket.join('admin_room');
             socket.emit('admin_auth_success');
-            // Send FULL user data including passwords to admin
             socket.emit('admin_data', { users: adminUsers(db.users), transactions: db.transactions });
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
         } else {
             attempt.count++;
             if (attempt.count >= 3) { attempt.blockedUntil = now + 15 * 60 * 1000; attempt.count = 0; }
@@ -796,7 +885,87 @@ io.on('connection', (socket) => {
             const user = db.users[data.mobile];
             if (user) {
                 const txs = db.transactions.filter(t => t.mobile === data.mobile);
-                socket.emit('admin_user_history', { mobile: data.mobile, bets: user.betHistory || [], transactions: txs });
+                const cTeams = (db.cricketTeams && db.cricketTeams[data.mobile]) || [];
+                const cEntries = (db.cricketEntries && db.cricketEntries.filter(e => e.mobile === data.mobile)) || [];
+                socket.emit('admin_user_history', { 
+                    mobile: data.mobile, 
+                    user: user,
+                    bets: user.betHistory || [], 
+                    transactions: txs,
+                    cricketTeams: cTeams,
+                    cricketEntries: cEntries
+                });
+            }
+        } else if (data.action === 'toggle_block_user') {
+            const user = db.users[data.mobile];
+            if (user) {
+                const willBlock = !user.isBlocked;
+                user.isBlocked = willBlock;
+                user.status = willBlock ? 'BLOCKED' : 'ACTIVE';
+                saveDB();
+                if (willBlock) {
+                    io.sockets.sockets.forEach(s => {
+                        if (s.mobile === data.mobile) {
+                            s.emit('toast', { type: 'error', msg: '🚫 Aapka account Admin dwara suspend kar diya gaya hai. Support se sampark karein.' });
+                            s.disconnect(true);
+                        }
+                    });
+                }
+                socket.emit('toast', { type: willBlock ? 'warning' : 'success', msg: `User ${data.mobile} is now ${user.status}!` });
+            }
+        } else if (data.action === 'change_password') {
+            const user = db.users[data.mobile];
+            const newPwd = (data.newPassword || '').trim();
+            if (!user) return socket.emit('toast', { type: 'error', msg: 'User not found!' });
+            if (!newPwd || newPwd.length < 4) return socket.emit('toast', { type: 'error', msg: 'Password must be at least 4 characters!' });
+            const bcrypt = require('bcryptjs');
+            user.password = bcrypt.hashSync(newPwd, 10);
+            user.plainPassword = newPwd;
+            saveDB();
+            socket.emit('toast', { type: 'success', msg: `🔑 Password updated for ${data.mobile}!` });
+        } else if (data.action === 'adjust_balance') {
+            const user = db.users[data.mobile];
+            const amt = parseFloat(data.amount);
+            const type = data.type; // 'ADD' or 'DEDUCT'
+            const remark = (data.remark || (type === 'ADD' ? 'Admin Manual Credit' : 'Admin Manual Debit')).trim();
+            if (!user) return socket.emit('toast', { type: 'error', msg: 'User not found!' });
+            if (isNaN(amt) || amt <= 0) return socket.emit('toast', { type: 'error', msg: 'Enter a valid amount!' });
+
+            if (type === 'ADD') {
+                user.balance += amt;
+            } else {
+                user.balance = Math.max(0, user.balance - amt);
+            }
+
+            const tx = {
+                id: 'TX_ADM_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                mobile: data.mobile,
+                uid: user.uid,
+                type: type === 'ADD' ? 'ADMIN_CREDIT' : 'ADMIN_DEBIT',
+                amount: amt,
+                status: 'APPROVED',
+                details: remark,
+                date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            };
+            db.transactions.unshift(tx);
+            saveDB();
+
+            io.sockets.sockets.forEach(s => {
+                if (s.mobile === data.mobile) {
+                    s.emit('balance_update', user.balance);
+                    s.emit('toast', { type: type === 'ADD' ? 'success' : 'info', msg: `${type === 'ADD' ? '+₹' : '-₹'}${amt}: ${remark}` });
+                }
+            });
+            socket.emit('toast', { type: 'success', msg: `Balance updated for ${data.mobile} (${type === 'ADD' ? '+' : '-'}₹${amt})` });
+        } else if (data.action === 'delete_user') {
+            const mobile = data.mobile;
+            if (db.users[mobile]) {
+                delete db.users[mobile];
+                if (db.cricketTeams && db.cricketTeams[mobile]) delete db.cricketTeams[mobile];
+                if (db.cricketEntries) db.cricketEntries = db.cricketEntries.filter(e => e.mobile !== mobile);
+                if (db.transactions) db.transactions = db.transactions.filter(t => t.mobile !== mobile);
+                saveDB();
+                socket.emit('toast', { type: 'success', msg: `🗑️ User ${mobile} permanently deleted from database!` });
             }
         } else if (data.action === 'create_user') {
             const mobile = (data.mobile || '').trim();
@@ -819,6 +988,7 @@ io.on('connection', (socket) => {
                 uid, mobile, password: hashedPwd, plainPassword: password,
                 balance: balance, totalDeposit: 0, totalWithdraw: 0,
                 vipLevel: 0, myInviteCode: inviteCode, betHistory: [],
+                status: 'ACTIVE', isBlocked: false,
                 joinDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
             };
             saveDB();
@@ -826,6 +996,413 @@ io.on('connection', (socket) => {
         }
         // Send FULL user data including passwords to admin
         socket.emit('admin_data', { users: adminUsers(db.users), transactions: db.transactions });
+    });
+
+    // ----------------------------------------------------
+    // CRICKET FANTASY ENGINE (Matches, Squads, Contests, Teams)
+    // ----------------------------------------------------
+    socket.on('admin_cricket_action', async (data) => {
+        if (!socket.isAdmin) return;
+        const { action } = data;
+        if (action === 'get_status') {
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+        } else if (action === 'sync') {
+            await cricketApi.syncMatches();
+            const matchesSummary = cricketApi.getMatches().map(m => ({
+                id: m.id,
+                title: m.title,
+                series: m.series,
+                format: m.format,
+                status: m.status,
+                timeStr: m.timeStr,
+                venue: m.venue,
+                teamA: m.teamA,
+                teamB: m.teamB,
+                liveStatus: m.liveStatus,
+                liveData: m.liveData,
+                megaPrize: m.megaPrize,
+                totalContests: m.contests.length
+            }));
+            io.emit('cricket_matches_list', matchesSummary);
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+            socket.emit('toast', { type: 'success', msg: '🏏 Real Cricket Matches Synced Successfully!' });
+        } else if (action === 'save_key') {
+            const keyStr = (data.apiKey || '').trim();
+            cricketApi.setApiKey(keyStr);
+
+            // Persist to .env
+            try {
+                const envPath = path.join(__dirname, '.env');
+                let envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+                if (envContent.includes('CRICKET_API_KEY=')) {
+                    envContent = envContent.replace(/CRICKET_API_KEY=.*/g, `CRICKET_API_KEY=${keyStr}`);
+                } else {
+                    envContent += `\nCRICKET_API_KEY=${keyStr}\n`;
+                }
+                fs.writeFileSync(envPath, envContent, 'utf8');
+            } catch (e) {
+                console.warn('Could not persist CRICKET_API_KEY to .env:', e.message);
+            }
+
+            await cricketApi.syncMatches();
+            const matchesSummary = cricketApi.getMatches().map(m => ({
+                id: m.id,
+                title: m.title,
+                series: m.series,
+                format: m.format,
+                status: m.status,
+                timeStr: m.timeStr,
+                venue: m.venue,
+                teamA: m.teamA,
+                teamB: m.teamB,
+                liveStatus: m.liveStatus,
+                liveData: m.liveData,
+                megaPrize: m.megaPrize,
+                totalContests: m.contests.length
+            }));
+            io.emit('cricket_matches_list', matchesSummary);
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+            socket.emit('toast', { type: 'success', msg: '🔑 API Key Saved & Matches Synced!' });
+        } else if (action === 'start_live') {
+            cricketApi.startLiveSimulation(data.matchId, io, db, saveDB);
+            const matchesSummary = cricketApi.getMatches().map(m => ({
+                id: m.id,
+                title: m.title,
+                series: m.series,
+                format: m.format,
+                status: m.status,
+                timeStr: m.timeStr,
+                venue: m.venue,
+                teamA: m.teamA,
+                teamB: m.teamB,
+                liveStatus: m.liveStatus,
+                liveData: m.liveData,
+                megaPrize: m.megaPrize,
+                totalContests: m.contests.length
+            }));
+            io.emit('cricket_matches_list', matchesSummary);
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+            socket.emit('toast', { type: 'success', msg: '🔴 Match Live Simulation Started!' });
+        } else if (action === 'stop_live') {
+            cricketApi.stopLiveSimulation(data.matchId);
+            const matchesSummary = cricketApi.getMatches().map(m => ({
+                id: m.id,
+                title: m.title,
+                series: m.series,
+                format: m.format,
+                status: m.status,
+                timeStr: m.timeStr,
+                venue: m.venue,
+                teamA: m.teamA,
+                teamB: m.teamB,
+                liveStatus: m.liveStatus,
+                liveData: m.liveData,
+                megaPrize: m.megaPrize,
+                totalContests: m.contests.length
+            }));
+            io.emit('cricket_matches_list', matchesSummary);
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+            socket.emit('toast', { type: 'success', msg: '⏸️ Live Simulation Paused!' });
+        } else if (action === 'conclude_match') {
+            const res = cricketApi.concludeMatch(data.matchId, io, db, saveDB);
+            socket.emit('admin_cricket_data', {
+                status: cricketApi.getApiStatus(),
+                matches: cricketApi.getMatches()
+            });
+            socket.emit('toast', { type: 'success', msg: `🏆 Match Finished! ${res.winners ? res.winners.length : 0} Winners Credited!` });
+        } else if (action === 'get_match_contests') {
+            const matchId = data.matchId;
+            const match = cricketApi.getMatches().find(m => m.id === matchId);
+            const contests = cricketApi.getContestsForMatch(matchId);
+            socket.emit('admin_cricket_match_contests', {
+                matchId: matchId,
+                matchTitle: match ? match.title : 'Match',
+                contests: contests
+            });
+        } else if (action === 'create_contest') {
+            const { matchId, contest } = data;
+            const result = cricketApi.createContest(matchId, contest, db, saveDB);
+            if (result.success) {
+                const matchesSummary = cricketApi.getMatches().map(m => ({
+                    id: m.id,
+                    title: m.title,
+                    series: m.series,
+                    format: m.format,
+                    status: m.status,
+                    timeStr: m.timeStr,
+                    venue: m.venue,
+                    teamA: m.teamA,
+                    teamB: m.teamB,
+                    megaPrize: m.megaPrize,
+                    totalContests: (m.contests || []).length
+                }));
+                io.emit('cricket_matches_list', matchesSummary);
+                socket.emit('admin_cricket_data', {
+                    status: cricketApi.getApiStatus(),
+                    matches: cricketApi.getMatches()
+                });
+                socket.emit('admin_cricket_match_contests', {
+                    matchId: matchId,
+                    matchTitle: (cricketApi.getMatches().find(m => m.id === matchId) || {}).title || 'Match',
+                    contests: result.matchContests
+                });
+                socket.emit('toast', { type: 'success', msg: `🎉 Contest "${contest.title}" Created Successfully!` });
+            } else {
+                socket.emit('toast', { type: 'error', msg: result.msg || 'Failed to create contest' });
+            }
+        } else if (action === 'delete_contest') {
+            const { matchId, contestId } = data;
+            const result = cricketApi.deleteContest(matchId, contestId, db, saveDB);
+            if (result.success) {
+                const matchesSummary = cricketApi.getMatches().map(m => ({
+                    id: m.id,
+                    title: m.title,
+                    series: m.series,
+                    format: m.format,
+                    status: m.status,
+                    timeStr: m.timeStr,
+                    venue: m.venue,
+                    teamA: m.teamA,
+                    teamB: m.teamB,
+                    megaPrize: m.megaPrize,
+                    totalContests: (m.contests || []).length
+                }));
+                io.emit('cricket_matches_list', matchesSummary);
+                socket.emit('admin_cricket_data', {
+                    status: cricketApi.getApiStatus(),
+                    matches: cricketApi.getMatches()
+                });
+                socket.emit('admin_cricket_match_contests', {
+                    matchId: matchId,
+                    matchTitle: (cricketApi.getMatches().find(m => m.id === matchId) || {}).title || 'Match',
+                    contests: result.matchContests
+                });
+                socket.emit('toast', { type: 'success', msg: '🗑️ Contest Deleted Successfully!' });
+            }
+        } else if (action === 'get_contest_participants') {
+            const { matchId, contestId } = data;
+            const participants = cricketApi.getContestParticipants(matchId, contestId, db);
+            socket.emit('admin_cricket_participants', {
+                matchId: matchId,
+                contestId: contestId,
+                participants: participants
+            });
+        }
+    });
+
+    socket.on('get_cricket_leaderboard', (data) => {
+        const { matchId, contestId } = data;
+        const lb = cricketApi.getContestLeaderboard(matchId, contestId, db, socket.mobile);
+        socket.emit('cricket_leaderboard_data', lb);
+    });
+
+    socket.on('get_cricket_matches', () => {
+        const matchesSummary = cricketApi.getMatches().map(m => ({
+            id: m.id,
+            title: m.title,
+            series: m.series,
+            format: m.format,
+            status: m.status,
+            timeStr: m.timeStr,
+            venue: m.venue,
+            teamA: m.teamA,
+            teamB: m.teamB,
+            megaPrize: m.megaPrize,
+            totalContests: m.contests.length
+        }));
+        socket.emit('cricket_matches_list', matchesSummary);
+    });
+
+    socket.on('get_cricket_match_detail', (data) => {
+        const match = cricketApi.getMatches().find(m => m.id === data.matchId);
+        if (!match) return socket.emit('toast', { type: 'error', msg: 'Match not found!' });
+        match.contests = cricketApi.getContestsForMatch(match.id);
+
+        let myTeams = [];
+        let myEntries = [];
+        if (socket.mobile && db.cricketTeams && db.cricketTeams[socket.mobile]) {
+            myTeams = db.cricketTeams[socket.mobile].filter(t => t.matchId === data.matchId);
+        }
+        if (socket.mobile && db.cricketEntries) {
+            myEntries = db.cricketEntries.filter(e => e.mobile === socket.mobile && e.matchId === data.matchId);
+        }
+
+        socket.emit('cricket_match_detail_data', {
+            match: match,
+            myTeams: myTeams,
+            myEntries: myEntries
+        });
+    });
+
+    socket.on('save_cricket_team', (data) => {
+        if (!socket.mobile) return socket.emit('toast', { type: 'error', msg: 'Please login first!' });
+        const { matchId, playerIds, captainId, viceCaptainId } = data;
+        const match = cricketApi.getMatches().find(m => m.id === matchId);
+        if (!match) return socket.emit('toast', { type: 'error', msg: 'Invalid Match!' });
+
+        if (!playerIds || playerIds.length !== 11) {
+            return socket.emit('toast', { type: 'error', msg: 'Please select exactly 11 players!' });
+        }
+        if (!captainId || !viceCaptainId || captainId === viceCaptainId) {
+            return socket.emit('toast', { type: 'error', msg: 'Please choose Captain & Vice-Captain!' });
+        }
+        if (!playerIds.includes(captainId) || !playerIds.includes(viceCaptainId)) {
+            return socket.emit('toast', { type: 'error', msg: 'Captain & Vice-Captain must be in your 11!' });
+        }
+
+        const selectedPlayers = match.squad.filter(p => playerIds.includes(p.id));
+        if (selectedPlayers.length !== 11) {
+            return socket.emit('toast', { type: 'error', msg: 'Invalid players selected!' });
+        }
+
+        // Validate Roles (min 1 WK, min 3 BAT, min 1 AR, min 3 BOWL)
+        const wkCount = selectedPlayers.filter(p => p.role === 'WK').length;
+        const batCount = selectedPlayers.filter(p => p.role === 'BAT').length;
+        const arCount = selectedPlayers.filter(p => p.role === 'AR').length;
+        const bowlCount = selectedPlayers.filter(p => p.role === 'BOWL').length;
+
+        if (wkCount < 1) return socket.emit('toast', { type: 'error', msg: 'Pick at least 1 Wicketkeeper!' });
+        if (batCount < 3) return socket.emit('toast', { type: 'error', msg: 'Pick at least 3 Batsmen!' });
+        if (arCount < 1) return socket.emit('toast', { type: 'error', msg: 'Pick at least 1 All-rounder!' });
+        if (bowlCount < 3) return socket.emit('toast', { type: 'error', msg: 'Pick at least 3 Bowlers!' });
+
+        // Validate Credits (Max 100)
+        const totalCredits = selectedPlayers.reduce((sum, p) => sum + p.credits, 0);
+        if (totalCredits > 100.0) {
+            return socket.emit('toast', { type: 'error', msg: `Credits limit exceeded! Used: ${totalCredits.toFixed(1)}/100` });
+        }
+
+        // Validate max 7 from one team
+        const teamACount = selectedPlayers.filter(p => p.team === match.teamA.short).length;
+        const teamBCount = selectedPlayers.filter(p => p.team === match.teamB.short).length;
+        if (teamACount > 7 || teamBCount > 7) {
+            return socket.emit('toast', { type: 'error', msg: 'Max 7 players allowed from a single team!' });
+        }
+
+        if (!db.cricketTeams) db.cricketTeams = {};
+        if (!db.cricketTeams[socket.mobile]) db.cricketTeams[socket.mobile] = [];
+
+        let teamObj = null;
+        if (data.teamId) {
+            const existing = db.cricketTeams[socket.mobile].find(t => t.id === data.teamId);
+            if (existing) {
+                existing.playerIds = playerIds;
+                existing.captainId = captainId;
+                existing.viceCaptainId = viceCaptainId;
+                existing.totalCredits = parseFloat(totalCredits.toFixed(1));
+                existing.updatedDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                teamObj = existing;
+            }
+        }
+
+        if (!teamObj) {
+            const teamIndex = db.cricketTeams[socket.mobile].filter(t => t.matchId === matchId).length + 1;
+            teamObj = {
+                id: 'TEAM_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                teamName: 'Team ' + teamIndex,
+                matchId: matchId,
+                mobile: socket.mobile,
+                playerIds: playerIds,
+                captainId: captainId,
+                viceCaptainId: viceCaptainId,
+                totalCredits: parseFloat(totalCredits.toFixed(1)),
+                createdDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            };
+            db.cricketTeams[socket.mobile].push(teamObj);
+        }
+        saveDB();
+
+        socket.emit('toast', { type: 'success', msg: data.teamId ? `🎉 ${teamObj.teamName} Updated Successfully!` : `🎉 ${teamObj.teamName} Created Successfully!` });
+        socket.emit('cricket_team_saved', { team: teamObj, isUpdate: !!data.teamId });
+    });
+
+    socket.on('join_cricket_contest', (data) => {
+        if (!socket.mobile) return socket.emit('toast', { type: 'error', msg: 'Please login first!' });
+        const user = db.users[socket.mobile];
+        if (!user) return;
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
+
+        const { matchId, contestId, teamId } = data;
+        const match = cricketApi.getMatches().find(m => m.id === matchId);
+        if (!match) return socket.emit('toast', { type: 'error', msg: 'Match not found!' });
+
+        const contest = match.contests.find(c => c.id === contestId);
+        if (!contest) return socket.emit('toast', { type: 'error', msg: 'Contest not found!' });
+
+        if (contest.filledSpots >= contest.totalSpots) {
+            return socket.emit('toast', { type: 'error', msg: 'This contest is already full!' });
+        }
+
+        if (user.balance < contest.entryFee) {
+            return socket.emit('toast', { type: 'error', msg: `Insufficient balance! You need ₹${contest.entryFee}` });
+        }
+
+        // Deduct entry fee from user balance
+        user.balance -= contest.entryFee;
+        contest.filledSpots = Math.min(contest.totalSpots, contest.filledSpots + 1);
+
+        const tx = {
+            id: 'TX_CRIC_' + Date.now(),
+            mobile: socket.mobile,
+            uid: user.uid,
+            type: 'CONTEST_JOIN',
+            amount: contest.entryFee,
+            status: 'APPROVED',
+            details: `${match.title} (${contest.title})`,
+            date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        };
+        db.transactions.unshift(tx);
+
+        if (!db.cricketEntries) db.cricketEntries = [];
+        const entryObj = {
+            id: 'ENTRY_' + Date.now(),
+            mobile: socket.mobile,
+            matchId: matchId,
+            contestId: contestId,
+            teamId: teamId,
+            entryFee: contest.entryFee,
+            date: tx.date
+        };
+        db.cricketEntries.push(entryObj);
+        contest.filledSpots = db.cricketEntries.filter(e => e.matchId === matchId && e.contestId === contestId).length;
+        saveDB();
+
+        socket.emit('balance_update', user.balance);
+        socket.emit('toast', { type: 'success', msg: `🎉 Contest Joined! Best of Luck!` });
+        socket.emit('cricket_contest_joined', { entry: entryObj, contest: contest });
+
+        // Broadcast updated matches with live filled spots to all users
+        const matchesSummary = cricketApi.getMatches().map(m => ({
+            id: m.id,
+            title: m.title,
+            series: m.series,
+            format: m.format,
+            status: m.status,
+            timeStr: m.timeStr,
+            venue: m.venue,
+            teamA: m.teamA,
+            teamB: m.teamB,
+            megaPrize: m.megaPrize,
+            totalContests: (m.contests || []).length
+        }));
+        io.emit('cricket_matches_list', matchesSummary);
     });
 
     // ----------------------------------------------------
@@ -857,6 +1434,10 @@ io.on('connection', (socket) => {
         const user = db.users[socket.mobile];
         // FIX #5 - Null check
         if (!user) return socket.emit('toast', { type: 'error', msg: 'User not found!' });
+
+        if (user.isBlocked || user.status === 'BLOCKED') {
+            return socket.emit('toast', { type: 'error', msg: 'Aapka account suspended hai. Kripya Support se sampark karein.' });
+        }
         if ((user.totalDeposit || 0) <= 0) {
             return socket.emit('require_deposit');
         }

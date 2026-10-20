@@ -198,21 +198,21 @@
                 <!-- Slides wrapper (3 slides, 300% width) -->
                 <div id="bannerTrack" class="flex h-full" style="width:300%;transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)">
 
-                    <!-- SLIDE 1: RUMMY/CARD GAMES (Deep Red Gold) -->
-                    <div class="flex-shrink-0 relative h-full" style="width:33.333%;background:linear-gradient(135deg,#1a0000 0%,#5a0000 50%,#8b1a00 100%);">
-                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(255,255,255,0.15) 1px,transparent 1px);background-size:18px 18px;"></div>
-                        <div class="absolute right-0 top-0 w-44 h-44 rounded-full -mr-12 -mt-12" style="background:radial-gradient(circle,rgba(255,200,0,0.25),transparent 70%)"></div>
-                        <!-- Floating playing cards -->
-                        <div class="absolute right-3 top-2 w-12 h-16 rounded-lg bg-white shadow-2xl flex items-center justify-center text-3xl" style="transform:rotate(12deg);box-shadow:0 4px 15px rgba(0,0,0,0.6)">♠</div>
-                        <div class="absolute right-9 top-6 w-12 h-16 rounded-lg bg-white shadow-2xl flex items-center justify-center text-3xl text-red-600" style="transform:rotate(-6deg);box-shadow:0 4px 15px rgba(0,0,0,0.6)">♥</div>
-                        <div class="absolute right-1 bottom-4 w-10 h-14 rounded-lg flex items-center justify-center text-2xl" style="background:linear-gradient(135deg,#b8860b,#ffd700);transform:rotate(5deg);box-shadow:0 4px 10px rgba(0,0,0,0.5)">🃏</div>
-                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-center pl-4 z-10" style="max-width:58%">
-                            <div class="inline-flex items-center gap-1 bg-yellow-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full mb-2 w-fit">
-                                <i class="fa-solid fa-star text-[8px]"></i> RUMMY SPECIAL
+                    <!-- SLIDE 1: CRICKET FANTASY (Obsidian & Radiant Gold) -->
+                    <div class="flex-shrink-0 relative h-full" style="width:33.333%;background:linear-gradient(135deg,#120f04 0%,#261c05 50%,#0d0b04 100%);">
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(251,191,36,0.3) 1px,transparent 1px);background-size:18px 18px;"></div>
+                        <div class="absolute right-0 top-0 w-44 h-44 rounded-full -mr-12 -mt-12" style="background:radial-gradient(circle,rgba(245,158,11,0.35),transparent 70%)"></div>
+                        <!-- Floating cricket elements -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-5xl" style="filter:drop-shadow(0 0 15px rgba(245,158,11,0.9))">🏏</div>
+                        <div class="absolute right-14 top-4 text-2xl" style="filter:drop-shadow(0 0 8px rgba(239,68,68,0.9))">🔴</div>
+                        <div class="absolute right-10 bottom-3 bg-gradient-to-r from-red-600 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg">₹25,000 MEGA</div>
+                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-center pl-4 z-10" style="max-width:62%">
+                            <div class="inline-flex items-center gap-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full mb-2 w-fit">
+                                <i class="fa-solid fa-trophy text-[8px]"></i> CRICKET FANTASY
                             </div>
-                            <div class="text-white font-black leading-tight mb-1" style="font-size:22px">Win Big <span style="color:#ffd700">Every Day!</span></div>
-                            <div class="text-gray-200 text-[11px] font-semibold mb-3">₹500 Bonus on First Deposit</div>
-                            <button onclick="openDepositModal()" class="text-black text-xs font-black px-4 py-1.5 rounded-full w-fit active:scale-95 shadow-lg" style="background:linear-gradient(135deg,#ffd700,#ffb300)">CLAIM NOW →</button>
+                            <div class="text-white font-black leading-tight mb-1" style="font-size:21px">Build Dream 11,<br><span style="color:#fbbf24">Win Real Cash!</span></div>
+                            <div class="text-gray-200 text-[11px] font-semibold mb-3">Captain (2x) · Live In-Play Match Simulation</div>
+                            <button onclick="switchView('cricket')" class="text-black text-xs font-black px-4 py-1.5 rounded-full w-fit active:scale-95 shadow-lg" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">PLAY NOW →</button>
                         </div>
                     </div>
 
@@ -277,7 +277,7 @@
                 <div class="inline-flex gap-2 pb-1">
                     <button class="bg-theme-gold text-black px-4 py-1.5 rounded-full font-black text-xs shadow-md flex items-center gap-1.5"><i class="fa-solid fa-gem text-[10px]"></i>Lottery</button>
                     <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-dice text-[10px]"></i>Slots</button>
-                    <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-futbol text-[10px]"></i>Sports</button>
+                    <button onclick="switchView('cricket')" class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50 cursor-pointer"><i class="fa-solid fa-baseball-bat-ball text-yellow-400 text-[10px]"></i>Cricket</button>
                     <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-cards text-[10px]"></i>Rummy</button>
                     <button class="bg-[#242424] text-gray-300 px-4 py-1.5 rounded-full font-bold text-xs border border-[#333] flex items-center gap-1.5 hover:border-theme-gold/50"><i class="fa-solid fa-gamepad text-[10px]"></i>Casino</button>
                 </div>
@@ -365,23 +365,25 @@
                     </div>
                 </div>
 
-                <!-- K3 Lottery Card -->
-                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-lg border border-[#1a1a2a] active:scale-95 transition-transform" onclick="showToast('K3 Lottery coming soon!','success')" style="background:linear-gradient(135deg,#080b1a,#0d1229)">
+                <!-- Cricket Fantasy Card (Luxury Obsidian & Gold Edition) -->
+                <div class="rounded-2xl overflow-hidden cursor-pointer relative shadow-xl border border-yellow-500/40 active:scale-95 transition-transform" onclick="switchView('cricket')" style="background:linear-gradient(135deg,#120f04,#1e1807,#0d0b05)">
                     <div class="h-[90px] relative overflow-hidden">
-                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#0f0c33,#1a1655,#120e3a)"></div>
-                        <div class="absolute inset-0 opacity-15" style="background-image:radial-gradient(circle,rgba(255,255,255,0.2) 1px,transparent 1px);background-size:14px 14px;"></div>
-                        <!-- Dice icons -->
-                        <div class="absolute inset-0 flex items-center justify-center gap-2">
-                            <div class="w-10 h-10 rounded-xl bg-white shadow-xl flex items-center justify-center text-2xl font-black text-indigo-600" style="transform:rotate(-10deg)">⚀</div>
-                            <div class="w-12 h-12 rounded-xl bg-white shadow-xl flex items-center justify-center text-3xl font-black text-indigo-600 z-10">⚄</div>
-                            <div class="w-10 h-10 rounded-xl bg-white shadow-xl flex items-center justify-center text-2xl font-black text-indigo-600" style="transform:rotate(10deg)">⚂</div>
+                        <div class="absolute inset-0" style="background:linear-gradient(135deg,#2b1d03,#3f2b05,#1e1402)"></div>
+                        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle,rgba(251,191,36,0.3) 1px,transparent 1px);background-size:12px 12px;"></div>
+                        <!-- Radiant Gold Glow -->
+                        <div class="absolute right-0 bottom-0 w-28 h-28 rounded-full" style="background:radial-gradient(circle,rgba(245,158,11,0.45),transparent 70%)"></div>
+                        <!-- Cricket Icon & Ball -->
+                        <div class="absolute inset-0 flex items-center justify-center text-4xl gap-1">
+                            <span style="filter:drop-shadow(0 0 12px rgba(245,158,11,0.9));transform:rotate(-15deg)">🏏</span>
+                            <span class="text-2xl" style="filter:drop-shadow(0 0 10px rgba(239,68,68,0.9));transform:translateY(-8px)">🔴</span>
                         </div>
-                        <div class="absolute top-1.5 right-1.5 bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">SOON</div>
+                        <div class="absolute top-1.5 left-1.5 bg-gradient-to-r from-red-600 to-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow">IPL &amp; T20</div>
+                        <div class="absolute top-1.5 right-1.5 bg-gradient-to-r from-yellow-400 to-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">⚡ LIVE</div>
                     </div>
                     <div class="p-2.5">
-                        <h3 class="font-black text-white text-sm mb-0.5">K3 Lottery</h3>
-                        <p class="text-[10px] text-indigo-400 font-bold mb-2">Guess the dice numbers</p>
-                        <button class="w-full py-1.5 rounded-xl font-black text-white text-xs active:scale-95 shadow-md" style="background:linear-gradient(135deg,#4f46e5,#3730a3)">SOON →</button>
+                        <h3 class="font-black text-white text-sm mb-0.5 flex items-center gap-1">Cricket Fantasy</h3>
+                        <p class="text-[10px] text-yellow-300/90 font-bold mb-2">Create Dream 11 &amp; Win!</p>
+                        <button type="button" onclick="event.stopPropagation(); switchView('cricket');" class="w-full py-1.5 rounded-xl font-black text-black text-xs active:scale-95 shadow-lg cursor-pointer" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">PLAY NOW →</button>
                     </div>
                 </div>
 
@@ -586,52 +588,301 @@
             </div>
         </div>
 
-        <!-- ================= MINE TAB (ACCOUNT) ================= -->
-        <div id="view-mine" class="view-section">
-            <div class="bg-theme-gold p-6 pt-10 pb-16 relative text-black rounded-b-[40px] shadow-md border-b-4 border-[#8A6A27]">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-[#121212] border-2 border-black flex items-center justify-center text-3xl shadow-lg relative">
-                        <i class="fa-solid fa-user-tie text-theme-gold"></i>
-                        <div class="absolute -bottom-2 bg-black text-theme-gold text-[10px] font-black px-2 rounded-full border border-theme-gold shadow-md" id="vipBadge">VIP 0</div>
+        <!-- ================= MINE TAB (ACCOUNT / PROFILE - TIRANGA & BDG STYLE) ================= -->
+        <div id="view-mine" class="view-section pb-24">
+            <!-- VIP Royal Header Banner -->
+            <div class="relative overflow-hidden pt-8 pb-14 px-5 text-white rounded-b-[36px] border-b border-[#D4AF37]/30 shadow-2xl" 
+                 style="background: linear-gradient(145deg, #1f1a0d 0%, #121008 50%, #0a0905 100%);">
+                
+                <!-- Subtle Background Glows -->
+                <div class="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 bottom-0 w-36 h-36 rounded-full bg-yellow-600/10 blur-2xl pointer-events-none"></div>
+
+                <!-- Top Status Bar: App Name & Notifications/Support -->
+                <div class="flex items-center justify-between mb-4 relative z-10">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-crown text-theme-gold text-base drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]"></i>
+                        <span class="text-xs font-black text-theme-gold tracking-widest uppercase">MEMBER CENTER</span>
                     </div>
-                    <div>
-                        <h2 class="text-xl font-black flex items-center gap-2 display-username">Loading...</h2>
-                        <span class="bg-black text-theme-gold px-3 py-1 rounded-full text-xs font-bold display-uid border border-[#333]">UID: ---</span>
+                    <div class="flex items-center gap-2.5">
+                        <button onclick="alert('Notification Center: You have no unread system announcements.')" class="w-8 h-8 rounded-full bg-[#1e1a12] border border-[#3d321d] text-gray-300 hover:text-theme-gold flex items-center justify-center text-xs active:scale-95 transition-all shadow">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+                        <button onclick="alert('24/7 VIP Customer Support:\n\nContact us on Telegram: @BKG_Support\nResponse Time: Under 2 minutes!')" class="w-8 h-8 rounded-full bg-[#1e1a12] border border-[#3d321d] text-gray-300 hover:text-theme-gold flex items-center justify-center text-xs active:scale-95 transition-all shadow">
+                            <i class="fa-solid fa-headset text-theme-gold"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Identity Row -->
+                <div class="flex items-center gap-4 relative z-10">
+                    <!-- 3D Luxury Avatar with VIP Badge -->
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 rounded-full p-0.5 shadow-[0_0_20px_rgba(212,175,55,0.4)]" 
+                             style="background: linear-gradient(135deg, #f59e0b, #fbbf24, #d97706, #78350f);">
+                            <div class="w-full h-full rounded-full bg-[#14120c] flex items-center justify-center border-2 border-[#121008] overflow-hidden">
+                                <i class="fa-solid fa-user-astronaut text-3xl text-theme-gold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.8)] border border-yellow-200/50 flex items-center gap-1 whitespace-nowrap" id="vipBadge">
+                            <i class="fa-solid fa-gem text-[8px]"></i> VIP 0
+                        </div>
+                    </div>
+
+                    <!-- User Credentials & Copy Buttons -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h2 class="text-lg font-black text-white font-mono tracking-wide truncate display-username">Loading...</h2>
+                            <span class="bg-emerald-950/80 text-emerald-400 text-[9px] font-black px-2 py-0.5 rounded-full border border-emerald-500/40 shrink-0 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-[8px]"></i> Verified
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <!-- UID Tag with Click to Copy -->
+                            <button onclick="copyAccountUID()" class="bg-[#1a1710] hover:bg-[#252014] text-gray-300 hover:text-theme-gold border border-[#3d321d] px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold flex items-center gap-1.5 active:scale-95 transition-all shadow-sm">
+                                <span class="display-uid text-theme-gold">UID: ---</span>
+                                <i class="fa-regular fa-copy text-[10px] text-gray-400"></i>
+                            </button>
+
+                            <!-- Invite Code Quick Copy -->
+                            <button onclick="copyInvite()" class="bg-[#1a1710] hover:bg-[#252014] text-gray-300 hover:text-theme-gold border border-[#3d321d] px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 active:scale-95 transition-all shadow-sm">
+                                <i class="fa-solid fa-share-nodes text-yellow-400 text-[9px]"></i>
+                                <span>Invite</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="px-4 -mt-10 relative z-10">
-                <div class="bg-[#1c1c1c] rounded-2xl shadow-xl p-5 mb-5 border border-[#333]">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <p class="text-sm text-theme-gold font-bold mb-1">Total Balance</p>
-                            <p class="text-xl font-black text-white user-balance-display">₹0.00</p>
+
+            <!-- Main Content Container Overlapping Header -->
+            <div class="px-4 -mt-8 relative z-20 space-y-4">
+
+                <!-- 1. TOTAL ASSETS / WALLET CARD (Tiranga/BDG Iconic Look) -->
+                <div class="bg-gradient-to-b from-[#1c1a14] via-[#151410] to-[#100f0c] rounded-2xl p-4 border border-[#D4AF37]/40 shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative overflow-hidden">
+                    <!-- Shimmer Accent Top Border -->
+                    <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-theme-gold/15 border border-theme-gold/30 flex items-center justify-center text-theme-gold text-sm shadow-inner">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Total Assets</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl font-black text-white font-mono tracking-tight user-balance-display">₹0.00</span>
+                                    <button onclick="refreshUserBalance(this)" title="Refresh Balance" class="text-gray-400 hover:text-theme-gold active:rotate-180 transition-transform">
+                                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <button class="bg-[#222] border border-[#444] text-gray-300 px-4 py-1 rounded-full text-xs font-bold active:scale-95" onclick="switchView('wallet')">Wallet <i class="fa-solid fa-angle-right ml-1"></i></button>
+
+                        <button onclick="switchView('wallet')" class="bg-[#242018] hover:bg-[#2e291f] text-theme-gold font-bold text-xs px-3.5 py-1.5 rounded-xl border border-[#4a3f24] shadow-sm flex items-center gap-1 active:scale-95 transition-all">
+                            <span>Wallet</span>
+                            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                        </button>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button class="bg-theme-gold text-black py-3 rounded-lg font-black shadow-md active:scale-95" onclick="openDepositModal()"><i class="fa-solid fa-wallet mr-2"></i>Deposit</button>
-                        <button class="bg-transparent border-2 border-theme-gold text-theme-gold py-3 rounded-lg font-black shadow-md active:scale-95" onclick="openWithdrawModal()"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Withdraw</button>
+
+                    <!-- Big 2 Action Buttons: Deposit & Withdraw -->
+                    <div class="grid grid-cols-2 gap-3 pt-2.5 border-t border-[#262218]">
+                        <!-- Deposit Button (Emerald Gradient) -->
+                        <button onclick="openDepositModal()" class="relative overflow-hidden py-3 px-4 rounded-xl font-black text-sm text-black flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(16,185,129,0.3)] active:scale-95 transition-all"
+                                style="background: linear-gradient(135deg, #34d399, #10b981, #059669);">
+                            <i class="fa-solid fa-circle-down text-base drop-shadow"></i>
+                            <span>DEPOSIT</span>
+                        </button>
+
+                        <!-- Withdraw Button (Coral Red Gradient) -->
+                        <button onclick="openWithdrawModal()" class="relative overflow-hidden py-3 px-4 rounded-xl font-black text-sm text-white flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(239,68,68,0.3)] active:scale-95 transition-all"
+                                style="background: linear-gradient(135deg, #f87171, #ef4444, #dc2626);">
+                            <i class="fa-solid fa-circle-up text-base drop-shadow"></i>
+                            <span>WITHDRAW</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="bg-[#1c1c1c] rounded-xl shadow-sm border border-[#333] overflow-hidden mb-5">
-                    <div class="flex items-center gap-3 p-4 border-b border-[#2a2a2a] cursor-pointer hover:bg-[#222]" onclick="openHistoryModal('bet')">
-                        <i class="fa-solid fa-list-ul text-theme-gold text-xl w-6 text-center"></i><span class="font-bold text-sm text-gray-200 flex-1">Bet History</span><i class="fa-solid fa-angle-right text-gray-500"></i>
+                <!-- 2. QUICK FINANCIAL RECORD GRID (4 Items) -->
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <!-- Bet History -->
+                    <div onclick="openHistoryModal('bet')" class="bg-[#14151c] hover:bg-[#1a1c26] border border-[#232636] rounded-2xl p-3 cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 text-base mb-1.5 shadow">
+                            <i class="fa-solid fa-dice"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-gray-200">Game Bets</span>
+                        <span class="text-[9px] text-gray-500 mt-0.5">Records</span>
                     </div>
-                    <div class="flex items-center gap-3 p-4 border-b border-[#2a2a2a] cursor-pointer hover:bg-[#222]" onclick="openHistoryModal('transaction')">
-                        <i class="fa-solid fa-file-invoice-dollar text-theme-gold text-xl w-6 text-center"></i><span class="font-bold text-sm text-gray-200 flex-1">Transaction History</span><i class="fa-solid fa-angle-right text-gray-500"></i>
+
+                    <!-- Deposit History -->
+                    <div onclick="openHistoryModal('deposit')" class="bg-[#14151c] hover:bg-[#1a1c26] border border-[#232636] rounded-2xl p-3 cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-base mb-1.5 shadow">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-gray-200">Deposit</span>
+                        <span class="text-[9px] text-gray-500 mt-0.5">History</span>
                     </div>
-                    <div class="flex items-center gap-3 p-4 border-b border-[#2a2a2a] cursor-pointer hover:bg-[#222]" onclick="openLanguageSheet()">
-                        <i class="fa-solid fa-language text-theme-gold text-xl w-6 text-center"></i><span class="font-bold text-sm text-gray-200 flex-1">Language</span><span class="text-xs font-bold text-gray-400" id="currentLang">English</span><i class="fa-solid fa-angle-right text-gray-500"></i>
+
+                    <!-- Withdraw History -->
+                    <div onclick="openHistoryModal('withdraw')" class="bg-[#14151c] hover:bg-[#1a1c26] border border-[#232636] rounded-2xl p-3 cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-xl bg-rose-950/60 border border-rose-500/30 flex items-center justify-center text-rose-400 text-base mb-1.5 shadow">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-gray-200">Withdraw</span>
+                        <span class="text-[9px] text-gray-500 mt-0.5">History</span>
                     </div>
-                    <div class="flex items-center gap-3 p-4 cursor-pointer hover:bg-[#222]" onclick="alert('Customer Service Live Chat coming soon!')">
-                        <i class="fa-solid fa-headset text-theme-gold text-xl w-6 text-center"></i><span class="font-bold text-sm text-gray-200 flex-1">Customer Service</span><i class="fa-solid fa-angle-right text-gray-500"></i>
+
+                    <!-- Transaction Ledger -->
+                    <div onclick="openHistoryModal('transaction')" class="bg-[#14151c] hover:bg-[#1a1c26] border border-[#232636] rounded-2xl p-3 cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center">
+                        <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400 text-base mb-1.5 shadow">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-gray-200">Statement</span>
+                        <span class="text-[9px] text-gray-500 mt-0.5">All Ledger</span>
                     </div>
                 </div>
 
-                <button onclick="logoutUser()" class="w-full bg-transparent border-2 border-[#555] text-gray-400 font-bold py-4 rounded-xl shadow-sm mb-6 hover:border-theme-gold hover:text-theme-gold active:scale-95 transition-all text-lg">Log out</button>
+                <!-- 3. VIP PRIVILEGE BANNER (Tiranga Style Progression) -->
+                <div onclick="alert('VIP Club Rewards:\nLevel Up to unlock Daily Salary, Weekly Bonus, Exclusive Luxury Cashback & Priority Withdrawals!')" 
+                     class="bg-gradient-to-r from-[#211a0c] via-[#2d2410] to-[#1a150a] rounded-2xl p-4 border border-[#D4AF37]/40 shadow-xl cursor-pointer active:scale-[0.99] transition-all relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 text-black flex items-center justify-center font-black text-sm shadow">
+                                <i class="fa-solid fa-gem text-xs"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-white flex items-center gap-1.5">
+                                    <span>VIP PRIVILEGE CLUB</span>
+                                    <span class="bg-amber-400/20 text-yellow-300 text-[9px] font-black px-1.5 py-0.2 rounded border border-yellow-400/30">EXCLUSIVE</span>
+                                </div>
+                                <div class="text-[10px] text-amber-200/70 font-medium">Earn daily cashbacks, level bonuses & VIP perks</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-theme-gold text-xs"></i>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-[#12100a] h-1.5 rounded-full overflow-hidden border border-[#3d321d] mt-2">
+                        <div class="bg-gradient-to-r from-amber-500 to-yellow-300 h-full rounded-full" style="width: 25%"></div>
+                    </div>
+                </div>
+
+                <!-- 4. SERVICES & ACCOUNT MANAGEMENT MENU (Tiranga List View) -->
+                <div class="bg-[#14151c] rounded-2xl border border-[#232636] shadow-xl overflow-hidden divide-y divide-[#1e2130]">
+                    <!-- Cricket Fantasy My Contests -->
+                    <div onclick="switchView('cricket')" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-amber-950/40 border border-amber-500/25 flex items-center justify-center text-amber-400 text-sm">
+                                <i class="fa-solid fa-baseball-bat-ball"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Cricket Fantasy Arena</span>
+                                <span class="text-[10px] text-gray-500">My Teams, Contests & Live Match Scores</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-500 group-hover:text-theme-gold text-xs transition-colors">
+                            <span class="text-[10px] text-emerald-400 font-bold font-mono">Live</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Promotion / Agency Center -->
+                    <div onclick="switchView('promotion')" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-blue-950/40 border border-blue-500/25 flex items-center justify-center text-blue-400 text-sm">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Promotion & Agency</span>
+                                <span class="text-[10px] text-gray-500">Invite friends & earn lifetime commission</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-theme-gold text-[10px] transition-colors"></i>
+                    </div>
+
+                    <!-- Bank / Payout Binding -->
+                    <div onclick="openWithdrawModal()" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-950/40 border border-emerald-500/25 flex items-center justify-center text-emerald-400 text-sm">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Bank Card & UPI</span>
+                                <span class="text-[10px] text-gray-500">Manage bank accounts for 1-click withdrawals</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-theme-gold text-[10px] transition-colors"></i>
+                    </div>
+
+                    <!-- Activity / Gift Codes -->
+                    <div onclick="switchView('activity')" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-rose-950/40 border border-rose-500/25 flex items-center justify-center text-rose-400 text-sm">
+                                <i class="fa-solid fa-gift"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Gifts & Activity Center</span>
+                                <span class="text-[10px] text-gray-500">Redeem daily bonuses & promotional rewards</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-theme-gold text-[10px] transition-colors"></i>
+                    </div>
+
+                    <!-- Security Center -->
+                    <div onclick="alert('Security Center:\nPassword protected with SHA-256 encryption.\nTo change password, contact Admin or Live Support.')" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-purple-950/40 border border-purple-500/25 flex items-center justify-center text-purple-400 text-sm">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Security Center</span>
+                                <span class="text-[10px] text-gray-500">Account login protection & data encryption</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-theme-gold text-[10px] transition-colors"></i>
+                    </div>
+
+                    <!-- Language Switcher -->
+                    <div onclick="openLanguageSheet()" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-cyan-950/40 border border-cyan-500/25 flex items-center justify-center text-cyan-400 text-sm">
+                                <i class="fa-solid fa-language"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">Language</span>
+                                <span class="text-[10px] text-gray-500">English / हिन्दी</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-400 group-hover:text-theme-gold text-xs transition-colors">
+                            <span class="text-[11px] font-bold" id="currentLang">English</span>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- 24/7 Live Support -->
+                    <div onclick="alert('Customer Service Live Support:\n\nOfficial Telegram: @BKG_Official\n24/7 Instant Deposit & Withdrawal assistance!')" class="flex items-center justify-between p-3.5 hover:bg-[#1a1c26] cursor-pointer transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-yellow-950/40 border border-yellow-500/25 flex items-center justify-center text-yellow-400 text-sm">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-200 block group-hover:text-theme-gold transition-colors">24x7 Customer Service</span>
+                                <span class="text-[10px] text-gray-500">Instant telegram & live chat support</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-theme-gold text-[10px] transition-colors"></i>
+                    </div>
+                </div>
+
+                <!-- 5. SLEEK LOGOUT BUTTON -->
+                <button onclick="logoutUser()" class="w-full bg-[#14151c] hover:bg-red-950/30 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 font-black py-3.5 rounded-2xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-lg text-sm">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                    <span>Log Out</span>
+                </button>
+
+                <!-- Version & Copyright Footer -->
+                <div class="text-center pt-2 pb-6">
+                    <p class="text-[10px] text-gray-600 font-mono tracking-wider font-bold">BIG KING CLUB v2.6 • Fair Play Guaranteed</p>
+                </div>
             </div>
         </div>
 
@@ -1114,6 +1365,556 @@
             </div>
         </div>
 
+        <!-- ================= CRICKET FANTASY TAB (DREAM11 STYLE) ================= -->
+        <div id="view-cricket" class="view-section">
+            <div class="w-full bg-[#0a0b10] text-white min-h-[100vh] flex flex-col font-sans select-none pb-16">
+                
+                <!-- Cricket Main Header (Sticky) -->
+                <div class="bg-[#10121a] border-b border-[#1f2230] px-3.5 py-3 flex items-center justify-between sticky top-0 z-40 shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="handleCricketBack()" class="w-8 h-8 rounded-full bg-[#181a24] hover:bg-[#222535] border border-[#2b2e40] flex items-center justify-center text-gray-300 hover:text-white transition-colors">
+                            <i class="fa-solid fa-angle-left text-lg"></i>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🏏</span>
+                            <div>
+                                <h2 class="text-sm font-black tracking-wide text-white" id="cricHeaderTitle">BKG Fantasy Cricket</h2>
+                                <p class="text-[10px] text-gray-400 font-medium" id="cricHeaderSub">Dream11 Style Real Cash Contests</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="bg-[#0b0c12] border border-[#262838] rounded-full px-3 py-1 flex items-center gap-1.5 shadow-inner">
+                            <i class="fa-solid fa-wallet text-theme-gold text-xs"></i>
+                            <span class="text-xs font-black text-theme-gold user-balance-display">₹0.00</span>
+                        </div>
+                        <button id="cricSoundToggleBtn" onclick="toggleCricketSound()" class="w-8 h-8 rounded-full bg-[#181a24] border border-[#2b2e40] text-yellow-400 hover:text-yellow-300 flex items-center justify-center text-xs transition-colors" title="Toggle Audio SFX">
+                            <i id="cricSoundIcon" class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <button onclick="toggleCricketRulesModal()" class="w-8 h-8 rounded-full bg-[#181a24] border border-[#2b2e40] text-gray-300 hover:text-white flex items-center justify-center text-xs transition-colors" title="Fantasy Rules">
+                            <i class="fa-solid fa-circle-info text-yellow-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 1: MATCHES LOBBY -->
+                <div id="cricLobbyView" class="flex-1 flex flex-col p-3 max-w-md mx-auto w-full">
+                    <!-- Promo Banner -->
+                    <div class="rounded-2xl bg-gradient-to-r from-red-950/80 via-[#181a24] to-amber-950/60 border border-red-500/40 p-4 mb-4 shadow-2xl relative overflow-hidden">
+                        <div class="absolute -right-4 -bottom-4 opacity-15 text-8xl select-none">🏏</div>
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow">Live Fantasy</span>
+                            <span class="text-xs font-bold text-yellow-400">🔥 Mega Contest Open</span>
+                        </div>
+                        <h3 class="text-base font-black text-white leading-tight">Build Your 11-Player Dream Squad</h3>
+                        <p class="text-xs text-gray-300 mt-1">Pick C (2x) &amp; VC (1.5x) • Compete &amp; Win Real Cash Daily!</p>
+                    </div>
+
+                    <!-- Section Title & Filter Pills -->
+                    <div class="flex items-center justify-between mb-2.5 px-1">
+                        <h3 class="text-xs font-black tracking-wider uppercase text-gray-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-trophy text-theme-gold"></i> Fantasy Matches
+                        </h3>
+                        <div class="flex items-center gap-1 bg-[#12141c] p-1 rounded-xl border border-[#212433]">
+                            <button onclick="filterCricLobby('ALL', this)" class="cric-filter-btn px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-theme-gold text-black shadow">All</button>
+                            <button onclick="filterCricLobby('LIVE', this)" class="cric-filter-btn px-2.5 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>Live</button>
+                            <button onclick="filterCricLobby('UPCOMING', this)" class="cric-filter-btn px-2.5 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white">Upcoming</button>
+                        </div>
+                    </div>
+
+                    <!-- Matches List Container -->
+                    <div id="cricMatchesContainer" class="space-y-3">
+                        <div class="p-8 text-center text-gray-400 text-xs">Loading matches...</div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 2: MATCH DETAIL & CONTESTS -->
+                <div id="cricMatchDetailView" class="hidden flex-1 flex flex-col max-w-md mx-auto w-full pb-20">
+                    <!-- High-Tech Live Score Arena (Visible when Match is LIVE) -->
+                    <div id="cricLiveScoreArena" class="hidden bg-gradient-to-r from-red-950/80 via-[#16172e] to-purple-950/80 border-b border-red-500/40 p-3 shadow-xl relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="flex h-2 w-2 relative">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                </span>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-red-400 font-mono">LIVE IN-PLAY</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-gray-300 font-bold" id="cricLiveOverCrr">CRR: 9.15</span>
+                        </div>
+
+                        <!-- Main Scoreboard Numbers -->
+                        <div class="flex items-center justify-between my-1">
+                            <div>
+                                <span class="text-xl font-black text-white font-mono" id="cricLiveTeamScore">IND 148/3</span>
+                                <span class="text-xs text-gray-400 ml-1" id="cricLiveOvers">(16.1 Ov)</span>
+                            </div>
+                            <!-- Ball by Ball Pills -->
+                            <div class="flex items-center gap-1" id="cricRecentBallsContainer">
+                                <!-- Dynamic ball pills -->
+                            </div>
+                        </div>
+
+                        <!-- Live Event Commentary Text -->
+                        <div class="text-[11px] text-yellow-300 font-medium truncate mt-1 flex items-center gap-1 bg-black/40 px-2 py-1 rounded-lg border border-yellow-500/20">
+                            <i class="fa-solid fa-bolt text-yellow-400 text-[10px]"></i>
+                            <span id="cricLiveCommentaryText">Match simulation in progress...</span>
+                        </div>
+
+                        <!-- User Live Points Floating Pill -->
+                        <div id="cricUserLiveStandingPill" class="mt-2 pt-2 border-t border-red-500/20 flex items-center justify-between text-[11px]">
+                            <span class="text-gray-300 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-shirt text-yellow-400"></i> <span id="cricUserLiveTeamName">Team 1</span>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-white font-mono font-black" id="cricUserLivePoints">Points: 0 pts</span>
+                                <span class="bg-yellow-400 text-black px-2 py-0.2 rounded font-black text-[10px]" id="cricUserLiveRank">Rank #1 🥇</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Match Quick Bar -->
+                    <div id="cricMatchBanner" class="bg-gradient-to-b from-[#141622] to-[#0e1017] border-b border-[#212433] p-3 shadow-md">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Match Detail 4 Tabs -->
+                    <div class="grid grid-cols-4 border-b border-[#212433] bg-[#0c0d14] px-1 sticky top-[53px] z-30 text-center">
+                        <button id="cricTabContests" onclick="switchCricDetailTab('contests')" class="py-2.5 text-xs font-black text-theme-gold border-b-2 border-theme-gold">
+                            Contests
+                        </button>
+                        <button id="cricTabLeaderboard" onclick="switchCricDetailTab('leaderboard')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white flex items-center justify-center gap-1">
+                            <span>Leaderboard</span>
+                            <i class="fa-solid fa-trophy text-[10px] text-yellow-400"></i>
+                        </button>
+                        <button id="cricTabMyTeams" onclick="switchCricDetailTab('myteams')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white">
+                            My Teams (<span id="cricMyTeamsCount">0</span>)
+                        </button>
+                        <button id="cricTabMyContests" onclick="switchCricDetailTab('mycontests')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white">
+                            Joined (<span id="cricMyContestsCount">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- Tab Content 1: Contests List -->
+                    <div id="cricTabContentContests" class="p-3 space-y-3">
+                        <!-- Contests List -->
+                    </div>
+
+                    <!-- Tab Content 2: Dynamic Live Leaderboard -->
+                    <div id="cricTabContentLeaderboard" class="p-3 space-y-3 hidden">
+                        <!-- Contest Selector Chips -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="cricLbContestChips">
+                            <!-- Populated with contest buttons -->
+                        </div>
+
+                        <!-- Prize Showcase Card -->
+                        <div class="bg-gradient-to-r from-amber-950/60 via-[#141622] to-yellow-950/60 border border-yellow-500/30 rounded-2xl p-3 shadow-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-black text-white flex items-center gap-1">
+                                    <i class="fa-solid fa-crown text-yellow-400"></i> Prize Pool Ranks
+                                </span>
+                                <span class="text-xs font-mono font-black text-theme-gold" id="cricLbPrizePool">₹10,000</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                                <div class="bg-[#0b0c12] p-2 rounded-xl border border-yellow-500/40">
+                                    <span class="text-[10px] text-gray-400 block font-bold">1st Rank 🥇</span>
+                                    <span class="font-black text-yellow-400 font-mono text-sm" id="cricLb1stPrize">₹2,500</span>
+                                </div>
+                                <div class="bg-[#0b0c12] p-2 rounded-xl border border-slate-500/40">
+                                    <span class="text-[10px] text-gray-400 block font-bold">2nd Rank 🥈</span>
+                                    <span class="font-black text-slate-300 font-mono text-sm" id="cricLb2ndPrize">₹1,000</span>
+                                </div>
+                                <div class="bg-[#0b0c12] p-2 rounded-xl border border-amber-700/40">
+                                    <span class="text-[10px] text-gray-400 block font-bold">3rd Rank 🥉</span>
+                                    <span class="font-black text-amber-500 font-mono text-sm" id="cricLb3rdPrize">₹500</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sticky User Standing Bar -->
+                        <div id="cricLbUserStandingBox" class="hidden bg-gradient-to-r from-emerald-950/80 via-[#12141c] to-[#0a0b10] border-2 border-emerald-500/60 rounded-2xl p-3 shadow-xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-500 text-black font-black text-xs flex items-center justify-center shadow">
+                                        YOU
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-black text-white flex items-center gap-1.5">
+                                            <span id="cricLbUserTeamName">Team 1</span>
+                                            <span class="bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-black border border-emerald-500/30">WINNING ZONE</span>
+                                        </div>
+                                        <div class="text-[10px] text-gray-400" id="cricLbUserCapVc">C: Kohli • VC: Bumrah</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-black text-white font-mono" id="cricLbUserPoints">0 pts</div>
+                                    <div class="text-xs font-black text-yellow-400 font-mono" id="cricLbUserWinning">Won: ₹0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Participants Leaderboard Table -->
+                        <div class="bg-[#12141c] border border-[#212433] rounded-2xl overflow-hidden shadow-lg">
+                            <div class="px-3.5 py-2.5 border-b border-[#1f2230] flex items-center justify-between text-[11px] font-bold text-gray-400 bg-[#0c0d14]">
+                                <span>All Teams (<span id="cricLbTotalTeams">0</span>)</span>
+                                <span>Points &amp; Rank</span>
+                            </div>
+                            <div id="cricLbParticipantsList" class="divide-y divide-[#1c1f2b] text-xs">
+                                <div class="p-8 text-center text-gray-500">Loading live rankings...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content 3: My Teams -->
+                    <div id="cricTabContentMyTeams" class="p-3 space-y-3 hidden">
+                        <!-- User saved teams -->
+                    </div>
+
+                    <!-- Tab Content 4: My Contests -->
+                    <div id="cricTabContentMyContests" class="p-3 space-y-3 hidden">
+                        <!-- User joined entries -->
+                    </div>
+
+                    <!-- Fixed Bottom Actions Bar -->
+                    <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0e1017]/95 backdrop-blur-md border-t border-[#212433] p-2.5 flex items-center gap-2 z-40">
+                        <button onclick="openTeamBuilder()" class="flex-1 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                            <i class="fa-solid fa-shirt text-sm text-yellow-300"></i>
+                            <span id="cricCreateTeamBtnText">CREATE TEAM</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 3: 11-PLAYER DREAM TEAM BUILDER -->
+                <div id="cricTeamBuilderView" class="hidden flex-1 flex flex-col max-w-md mx-auto w-full pb-24">
+                    <!-- Builder Status Header (Luxury Dashboard) -->
+                    <div class="bg-gradient-to-b from-[#161824] via-[#11131c] to-[#0c0d14] border-b border-[#242738] p-3.5 sticky top-[53px] z-30 shadow-lg">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <div>
+                                <span class="text-[9px] text-gray-400 uppercase tracking-widest font-black block mb-1">Max 7 From Single Team</span>
+                                <div class="text-xs font-black text-white flex items-center gap-2">
+                                    <span id="cricTeamACountBadge" class="bg-gradient-to-r from-blue-700 to-indigo-900 text-white px-2.5 py-0.5 rounded-full font-black text-[11px] shadow border border-blue-400/40">IND: 0</span>
+                                    <span id="cricTeamBCountBadge" class="bg-gradient-to-r from-amber-500 to-yellow-600 text-black px-2.5 py-0.5 rounded-full font-black text-[11px] shadow border border-yellow-300/60">AUS: 0</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] text-gray-400 uppercase tracking-widest font-black block mb-1">Credits Budget</span>
+                                <div class="text-sm font-black text-theme-gold font-mono flex items-center justify-end gap-1" id="cricCreditsLeftDisplay">
+                                    <i class="fa-solid fa-coins text-yellow-400 text-xs"></i> 100.0 / 100
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 11 Dots Slots Indicator -->
+                        <div class="flex items-center justify-between gap-1 pt-1.5 border-t border-[#1e2130]">
+                            <div class="flex items-center gap-1.5" id="cricPlayerDotsContainer">
+                                <!-- 11 indicator pills dynamically rendered -->
+                            </div>
+                            <span class="text-xs font-black text-white font-mono bg-[#1a1c28] px-2 py-0.5 rounded-md border border-[#2b2f42]" id="cricPlayerCountDisplay">0/11</span>
+                        </div>
+                    </div>
+
+                    <!-- Role Selector Tabs (WK, BAT, AR, BOWL) -->
+                    <div class="grid grid-cols-4 bg-[#0d0f16] border-b border-[#202332] sticky top-[138px] z-30 text-center shadow-md">
+                        <button id="cricRoleTabWK" onclick="switchCricRole('WK')" class="py-2.5 text-xs font-black text-theme-gold border-b-2 border-theme-gold flex items-center justify-center gap-1">
+                            <span>🧤 WK</span> (<span id="cricCountWK">0</span>)
+                        </button>
+                        <button id="cricRoleTabBAT" onclick="switchCricRole('BAT')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white flex items-center justify-center gap-1">
+                            <span>🏏 BAT</span> (<span id="cricCountBAT">0</span>)
+                        </button>
+                        <button id="cricRoleTabAR" onclick="switchCricRole('AR')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white flex items-center justify-center gap-1">
+                            <span>⚡ AR</span> (<span id="cricCountAR">0</span>)
+                        </button>
+                        <button id="cricRoleTabBOWL" onclick="switchCricRole('BOWL')" class="py-2.5 text-xs font-bold text-gray-400 hover:text-white flex items-center justify-center gap-1">
+                            <span>🎯 BOWL</span> (<span id="cricCountBOWL">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- Role Instructions Bar -->
+                    <div class="bg-[#11131c] px-3.5 py-1.5 text-[11px] text-gray-300 flex items-center justify-between border-b border-[#1c1f2b]">
+                        <span id="cricRoleGuideText" class="flex items-center gap-1 text-amber-300 font-bold">
+                            <i class="fa-solid fa-circle-info text-yellow-400 text-[10px]"></i> Select 1 - 4 Wicketkeepers
+                        </span>
+                        <span class="text-[10px] text-gray-400">Sorted by Points</span>
+                    </div>
+
+                    <!-- Players List Container -->
+                    <div id="cricPlayersListContainer" class="p-2 space-y-2">
+                        <!-- Player cards populated dynamically -->
+                    </div>
+
+                    <!-- Bottom Action Controls Bar -->
+                    <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0d0f17]/95 backdrop-blur-md border-t border-[#222536] p-2.5 flex items-center gap-3 z-40">
+                        <button onclick="openPitchPreviewModal()" class="w-1/3 bg-[#171924] hover:bg-[#202332] text-gray-200 border border-[#2b2f42] font-black py-2.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all">
+                            <i class="fa-solid fa-eye text-emerald-400 text-sm"></i> Preview
+                        </button>
+                        <button id="cricProceedCapVcBtn" onclick="proceedToCapVc()" disabled class="flex-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(250,204,21,0.3)] active:scale-95 transition-all">
+                            <span>NEXT: CHOOSE C &amp; VC</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 4: CAPTAIN & VICE-CAPTAIN SELECTOR -->
+                <div id="cricCapVcView" class="hidden flex-1 flex flex-col max-w-md mx-auto w-full pb-24">
+                    <!-- Explanation banner -->
+                    <div class="bg-gradient-to-b from-[#161824] to-[#0e1017] border-b border-[#222536] p-3.5 text-center shadow-md">
+                        <h3 class="text-xs font-black text-white uppercase tracking-wider mb-1.5">Choose Captain &amp; Vice-Captain</h3>
+                        <div class="flex items-center justify-center gap-4 text-[11px]">
+                            <span class="text-yellow-400 font-black flex items-center gap-1">
+                                <span class="w-5 h-5 rounded-full bg-yellow-400 text-black font-black text-[10px] flex items-center justify-center shadow">C</span> gets 2x Points
+                            </span>
+                            <span class="text-blue-400 font-black flex items-center gap-1">
+                                <span class="w-5 h-5 rounded-full bg-blue-500 text-white font-black text-[10px] flex items-center justify-center shadow">VC</span> gets 1.5x Points
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Selected 11 Players List for C & VC -->
+                    <div id="cricCapVcListContainer" class="p-2 space-y-2">
+                        <!-- 11 chosen players with [C] and [VC] toggle buttons -->
+                    </div>
+
+                    <!-- Bottom Save Team Bar -->
+                    <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0d0f17]/95 backdrop-blur-md border-t border-[#222536] p-2.5 flex items-center gap-3 z-40">
+                        <button onclick="backToTeamBuilder()" class="w-1/3 bg-[#171924] hover:bg-[#202332] text-gray-200 border border-[#2b2f42] font-black py-2.5 px-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all">
+                            <i class="fa-solid fa-arrow-left"></i> Edit 11
+                        </button>
+                        <button id="cricSaveTeamBtn" onclick="submitCricketTeam()" disabled class="flex-1 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 hover:from-emerald-400 hover:to-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-95 transition-all">
+                            <i class="fa-solid fa-floppy-disk text-xs"></i>
+                            <span>SAVE TEAM</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= CRICKET PITCH PREVIEW MODAL (3D VIRTUAL STADIUM) ================= -->
+        <div id="cricPitchModal" class="fixed inset-0 bg-black/90 z-[10006] hidden flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-md">
+            <div class="bg-[#0f1118] border border-[#272b3c] w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-[#171924] to-[#10121a] p-3.5 border-b border-[#222536] flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 text-black font-black flex items-center justify-center text-sm shadow">
+                            <i class="fa-solid fa-stadium"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-xs font-black text-white flex items-center gap-1.5" id="cricPitchModalTitle">
+                                Virtual Pitch Preview
+                            </h3>
+                            <p class="text-[10px] text-gray-400 font-medium">BKG 3D Stadium Field</p>
+                        </div>
+                    </div>
+                    <button onclick="closePitchModal()" class="w-8 h-8 rounded-full bg-[#1b1e2a] hover:bg-[#252a3b] text-gray-300 hover:text-white flex items-center justify-center text-xs transition-colors">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+                <!-- Pitch Ground View (Realistic Turf with Crease Lines & Floodlights) -->
+                <div class="flex-1 overflow-y-auto p-3 relative shadow-inner"
+                     style="background: repeating-linear-gradient(180deg, #124d26, #124d26 28px, #0e3f1f 28px, #0e3f1f 56px);">
+                    <!-- Stadium Ambient Glow & Vignette -->
+                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.12),transparent_70%)] pointer-events-none"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 pointer-events-none"></div>
+                    
+                    <!-- 30 Yard Circle Oval Ring -->
+                    <div class="absolute inset-x-4 inset-y-10 rounded-[100px] border border-white/20 pointer-events-none"></div>
+
+                    <!-- Authentic Tan Clay Pitch Strip in Center -->
+                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-80 rounded border border-amber-900/40 opacity-75 pointer-events-none shadow-2xl flex flex-col justify-between p-1"
+                         style="background: linear-gradient(180deg, #d4b184 0%, #c4a073 50%, #d4b184 100%);">
+                        <!-- Top Batting Crease -->
+                        <div class="w-full border-b-2 border-white/90 h-3 flex items-center justify-center">
+                            <div class="flex gap-1">
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                            </div>
+                        </div>
+                        <!-- Bottom Bowling Crease -->
+                        <div class="w-full border-t-2 border-white/90 h-3 flex items-center justify-center">
+                            <div class="flex gap-1">
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                                <span class="w-0.5 h-2 bg-amber-950"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Pitch Content (Players) -->
+                    <div id="cricPitchContent" class="relative z-10 space-y-4 py-2">
+                        <!-- Populated dynamically with WK, BAT, AR, BOWL -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CRICKET CONTEST JOIN CONFIRMATION MODAL ================= -->
+        <div id="cricJoinModal" class="fixed inset-0 bg-black/85 z-[10006] hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-[#12141c] border border-[#262838] w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl p-4">
+                <div class="flex items-center justify-between pb-3 border-b border-[#212433]">
+                    <h3 class="text-sm font-black text-white flex items-center gap-1.5">
+                        <i class="fa-solid fa-trophy text-theme-gold"></i> Join Contest
+                    </h3>
+                    <button onclick="closeCricketJoinModal()" class="w-6 h-6 rounded-full bg-[#1c1f2b] text-gray-400 hover:text-white flex items-center justify-center text-xs border border-[#2b2f42]">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="py-4 space-y-3">
+                    <div class="bg-[#0b0c12] p-3 rounded-xl border border-[#1f2230]">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider block font-bold">Selected Contest</span>
+                        <h4 class="text-sm font-black text-white" id="cricModalContestTitle">Mega Contest</h4>
+                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-[#1f2230] text-xs">
+                            <span class="text-gray-400">Prize Pool:</span>
+                            <span class="text-theme-gold font-black font-mono" id="cricModalPrizePool">₹10,000</span>
+                        </div>
+                        <div class="flex items-center justify-between mt-1 text-xs">
+                            <span class="text-gray-400">Entry Fee:</span>
+                            <span class="text-emerald-400 font-black font-mono" id="cricModalEntryFee">₹49</span>
+                        </div>
+                    </div>
+
+                    <!-- Team Selector -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">Select Team to Enter:</label>
+                        <select id="cricModalTeamSelect" class="w-full bg-[#0b0c12] border border-[#262838] rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-theme-gold">
+                            <!-- Team options populated -->
+                        </select>
+                    </div>
+
+                    <!-- Wallet Balance Check -->
+                    <div class="flex items-center justify-between bg-[#0b0c12] p-2.5 rounded-xl border border-[#1f2230] text-xs">
+                        <span class="text-gray-400">Wallet Balance:</span>
+                        <span class="text-theme-gold font-black user-balance-display">₹0.00</span>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center gap-2">
+                    <button onclick="closeCricketJoinModal()" class="w-1/3 bg-[#1a1c28] hover:bg-[#252838] text-gray-300 font-bold py-2.5 rounded-xl text-xs border border-[#2b2f42] transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="confirmJoinContest()" class="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-black py-2.5 rounded-xl text-xs shadow-lg active:scale-95 transition-all">
+                        CONFIRM &amp; PAY
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CRICKET RULES & SCORING MODAL ================= -->
+        <div id="cricRulesModal" class="fixed inset-0 bg-black/85 z-[10006] hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-[#12141c] border border-[#262838] w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl p-4 max-h-[85vh] flex flex-col">
+                <div class="flex items-center justify-between pb-3 border-b border-[#212433]">
+                    <h3 class="text-sm font-black text-theme-gold flex items-center gap-1.5">
+                        <i class="fa-solid fa-scroll"></i> Fantasy Cricket Rules
+                    </h3>
+                    <button onclick="toggleCricketRulesModal()" class="w-6 h-6 rounded-full bg-[#1c1f2b] text-gray-400 hover:text-white flex items-center justify-center text-xs border border-[#2b2f42]">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto py-3 space-y-3 text-xs text-gray-300">
+                    <div class="bg-[#0b0c12] p-3 rounded-xl border border-[#1f2230]">
+                        <h4 class="font-black text-white text-xs mb-1">🏏 Team Creation Rules:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-[11px] text-gray-400">
+                            <li>Select exactly <b>11 players</b> within <b>100 credits</b>.</li>
+                            <li>Maximum <b>7 players</b> allowed from a single team.</li>
+                            <li>1 - 4 Wicket-Keepers (WK)</li>
+                            <li>3 - 6 Batters (BAT)</li>
+                            <li>1 - 4 All-Rounders (AR)</li>
+                            <li>3 - 6 Bowlers (BOWL)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-[#0b0c12] p-3 rounded-xl border border-[#1f2230]">
+                        <h4 class="font-black text-white text-xs mb-1">👑 Multiplier Roles:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-[11px] text-gray-400">
+                            <li><b class="text-yellow-400">Captain (C):</b> Gets <b>2x</b> Fantasy Points.</li>
+                            <li><b class="text-blue-400">Vice-Captain (VC):</b> Gets <b>1.5x</b> Fantasy Points.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-[#0b0c12] p-3 rounded-xl border border-[#1f2230]">
+                        <h4 class="font-black text-white text-xs mb-1">⚡ Fantasy Points System:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-[11px] text-gray-400">
+                            <li>Run: <b>+1 pt</b> | Boundary bonus: <b>+1 pt</b></li>
+                            <li>Six bonus: <b>+2 pts</b> | Half-century: <b>+8 pts</b></li>
+                            <li>Wicket: <b>+25 pts</b> | 4-wicket haul: <b>+16 pts</b></li>
+                            <li>Catch: <b>+8 pts</b> | Stumping: <b>+12 pts</b></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button onclick="toggleCricketRulesModal()" class="w-full bg-[#1a1c28] hover:bg-[#252838] text-white font-black py-2.5 rounded-xl text-xs border border-[#2b2f42] transition-colors mt-2">
+                    GOT IT
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= CRICKET WINNER CELEBRATION MODAL ================= -->
+        <div id="cricWinnerModal" class="fixed inset-0 bg-black/90 z-[10008] hidden flex-col items-center justify-center p-4 backdrop-blur-md">
+            <!-- Fullscreen Particle Confetti Canvas -->
+            <canvas id="cricConfettiCanvas" class="absolute inset-0 pointer-events-none z-[10009]"></canvas>
+
+            <div class="relative w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl border border-yellow-500/50 overflow-hidden z-[10010]"
+                 style="background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.25) 0%, rgba(10, 11, 16, 0.98) 70%); box-shadow: 0 0 50px rgba(245, 158, 11, 0.35);">
+                
+                <!-- Ambient Glow Elements -->
+                <div class="absolute -top-16 -left-16 w-36 h-36 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -bottom-16 -right-16 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                <!-- 3D Gold Trophy with Pulsing Halo -->
+                <div class="relative mx-auto mb-3 w-24 h-24 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-yellow-500/40 to-amber-300/10 blur-xl animate-pulse"></div>
+                    <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-b from-[#2e260e] to-[#161208] border-2 border-yellow-400/60 shadow-inner flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform">
+                        <i class="fa-solid fa-trophy text-5xl text-yellow-400 filter drop-shadow-[0_4px_10px_rgba(250,204,21,0.6)]"></i>
+                    </div>
+                    <div class="absolute -top-1 -right-1 bg-gradient-to-r from-red-600 to-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded-full shadow-md uppercase tracking-wider animate-bounce">
+                        WINNER!
+                    </div>
+                </div>
+
+                <!-- Header Title & Sub -->
+                <h2 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 tracking-wide uppercase drop-shadow">
+                    Congratulations!
+                </h2>
+                <p class="text-xs text-gray-300 font-medium mt-1" id="cricWinnerMatchTitle">
+                    India vs Australia • Fantasy Mega Contest
+                </p>
+
+                <!-- Radiant Prize Amount Showcase -->
+                <div class="my-4 py-3 px-4 rounded-2xl bg-[#0b0c12]/90 border border-emerald-500/40 shadow-inner">
+                    <span class="text-[10px] font-bold tracking-widest text-emerald-400 uppercase block">Total Cash Won</span>
+                    <div class="text-3xl font-black font-mono text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-yellow-300 drop-shadow mt-0.5" id="cricWinnerAmount">
+                        +₹2,500
+                    </div>
+                    <div class="text-[10px] text-gray-400 flex items-center justify-center gap-1 mt-1">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i> Auto-credited to your Game Wallet
+                    </div>
+                </div>
+
+                <!-- Match Performance Stats -->
+                <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+                    <div class="bg-[#12141c] p-2.5 rounded-xl border border-[#212433]">
+                        <span class="text-[10px] text-gray-400 block font-bold">Your Rank</span>
+                        <span class="text-sm font-black text-yellow-400 font-mono" id="cricWinnerRank">Rank #1 🥇</span>
+                    </div>
+                    <div class="bg-[#12141c] p-2.5 rounded-xl border border-[#212433]">
+                        <span class="text-[10px] text-gray-400 block font-bold">Total Points</span>
+                        <span class="text-sm font-black text-white font-mono" id="cricWinnerPoints">842.5 Pts</span>
+                    </div>
+                </div>
+
+                <!-- Claim / Action Button -->
+                <button onclick="closeCricketWinnerModal()"
+                        class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-black font-black text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(250,204,21,0.5)] active:scale-98 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>CLAIM &amp; CONTINUE</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
         <!-- ================= FULL SCREEN HISTORY MODAL ================= -->
         <div id="historyModal" class="fixed inset-0 bg-[#121212] z-[200] hidden flex-col transition-transform transform translate-x-full">
             <div class="bg-[#1c1c1c] p-4 flex items-center sticky top-0 z-40 shadow-sm border-b border-[#333]">
@@ -1327,6 +2128,7 @@
 
     <script>
         const socket = io();
+        window.socket = socket;
         
         // --- NAVIGATION ---
         let currentRoom = '30s';
@@ -1410,6 +2212,7 @@
         function handleGameClick(gameId) {
             if (gameId === 'wingo') switchView('wingo');
             else if (gameId === 'aviator') openAviatorGame();
+            else if (gameId === 'cricket') switchView('cricket');
             else showToast('Coming soon!', 'success');
         }
 
@@ -1492,6 +2295,12 @@
                 initAviatorGame();
                 setTimeout(() => initAviatorCanvas(), 60);
                 setTimeout(() => initAviatorCanvas(), 260);
+            } else if (viewId === 'cricket') {
+                if (bottomNav) bottomNav.classList.add('hidden');
+                if (mainContainer) mainContainer.classList.add('game-fullscreen-mode');
+                socket.emit('leave_aviator');
+                stopAviatorAudio();
+                initCricketView();
             } else if (viewId === 'wingo') {
                 if (bottomNav) bottomNav.classList.add('hidden');
                 if (mainContainer) mainContainer.classList.remove('game-fullscreen-mode');
@@ -2369,10 +3178,44 @@
         });
 
         function copyInvite() {
-            const code = document.getElementById('promoInviteCode').innerText;
-            if(code && code !== '------') {
-                navigator.clipboard.writeText(code);
-                alert('Invite Code Copied: ' + code);
+            const promoEl = document.getElementById('promoInviteCode');
+            const code = promoEl ? promoEl.innerText : '';
+            if (code && code !== '------') {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Invite Code Copied: ' + code);
+                }).catch(() => {
+                    alert('Invite Code: ' + code);
+                });
+            } else {
+                // If on account page, fetch or show info
+                const mobile = localStorage.getItem('bkg_mobile');
+                if (mobile) {
+                    alert('Your Invite Link is ready in the Promotion Center!');
+                }
+            }
+        }
+
+        function copyAccountUID() {
+            const el = document.querySelector('.display-uid');
+            if (!el) return;
+            const uid = el.innerText.replace('UID:', '').trim();
+            if (uid && uid !== '---') {
+                navigator.clipboard.writeText(uid).then(() => {
+                    alert('UID Copied: ' + uid);
+                }).catch(() => {
+                    alert('UID: ' + uid);
+                });
+            }
+        }
+
+        function refreshUserBalance(btn) {
+            if (btn) {
+                btn.classList.add('fa-spin');
+                setTimeout(() => btn.classList.remove('fa-spin'), 700);
+            }
+            const mobile = localStorage.getItem('bkg_mobile');
+            if (mobile && socket) {
+                socket.emit('get_profile', { mobile });
             }
         }
         // --- HISTORY & LANGUAGE MODALS ---
@@ -4094,6 +4937,7 @@
             </div>
         </div>
     </div>
+    <script src="/cricket.js?v=5"></script>
 </body>
 </html>
 
